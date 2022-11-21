@@ -64,11 +64,16 @@ module.exports = {
       created_at: {
         allowNull: false,
         type: DataTypes.DATE,
+<<<<<<< HEAD
         defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+=======
+        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
+>>>>>>> c733801 (create seeder for admin)
       },
       updated_at: {
         allowNull: false,
         type: DataTypes.DATE,
+<<<<<<< HEAD
         defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
       },
       deleted_at: {
@@ -77,6 +82,12 @@ module.exports = {
         defaultValue: null,
       },
     });
+=======
+        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
+      }
+    }, 
+  );
+>>>>>>> c733801 (create seeder for admin)
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('users');
