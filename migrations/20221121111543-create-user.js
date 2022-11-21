@@ -3,28 +3,28 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
     await queryInterface.createTable('users', {
-      id:{
+      id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.literal('uuid_generate_v4()')
       },
-      first_name : {
+      first_name: {
         type: DataTypes.STRING,
-        allowNull:false,
-        isAlpha:true
+        allowNull: false,
+        isAlpha: true
       },
       last_name: {
         type: DataTypes.STRING,
-        allowNull:false,
-        isAlpha:true
+        allowNull: false,
+        isAlpha: true
       },
       email: {
         type: DataTypes.STRING,
-        allowNull:false,
-        unique:true,
-        validate:{
-          isEmail:true
+        allowNull: false,
+        unique: true,
+        validate: {
+          isEmail: true
         }
       },
       phone: {
@@ -33,10 +33,10 @@ module.exports = {
         isNumeric: true,
         unique: true
       },
-      user_name:{
+      user_name: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique:true,
+        unique: true,
       },
       password: {
         type: DataTypes.STRING,
@@ -44,20 +44,20 @@ module.exports = {
         isAlphanumeric: true
       },
       token: {
-        type: DataTypes.TEXT ,
+        type: DataTypes.TEXT,
         allowNull: true
       },
       token_expiration: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         allowNull: true
       },
-      is_admin : {
-        type: DataTypes.ENUM(['true','false']) ,
+      is_admin: {
+        type: DataTypes.ENUM(['true', 'false']),
         allowNull: false,
         defaultValue: 'false'
       },
-      is_delete : {
-        type: DataTypes.ENUM(['true','false']) ,
+      is_delete: {
+        type: DataTypes.ENUM(['true', 'false']),
         allowNull: false,
         defaultValue: 'false'
       },
@@ -71,8 +71,8 @@ module.exports = {
         type: DataTypes.DATE,
         defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
       }
-    }, 
-  );
+    },
+    );
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('users');
