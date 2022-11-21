@@ -3,15 +3,9 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Designation extends Model {
     static associate(models) {
-<<<<<<< HEAD
       this.belongsToMany(models.User, {
         through: "user_designation_mapping",
       });
-=======
-      this.hasMany(models.UserDesignationMapping, {
-        foreignKey: 'id'
-      })
->>>>>>> f558473 (association fix)
     }
   }
   Designation.init(

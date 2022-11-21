@@ -3,12 +3,9 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-<<<<<<< HEAD
       this.belongsToMany(models.Designation, {
         through: "user_designation_mapping",
       });
-=======
->>>>>>> fcc3e71 (Create user_role_mapping and user_reportee associations)
       this.belongsToMany(models.Role, { through: 'user_role_mapping' });
 
       this.belongsToMany(models.User, { through: 'user_reportee', as: 'manager_id' });

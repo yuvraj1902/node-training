@@ -2,9 +2,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable("users", {
+    await queryInterface.createTable('users', {
       id: {
-        allowNull: true,
+        allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.fn("uuid_generate_v4"),
@@ -12,30 +12,30 @@ module.exports = {
       first_name: {
         type: DataTypes.STRING,
         allowNull: false,
-        isAlpha: true,
+        isAlpha: true
       },
       last_name: {
         type: DataTypes.STRING,
         allowNull: false,
-        isAlpha: true,
+        isAlpha: true
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
-          isEmail: true,
-        },
+          isEmail: true
+        }
       },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
         isAlphanumeric: true,
       },
-      organization: {
+      user_name: {
         type: DataTypes.STRING,
         allowNull: false,
-        isAlphanumeric: true,
+        unique: true,
       },
       google_id: {
         type: DataTypes.STRING,
@@ -64,30 +64,21 @@ module.exports = {
       created_at: {
         allowNull: false,
         type: DataTypes.DATE,
-<<<<<<< HEAD
         defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
-=======
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
->>>>>>> c733801 (create seeder for admin)
       },
       updated_at: {
         allowNull: false,
         type: DataTypes.DATE,
-<<<<<<< HEAD
+
         defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
       },
       deleted_at: {
         allowNull: true,
         type: DataTypes.DATE,
-        defaultValue: null,
+       
+        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
       },
     });
-=======
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
-      }
-    }, 
-  );
->>>>>>> c733801 (create seeder for admin)
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('users');
