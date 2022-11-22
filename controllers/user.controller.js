@@ -28,12 +28,10 @@ module.exports = {
             // check for correct password
             const match = await bcrypt.compareSync(password, user.password)
             if (!match) {
-                return res.status(401).json({ response: `Wrong email or password` })
+                return res.status(401).json({ response: 'Wrong email or password' })
             }
             // jwt token assignment
-            let jsonToken;
-            if (email) jsonToken = jwt.sign({ email: email }, process.env.secretKey);
-            else jsonToken = jwt.sign({ user_name: user_name }, process.env.secretKey);
+            const jsonToken = jwt.sign({ email: email }, process.env.secretKey);
             const expirationTime = (Date.now() + (1 * 60 * 60 * 1000));
             await models.User.update({ token: jsonToken, token_expiration: expirationTime }, {
                 where: {
