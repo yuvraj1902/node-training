@@ -15,22 +15,22 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
-    first_name : {
+    first_name: {
       type: DataTypes.STRING,
-      allowNull:false,
-      isAlpha:true
+      allowNull: false,
+      isAlpha: true
     },
     last_name: {
       type: DataTypes.STRING,
-      allowNull:false,
-      isAlpha:true
+      allowNull: false,
+      isAlpha: true
     },
     email: {
       type: DataTypes.STRING,
-      allowNull:false,
-      unique:true,
-      validate:{
-        isEmail:true
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true
       }
     },
     password: {
@@ -60,13 +60,14 @@ module.exports = (sequelize, DataTypes) => {
       isAlphanumeric: true
     },
     token: {
-      type: DataTypes.TEXT ,
+      type: DataTypes.TEXT,
       allowNull: true
     },
     token_expiration: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: true
     },
+<<<<<<< HEAD
   }, 
  
   {
@@ -75,5 +76,24 @@ module.exports = (sequelize, DataTypes) => {
     tableName:'users',
     modelName: 'User',
   });
+=======
+    role : {
+      type: DataTypes.ENUM(['CEO','LEAD','EMPLOYEE','INTERN']) ,
+      allowNull: false,
+    },
+    is_delete : {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: '0'
+    },
+  },
+
+    {
+      sequelize,
+      timestamps: false,
+      tableName: 'users',
+      modelName: 'User',
+    });
+>>>>>>> 09024f2 (Resolve conflict by keeping current changes)
   return User;
 };
