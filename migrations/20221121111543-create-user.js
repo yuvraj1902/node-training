@@ -52,7 +52,7 @@ module.exports = {
         allowNull: true
       },
       role : {
-        type: DataTypes.ENUM(['CEO','lead','employee','intern']) ,
+        type: DataTypes.ENUM(['CEO','LEAD','EMPLOYEE','INTERN']) ,
         allowNull: false,
       },
       is_delete : {
