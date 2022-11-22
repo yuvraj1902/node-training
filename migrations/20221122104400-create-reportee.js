@@ -6,7 +6,7 @@ module.exports = {
       id: {
         type:DataTypes.UUID,
         allowNull:false,
-        defaultValue:DataTypes.UUIDV4,
+        defaultValue: DataTypes.literal('uuid_generate_v4()'),
         primaryKey:true
       },
       createdAt: {

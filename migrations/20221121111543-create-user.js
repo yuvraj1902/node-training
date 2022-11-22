@@ -4,10 +4,10 @@ module.exports = {
   async up(queryInterface, DataTypes) {
     await queryInterface.createTable('users', {
       id:{
-          type:DataTypes.UUID,
-          allowNull:false,
-          defaultValue:DataTypes.UUIDV4,
-          primaryKey:true
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.literal('uuid_generate_v4()')
       },
       first_name : {
         type: DataTypes.STRING,
@@ -62,11 +62,13 @@ module.exports = {
       },
       created_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        defaultValue:DataTypes.literal('CURRENT_TIMESTAMP')
       },
       updated_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        defaultValue:DataTypes.literal('CURRENT_TIMESTAMP')
       }
     }, 
   );
