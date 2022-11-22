@@ -67,6 +67,6 @@ module.exports = {
 
         return res
             .status(201)
-            .json({ message: "User created", first_name, last_name, email, phone });
+            .json({ message: "User created" });
     },
 };
