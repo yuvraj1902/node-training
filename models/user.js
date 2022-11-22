@@ -51,15 +51,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: true
     },
-    is_admin : {
-      type: DataTypes.ENUM(['true','false']) ,
+    role : {
+      type: DataTypes.ENUM(['CEO','lead','employee','intern']) ,
       allowNull: false,
-      defaultValue: 'false'
     },
     is_delete : {
-      type: DataTypes.ENUM(['true','false']) ,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 'false'
+      defaultValue: '0'
     },
   }, 
  
