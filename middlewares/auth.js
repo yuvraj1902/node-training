@@ -21,6 +21,7 @@ module.exports = {
               },
             },
           });
+            console.log(payload);
           if (user) {
             req.email = payload.email;
             next();
@@ -35,3 +36,6 @@ module.exports = {
     }
   },
 };
+
+
+
