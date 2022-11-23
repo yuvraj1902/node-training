@@ -18,11 +18,11 @@ module.exports = (sequelize, DataTypes) => {
   }
   Reportee.init({
     reportee_id: {
-      type:DataTypes.INTEGER,
+      type:DataTypes.UUID,
       allowNull:false
     },
     manager_id: {
-      type:DataTypes.INTEGER,
+      type:DataTypes.UUID,
       allowNull:false
     }
   }, {

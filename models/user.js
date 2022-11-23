@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.Reportee,{
       foreignKey:"manager_id"
     })
+      
+      User.hasOne(models.designation_user_mapping, {
+        foreignKey:"user_id"
+      })
     }
   }
   User.init({
@@ -67,7 +71,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BIGINT,
       allowNull: true
     },
-<<<<<<< HEAD
   }, 
  
   {
@@ -76,24 +79,5 @@ module.exports = (sequelize, DataTypes) => {
     tableName:'users',
     modelName: 'User',
   });
-=======
-    role : {
-      type: DataTypes.ENUM(['CEO','LEAD','EMPLOYEE','INTERN']) ,
-      allowNull: false,
-    },
-    is_delete : {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: '0'
-    },
-  },
-
-    {
-      sequelize,
-      timestamps: false,
-      tableName: 'users',
-      modelName: 'User',
-    });
->>>>>>> 09024f2 (Resolve conflict by keeping current changes)
   return User;
 };
