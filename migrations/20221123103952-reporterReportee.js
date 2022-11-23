@@ -1,9 +1,9 @@
 'use strict';
 
-/** @type {import(‘sequelize-cli’).Migration} */
+
 module.exports = {
   async up (queryInterface, DataTypes) {
-   await queryInterface.addColumn("reportees","reporteeId",{
+   await queryInterface.addColumn("reportees","reportee_id",{
       type:DataTypes.UUID,
       references:{
         model:"users",
@@ -12,7 +12,7 @@ module.exports = {
         autoIncrement:true
       }
     })
-    await queryInterface.addColumn("reportees","reporterId",{
+    await queryInterface.addColumn("reportees","manager_id",{
       type:DataTypes.UUID,
       references:{
         model:"users",
@@ -23,7 +23,7 @@ module.exports = {
     })
   },
   async down (queryInterface, DataTypes) {
-    await queryInterface.removeColumn("reportees","reporteeId")
-    await queryInterface.removeColumn("reportees","reporterId")
+    await queryInterface.removeColumn("reportees","reportee_id")
+    await queryInterface.removeColumn("reportees","manager_id")
   }
 };

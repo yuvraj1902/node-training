@@ -27,20 +27,30 @@ module.exports = {
           isEmail:true
         }
       },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        isNumeric: true,
-        unique: true
-      },
-      user_name:{
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique:true,
-      },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
+        isAlphanumeric: true
+      },
+      organization: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        isAlphanumeric: true
+      },
+      google_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique:true,
+        isAlphanumeric: true
+      },
+      image_url: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        isAlphanumeric: true
+      },
+      source: {
+        type: DataTypes.STRING,
+        allowNull: true,
         isAlphanumeric: true
       },
       token: {
@@ -51,22 +61,20 @@ module.exports = {
         type: DataTypes.INTEGER,
         allowNull: true
       },
-      role : {
-        type: DataTypes.ENUM(['CEO','LEAD','EMPLOYEE','INTERN']) ,
-        allowNull: false,
-      },
-      is_delete : {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: '0'
-      },
       created_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        defaultValue:DataTypes.literal('CURRENT_TIMESTAMP')
       },
       updated_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        defaultValue:DataTypes.literal('CURRENT_TIMESTAMP')
+      },
+      deleted_at: {
+        allowNull: true,
+        type: DataTypes.DATE,
+        defaultValue:DataTypes.literal('CURRENT_TIMESTAMP')
       }
     }, 
   );

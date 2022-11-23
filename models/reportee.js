@@ -7,26 +7,27 @@ module.exports = (sequelize, DataTypes) => {
    
     static associate(models) {
       Reportee.belongsTo(models.User,{
-        foreignKey:"reporteeId",
+        foreignKey:"reportee_id",
         targetKey:"id"
       })
       Reportee.belongsTo(models.User,{
-       foreignKey:"reporterId",
+       foreignKey:"manager_id",
         targetKey:"id"
       })
     }
   }
   Reportee.init({
-    reporteeId: {
+    reportee_id: {
       type:DataTypes.INTEGER,
       allowNull:false
     },
-    reporterId: {
+    manager_id: {
       type:DataTypes.INTEGER,
       allowNull:false
     }
   }, {
     sequelize,
+    paranoid:true,
     tableName:'reportees',
     modelName: 'Reportee',
   });

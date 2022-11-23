@@ -6,11 +6,11 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       User.hasMany(models.Reportee,{
-        foreignKey:"reporteeId"
+        foreignKey:"reportee_id"
       })
     
     User.hasMany(models.Reportee,{
-      foreignKey:"reporterId"
+      foreignKey:"manager_id"
     })
     }
   }
@@ -33,20 +33,30 @@ module.exports = (sequelize, DataTypes) => {
         isEmail:true
       }
     },
-    phone: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      isNumeric: true,
-      unique: true
-    },
-    user_name:{
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique:true,
-    },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+      isAlphanumeric: true
+    },
+    organization: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      isAlphanumeric: true
+    },
+    google_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique:true,
+      isAlphanumeric: true
+    },
+    image_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      isAlphanumeric: true
+    },
+    source: {
+      type: DataTypes.STRING,
+      allowNull: true,
       isAlphanumeric: true
     },
     token: {
@@ -57,19 +67,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: true
     },
-    role : {
-      type: DataTypes.ENUM(['CEO','LEAD','EMPLOYEE','INTERN']) ,
-      allowNull: false,
-    },
-    is_delete : {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: '0'
-    },
   }, 
  
   {
     sequelize,
+    paranoid: true,
     tableName:'users',
     modelName: 'User',
   });

@@ -9,17 +9,21 @@ module.exports = {
         defaultValue:DataTypes.UUIDV4,
         primaryKey:true
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: DataTypes.DATE
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
+        type: DataTypes.DATE
+      },
+      deleted_at: {
+        allowNull: true,
         type: DataTypes.DATE
       }
     })
     await queryInterface.addConstraint('reportees',  {
-      fields: ['reporteeId', 'reporterId'],
+      fields: ['reportee_id', 'manager_id'],
       type: 'unique',
       name: 'composite_key_name'
     })
