@@ -51,7 +51,7 @@ module.exports = {
       google_id: {
         type: DataTypes.STRING,
         allowNull: true,
-        unique:true,
+        unique: true,
         isAlphanumeric: true
       },
       image_url: {
@@ -80,12 +80,12 @@ module.exports = {
       updated_at: {
         allowNull: false,
         type: DataTypes.DATE,
-        defaultValue:DataTypes.literal('CURRENT_TIMESTAMP')
+        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
       },
       deleted_at: {
         allowNull: true,
         type: DataTypes.DATE,
-        defaultValue:DataTypes.literal('CURRENT_TIMESTAMP')
+        defaultValue: null
       }
     },
     );

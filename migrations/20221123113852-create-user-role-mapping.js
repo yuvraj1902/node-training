@@ -2,27 +2,20 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('roles', {
+    await queryInterface.createTable('UserRoleMappings', {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.literal('uuid_generate_v4()'),
         allowNull: false,
-        primaryKey: true,
+        primaryKey: true
       },
-      role_key: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+      user_id: {
+        type: DataTypes.UUID,
+        allowNull: false
       },
-      role_code: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-      },
-      role_title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+      role_id: {
+        type: DataTypes.UUID,
+        allowNull: false
       },
       created_at: {
         type: DataTypes.DATE,
@@ -42,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('roles');
+    await queryInterface.dropTable('UserRoleMappings');
   }
 };

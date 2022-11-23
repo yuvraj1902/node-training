@@ -5,13 +5,14 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      User.hasMany(models.Reportee,{
-        foreignKey:"reportee_id"
+      User.hasMany(models.Reportee, {
+        foreignKey: "reportee_id"
       })
-    
-    User.hasMany(models.Reportee,{
-      foreignKey:"manager_id"
-    })
+
+      User.hasMany(models.Reportee, {
+        foreignKey: "manager_id"
+      })
+      this.hasOne(models.userRoleMapping, { foreignKey: user_id })
     }
   }
   User.init({
@@ -57,7 +58,7 @@ module.exports = (sequelize, DataTypes) => {
     google_id: {
       type: DataTypes.STRING,
       allowNull: true,
-      unique:true,
+      unique: true,
       isAlphanumeric: true
     },
     image_url: {
@@ -78,13 +79,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BIGINT,
       allowNull: true
     },
-  }, 
- 
-  {
-    sequelize,
-    paranoid: true,
-    tableName:'users',
-    modelName: 'User',
-  });
+  },
+
+    {
+      sequelize,
+      paranoid: true,
+      tableName: 'users',
+      modelName: 'User',
+    });
   return User;
 };

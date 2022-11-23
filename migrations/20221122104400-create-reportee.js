@@ -19,7 +19,8 @@ module.exports = {
       },
       deleted_at: {
         allowNull: true,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        defaultValue: null
       }
     })
     await queryInterface.addConstraint('reportees',  {
