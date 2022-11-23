@@ -51,11 +51,11 @@ module.exports = {
         type: DataTypes.BIGINT,
         allowNull: true
       },
-      role : {
-        type: DataTypes.ENUM(['CEO','LEAD','EMPLOYEE','INTERN']) ,
+      role: {
+        type: DataTypes.ENUM(['CEO', 'LEAD', 'EMPLOYEE', 'INTERN']),
         allowNull: false,
       },
-      is_delete : {
+      is_delete: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: '0'
@@ -63,12 +63,12 @@ module.exports = {
       created_at: {
         allowNull: false,
         type: DataTypes.DATE,
-        defaultValue:DataTypes.literal('CURRENT_TIMESTAMP')
+        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
       },
       updated_at: {
         allowNull: false,
         type: DataTypes.DATE,
-        defaultValue:DataTypes.literal('CURRENT_TIMESTAMP')
+        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
       }
     },
     );
