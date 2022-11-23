@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       designation_user_mapping.belongsTo(models.designation, {
         foreignKey: "designation_id",
-        targetKey: "id",
+        targetKey: "designation_code",
       });
     }
   }
@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       designation_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
     },

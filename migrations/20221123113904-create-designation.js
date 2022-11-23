@@ -7,10 +7,13 @@ module.exports = {
         type: DataTypes.UUID,
         allowNull: false,
         defaultValue: DataTypes.literal("uuid_generate_v4()"),
-        primaryKey: true,
       },
       designation_titile: {
         type: DataTypes.STRING,
+      },
+      designation_code: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
       },
       created_at: {
         type: DataTypes.DATE,
@@ -26,7 +29,7 @@ module.exports = {
         type: DataTypes.DATE,
         defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
         allowNull: true,
-      }
+      },
     });
   },
   async down(queryInterface, DataTypes) {
