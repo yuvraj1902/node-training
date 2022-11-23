@@ -15,16 +15,15 @@ module.exports = {
           model: "users",
           key: "id",
           allowNull: false,
-          autoIncrement: true,
+          
         },
       },
       designation_id: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         references: {
           model: "designations",
-          key: "id",
+          key: "designation_code",
           allowNull: false,
-          autoIncrement:true
         },
       },
       created_at: {
