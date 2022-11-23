@@ -8,7 +8,7 @@ module.exports = {
                     email: req.email
                 }
             })
-            if (user.is_admin) {
+            if (user.role === "CEO") {
                 next();
             } else {
                 return res.status(403).json({ response: 'Access denied' });
