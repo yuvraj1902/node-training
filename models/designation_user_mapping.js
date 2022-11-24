@@ -8,15 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
-      DesignationUserMapping.belongsTo(models.User, {
-        foreignKey: "user_id",
-        targetKey: "id",
-      });
-      DesignationUserMapping.belongsTo(models.Designation, {
-        foreignKey: "designation_id",
-        targetKey: "designation_code",
-      });
+      
     }
   }
   DesignationUserMapping.init(

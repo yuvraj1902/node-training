@@ -8,14 +8,6 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      UserRoleMapping.belongsTo(models.User, {
-        foreignKey: "user_id",
-        targetKey: "id",
-      });
-      UserRoleMapping.belongsTo(models.Role, {
-        foreignKey: "role_code",
-        targetKey: "role_code",
-      });
     }
   }
   UserRoleMapping.init(

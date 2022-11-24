@@ -6,14 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   class Reportee extends Model {
 
     static associate(models) {
-      Reportee.belongsTo(models.User, {
-        foreignKey: "reportee_id",
-        targetKey: "id"
-      })
-      Reportee.belongsTo(models.User, {
-        foreignKey: "manager_id",
-        targetKey: "id"
-      })
+      
     }
   }
   Reportee.init({
