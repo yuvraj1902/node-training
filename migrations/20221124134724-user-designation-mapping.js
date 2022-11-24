@@ -1,29 +1,16 @@
 "use strict";
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('user_designation_mapping', {
-      id: {
-        allowNull: false,
-        primaryKey: true,
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.literal('uuid_generate_v4()'),
-      },
+    return queryInterface.createTable("user_designation_mapping", {
       user_id: {
         type: DataTypes.UUID,
-        references: {
-          model: 'User',
-          key: 'id',
-          allowNull: false,
-        },
+        primaryKey: true,
       },
       designation_id: {
-        type: DataTypes.INTEGER,
-        references: {
-          model: 'Designations',
-          key: 'designation_code',
-          allowNull: false,
-        },
+        type: DataTypes.UUID,
+        primaryKey: true,
       },
       created_at: {
         type: DataTypes.DATE,
@@ -42,6 +29,7 @@ module.exports = {
       },
     });
   },
+
   async down(queryInterface, DataTypes) {
     await queryInterface.dropTable("user_designation_mapping");
   },
