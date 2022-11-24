@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Reportee, {
         foreignKey: "manager_id"
       })
-      this.hasOne(models.userRoleMapping, { foreignKey: user_id })
+      User.hasOne(models.UserRoleMapping, { foreignKey: "user_id" })
     }
   }
   User.init({

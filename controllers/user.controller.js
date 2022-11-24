@@ -120,4 +120,23 @@ module.exports = {
             return res.status(500).json({ error: `Something went wrong!` });
         }
     },
+    
+    
+    deactivateUser: async (req, res) => {
+        try {
+           
+            let user_id=req.params.id;
+            const existingUser = await models.User.findOne({ where: { id: user_id } });
+            if (!existingUser) return res.status(404).json({ response: `User not found` });
+            const user = await models.User.destroy({
+                where: {
+                  id: user_id
+                }
+              })
+            return res.status(200).json({ response: "User deactivated successfully" });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ error: `Something went wrong!` });
+        }
+    },
 };
