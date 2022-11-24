@@ -13,7 +13,7 @@ module.exports = {
         type: DataTypes.UUID,
         allowNull: false
       },
-      role_id: {
+      role_code: {
         type: DataTypes.UUID,
         allowNull: false
       },
