@@ -8,34 +8,31 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Role.hasMany(models.UserRoleMapping, { foreignKey: "user_id" });
+
     }
   }
-  Role.init(
-    {
-      role_key: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      role_code: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      role_title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
+  Role.init({
+    role_key: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
     },
-    {
-      sequelize,
-      tableName: "roles",
-      modelName: "Role",
-      paranoid: true,
-      timestamps: true,
+    role_code: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    role_title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
     }
-  );
+  }, {
+    sequelize,
+    tableName: 'roles',
+    modelName: 'Role',
+    paranoid: true,
+    timestamps: true
+  });
   return Role;
 };
