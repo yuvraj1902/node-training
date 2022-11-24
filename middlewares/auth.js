@@ -6,8 +6,6 @@ module.exports = {
   checkToken: async (req, res, next) => {
     try {
       let token = req.headers["authorization"];
-      console.log(JSON.parse(
-        Buffer.from(token.split(".")[1], "base64").toString()));
       if (token) {
         var payload = JSON.parse(
           Buffer.from(token.split(".")[1], "base64").toString()
@@ -23,7 +21,6 @@ module.exports = {
             },
           },
         });
-        console.log(user);
         if (user) {
           req.user = payload.email;
           next();
