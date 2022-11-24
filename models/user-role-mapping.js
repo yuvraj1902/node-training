@@ -7,19 +7,18 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate({ User, Role }) {
+      User.belongsToMany(Role, {
+        through: UserRoleMapping,
+      });
+      Role.belongsToMany(User, {
+        through: UserRoleMapping,
+      });
+
     }
   }
   UserRoleMapping.init(
     {
-      user_id: {
-        type: DataTypes.UUID,
-        allowNull: false,
-      },
-      role_code: {
-        type: DataTypes.UUID,
-        allowNull: false,
-      },
     },
     {
       sequelize,

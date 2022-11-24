@@ -5,26 +5,19 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class UserReportee extends Model {
 
-    // static associate(models) {
-    //   Reportee.belongsTo(models.User, {
-    //     foreignKey: "reportee_id",
-    //     targetKey: "id"
-    //   })
-    //   Reportee.belongsTo(models.User, {
-    //     foreignKey: "manager_id",
-    //     targetKey: "id"
-    //   })
-    // }
+    static associate({ User }) {
+      User.belongsToMany(User, {
+        through: UserReportee,
+        as: 'reportee_id'
+      });
+      User.belongsToMany(User, {
+        through: UserReportee,
+        as: 'manager_id'
+      });
+    }
   }
   UserReportee.init({
-    reportee_id: {
-      type: DataTypes.UUID,
-      allowNull: false
-    },
-    manager_id: {
-      type: DataTypes.UUID,
-      allowNull: false
-    }
+
   }, {
     sequelize,
     paranoid: true,

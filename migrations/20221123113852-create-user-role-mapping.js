@@ -11,11 +11,19 @@ module.exports = {
       },
       user_id: {
         type: DataTypes.UUID,
-        allowNull: false,
+        references: {
+          model: 'User',
+          key: 'id',
+          allowNull: false,
+        }
       },
       role_code: {
         type: DataTypes.STRING,
-        allowNull: false,
+        references: {
+          model: 'Role',
+          key: 'role_code',
+          allowNull: false,
+        }
       },
       created_at: {
         type: DataTypes.DATE,

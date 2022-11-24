@@ -29,7 +29,6 @@ module.exports = {
         return res.status(401).json({ response: "Access denied" });
       }
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ error: "Something went wrong!" });
     }
   },

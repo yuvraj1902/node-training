@@ -8,7 +8,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-
+      this.hasMany(models.UserRoleMapping, {
+        foreignKey: 'role_code'
+      })
     }
   }
   Role.init({
@@ -18,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: true
     },
     role_code: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
       unique: true
     },

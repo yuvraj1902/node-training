@@ -43,7 +43,6 @@ module.exports = {
             return res.status(200).json({ token: jsonToken });
 
         } catch (err) {
-            console.log(err);
             return res.status(500).json({ error: `Something went wrong!` });
         }
     },
@@ -53,7 +52,6 @@ module.exports = {
             where: { email: req.body.email },
         });
 
-        console.log({ existingUser });
         if (req.body.throwError) throw 500;
         if (existingUser) {
             return res
@@ -115,7 +113,6 @@ module.exports = {
             })
             return res.status(200).json({ response: users });
         } catch (err) {
-            console.log(err);
             return res.status(500).json({ error: `Something went wrong!` });
         }
     },
@@ -134,7 +131,6 @@ module.exports = {
               })
             return res.status(200).json({ response: "User deactivated successfully" });
         } catch (err) {
-            console.log(err);
             return res.status(500).json({ error: `Something went wrong!` });
         }
     },
