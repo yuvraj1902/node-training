@@ -2,12 +2,20 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('reportees', {
+    await queryInterface.createTable('user_reportee', {
       id: {
         type:DataTypes.UUID,
         allowNull:false,
         defaultValue: DataTypes.literal('uuid_generate_v4()'),
         primaryKey:true
+      },
+      reportee_id: {
+        type:DataTypes.UUID,
+        allowNull:false,
+      },
+      manager_id: {
+        type:DataTypes.UUID,
+        allowNull:false,
       },
       created_at: {
         allowNull: false,
@@ -25,13 +33,13 @@ module.exports = {
         defaultValue: null
       }
     })
-    await queryInterface.addConstraint('reportees',  {
+    await queryInterface.addConstraint('user_reportee',  {
       fields: ['reportee_id', 'manager_id'],
       type: 'unique',
       name: 'composite_key_name'
     })
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('reportees');
+    await queryInterface.dropTable('user_reportee');
   }, 
 };
