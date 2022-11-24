@@ -8,7 +8,7 @@ module.exports = {
         allowNull: false,
         defaultValue: DataTypes.literal("uuid_generate_v4()"),
       },
-      designation_titile: {
+      designation_title: {
         type: DataTypes.STRING,
       },
       designation_code: {
@@ -27,7 +27,7 @@ module.exports = {
       },
       deleted_at: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        defaultValue: null,
         allowNull: true,
       },
     });

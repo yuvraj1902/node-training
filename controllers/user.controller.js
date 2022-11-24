@@ -49,7 +49,6 @@ module.exports = {
     },
 
     createUser: async (req, res) => {
-        console.log(`hello`, req.body.email);
         const existingUser = await models.User.findOne({
             where: { email: req.body.email },
         });
