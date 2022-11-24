@@ -25,7 +25,7 @@ module.exports = {
         });
         console.log(user);
         if (user) {
-          req.email = payload.email;
+          req.user = payload.email;
           next();
         } else return res.status(498).json({ response: "Invalid token" });
       } else {

@@ -1,40 +1,40 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('UserRoleMappings', {
+    await queryInterface.createTable("user_role_mapping", {
       id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.literal('uuid_generate_v4()'),
+        defaultValue: DataTypes.literal("uuid_generate_v4()"),
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
       },
       user_id: {
         type: DataTypes.UUID,
-        allowNull: false
+        allowNull: false,
       },
-      role_id: {
-        type: DataTypes.UUID,
-        allowNull: false
+      role_code: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       created_at: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
-        allowNull: false
+        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        allowNull: false,
       },
       updated_at: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
-        allowNull: false
+        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        allowNull: false,
       },
       deleted_at: {
         type: DataTypes.DATE,
         defaultValue: null,
-        allowNull: true
-      }
+        allowNull: true,
+      },
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('UserRoleMappings');
-  }
+    await queryInterface.dropTable("user_role_mapping");
+  },
 };

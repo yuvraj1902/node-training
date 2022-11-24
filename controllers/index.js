@@ -1,7 +1,7 @@
 const User = require('./user.controller');
-const Roles = require('./role.controller');
+const Rol = require('./role.controller');
 
 module.exports = {
     User,
-    Roles
+    Role
 }

@@ -8,7 +8,7 @@ const models = require("../models");
 module.exports={
 
     createRole: async (req, res) => {
-        const existingRole = await models.Roles.findOne({
+        const existingRole = await models.Role.findOne({
             where: { email: req.body.role_code },
         });
         if (req.body.throwError) throw 500;
@@ -18,7 +18,7 @@ module.exports={
                 .json({ message: `Role already exist` });
         }
         const {role_key,role_code,role_title } = req.body;
-        const user = await models.Roles.create({
+        const user = await models.Role.create({
             role_key: req.body.role_key,
             role_code: req.body.role_code,
             role_title: req.body.role_title,
