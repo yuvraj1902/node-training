@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "manager_id",
       });
 
-      User.hasMany(models.designation_user_mapping, {
+      User.hasMany(models.DesignationUserMapping, {
         foreignKey: "user_id",
       });
     }
