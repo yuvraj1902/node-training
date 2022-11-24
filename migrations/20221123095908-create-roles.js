@@ -36,7 +36,7 @@ module.exports = {
       },
       deleted_at: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
+        defaultValue: null,
         allowNull: true
       }
     });

@@ -5,13 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      User.hasMany(models.Reportee,{
-        foreignKey:"reporteeId"
-      })
-    
-    User.hasMany(models.Reportee,{
-      foreignKey:"reporterId"
-    })
+
     }
   }
   User.init({
@@ -57,11 +51,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BIGINT,
       allowNull: true
     },
-    role : {
-      type: DataTypes.ENUM(['CEO','LEAD','EMPLOYEE','INTERN']) ,
+    role: {
+      type: DataTypes.ENUM(['CEO', 'LEAD', 'EMPLOYEE', 'INTERN']),
       allowNull: false,
     },
-    is_delete : {
+    is_delete: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: '0'
