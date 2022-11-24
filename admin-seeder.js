@@ -69,22 +69,27 @@ const { hash } = require("bcrypt");
           email: result.email,
         },
       });
-      const designation_user_mapping_designationID =
-        await models.DesignationUserMapping.create({
-          designation_code: designation.designation_code,
+      if (userId) {
+        const designation_user_mapping_designationID =
+          await models.DesignationUserMapping.create({
+            designation_id: designation.designation_code,
+            user_id: userId.id,
+          });
+        const role = await models.Role.findOne({
+          where: {
+            role_title: result.role_title,
+          },
+        });
+        const user_role_mapping = await models.UserRoleMapping.create({
+          role_code: role.role_code,
           user_id: userId.id,
         });
-      const role = await models.Role.findOne({
-        where: {
-          role_title: result.role_title,
-        },
-      });
-      const user_role_mapping = await models.UserRoleMapping.create({
-        role_code: role.role_code,
-        user_id: userId.id,
-      });
-
-      console.log(colors.cyan("You are good to go."));
+        console.log(colors.cyan("You are good to go."));
+      } else {
+        console.log(
+          colors.cyan("Sorry there is some issue,Please contact us.")
+        );
+      }
     }
   );
 })();
