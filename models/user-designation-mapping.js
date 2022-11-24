@@ -17,14 +17,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      designation_id: {
+      designation_code: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
     },
     {
       sequelize,
-      tableName: "designation_user_mappings",
+      tableName: "user_designation_mapping",
       modelName: "DesignationUserMapping",
       paranoid: true,
       timestamps: true,

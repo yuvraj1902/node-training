@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable("designation_user_mappings", {
+    await queryInterface.createTable("user_designation_mapping", {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -37,12 +37,12 @@ module.exports = {
       },
       deleted_at: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        defaultValue: null,
         allowNull: true,
       },
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable("designation_user_mappings");
+    await queryInterface.dropTable("user_designation_mapping");
   },
 };

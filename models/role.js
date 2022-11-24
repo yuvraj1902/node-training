@@ -35,8 +35,4 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true
   });
   return Role;
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 9b7b066 (Refactor role model and migration)

@@ -8,14 +8,18 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      
+
     }
   }
   Designation.init(
     {
-      designation_title: DataTypes.STRING,
+      designation_title: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
       designation_code: {
         type: DataTypes.INTEGER,
+        allowNull: false
       },
     },
     {
