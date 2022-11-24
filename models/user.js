@@ -6,6 +6,10 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.Designation, {
         through: "user_designation_mapping",
       });
+      this.belongsToMany(models.Role, { through: 'user_role_mapping' });
+
+      this.belongsToMany(models.User, { through: 'user_reportee', as: 'manager_id' });
+      this.belongsToMany(models.User, { through: 'user_reportee', as: 'reportee_id' });
     }
   }
 
