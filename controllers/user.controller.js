@@ -9,35 +9,36 @@ module.exports = {
     // login API
     loginUser: async (req, res) => {
         try {
-            if (!(req.body.password) || !(req.body.email || req.body.user_name)) {
-                return res.status(400).json({ response: `All filed must required` });
+
+            const { email, password } = req.body;
+
+
+            if (!password || !email) {
+                return res.status(400).json({ response: `Password and Email is required.` });
             }
-            const { email, password, user_name } = req.body;
-            console.log(user_name);
+
             // check for valid request
-            const user = await models.User.findOne({
+            const userWithEmail = await models.User.findOne({
                 where: {
-                    [Op.or]: [{ email: email }, { user_name: user_name }]
+                    email: email
                 }
             });
-            console.log('Hello');
 
-            if (!user) {
-                return res.status(401).json({ response: `Wrong email or password` });
+            if (!userWithEmail) {
+                return res.status(401).json({ response: `Credentials are invalid!` });
             }
             // check for correct password
-            const match = await bcrypt.compareSync(password, user.password)
+            const match = await bcrypt.compareSync(password, userWithEmail.password)
             if (!match) {
                 return res.status(401).json({ response: `Wrong email or password` })
             }
             // jwt token assignment
-            let jsonToken;
-            if (email) jsonToken = jwt.sign({ email: email }, process.env.secretKey);
-            else jsonToken = jwt.sign({ user_name: user_name }, process.env.secretKey);
+            const jsonToken = jwt.sign({ email: email }, process.env.secretKey);
+
             const expirationTime = (Date.now() + (1 * 60 * 60 * 1000));
             await models.User.update({ token: jsonToken, token_expiration: expirationTime }, {
                 where: {
-                    id: user.id
+                    id: userWithEmail.id
                 }
             })
             return res.status(200).json({ token: jsonToken });
