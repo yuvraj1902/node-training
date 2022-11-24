@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      tableName: "DesignationUserMappings",
+      tableName: "designation_user_mappings",
       modelName: "DesignationUserMapping",
       paranoid: true,
       timestamps: true,
