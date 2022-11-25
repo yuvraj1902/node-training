@@ -1,12 +1,46 @@
 const bcrypt = require("bcrypt");
 const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { Op } = require("sequelize");
+// const { Op } = require("sequelize");
 
 const models = require("../models");
 
 module.exports = {
-    registration: async (data, callback) => {
+
+  // Login
+  loginUser: async (data, callback) => {
+    try {
+      const { email, password } = data;
+      const userWithEmail = await models.User.findOne({
+        where: {
+          email: email
+        }
+      });
+
+      if (!userWithEmail) {
+        return callback(401, { message: `Credentials are invalid!` });
+      }
+      // check for correct password
+      const match = await bcrypt.compareSync(password, userWithEmail.password);
+      if (!match) {
+        return callback(401, { message: `Wrong email or password` });
+      }
+
+      // jwt token assignment
+      const jsonToken = jwt.sign({ email: email }, process.env.secretKey);
+      const expirationTime = (Date.now() + (1 * 60 * 60 * 1000));
+      await models.User.update({ token: jsonToken, token_expiration: expirationTime }, {
+        where: {
+          id: userWithEmail.id
+        }
+      })
+      return callback(200, { token: jsonToken });
+    } catch (error) {
+      return callback(500, { message: `Something went wrong!` });
+    }
+  },
+
+  registration: async (data, callback) => {
     try {
       const existingUser = await models.User.findOne({
         where: { email: data.email },
