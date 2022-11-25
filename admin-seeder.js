@@ -70,18 +70,18 @@ const { hash } = require("bcrypt");
         },
       });
       if (userId) {
-        const designation_user_mapping_designationID =
-          await models.DesignationUserMapping.create({
-            designation_id: designation.designation_code,
-            user_id: userId.id,
-          });
+      
+        await models.UserDesignationMapping.create({
+          user_id: userId.id,
+          designation_id: designation.id,
+        });
         const role = await models.Role.findOne({
           where: {
             role_title: result.role_title,
           },
         });
         const user_role_mapping = await models.UserRoleMapping.create({
-          role_code: role.role_code,
+          role_id: role.id,
           user_id: userId.id,
         });
         console.log(colors.cyan("You are good to go."));
