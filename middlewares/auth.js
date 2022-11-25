@@ -7,19 +7,29 @@ module.exports = {
     try {
       let token = req.headers["authorization"];
       if (token) {
-        var payload = JSON.parse(
-          Buffer.from(token.split(".")[1], "base64").toString()
-        );
-
-        let currTime = Date.now();
-        const user = await models.User.findOne({
-          where: {
-            [Op.or]: [{ email: email }, { user_name: user_name }],
-            token: token,
-            token_expiration: {
-              [Op.gte]: currTime,
-            },
-          },
+        jwt.verify(token,process.env.secretKey, async function(err, decoded) {
+            if(err){
+              return res.status(401).json({
+                error:"You are not authorized"
+              })
+            }
+            const user = await models.User.findOne({
+              where: {
+                  email: decoded.email
+              },
+              include:models.Role
+          })
+          if(!user) return res.status(400).json({
+            error:"User not found"
+          })
+         if(user){
+              req.user=user.Roles[0].dataValues;
+              next();
+          }else{
+            return res.status(403).json({
+              error:"Access Denied"
+            })
+          }
         });
         if (user) {
           req.user = payload.email;

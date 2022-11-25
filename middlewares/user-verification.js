@@ -3,12 +3,7 @@ const models = require('../models');
 module.exports = {
     verifyUser: async (req, res, next) => {
         try {
-            const user = await models.User.findOne({
-                where: {
-                    email: req.email
-                }
-            })
-            if (user.role === "CEO") {
+            if(req.user.role_code == 1001){
                 next();
             } else {
                 return res.status(403).json({ response: 'Access denied' });
