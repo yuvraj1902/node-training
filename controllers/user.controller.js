@@ -25,6 +25,14 @@ module.exports = {
             next();
         })
 
+    },
+    deactiveUsers: async (req, res, next) => {
+        deactivateUser(req.params, (statusCode, result) => {
+            req.statusCode = statusCode;
+            req.result = result;
+            next();
+        })
+
     }
 };
 
