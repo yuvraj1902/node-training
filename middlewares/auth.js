@@ -16,8 +16,17 @@ module.exports = {
                   email: decoded.email
               }
           })
-          if(user){
-              req.user=user;
+          if(!user) return res.status(400).json({
+            error:"User not found"
+          })
+          const role=await models.UserRoleMapping.findOne({
+              where:{
+                  user_id:user.id
+              }
+          })
+
+          if(role){
+              req.user=role;
               next();
           }else{
             return res.status(403).json({
