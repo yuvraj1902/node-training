@@ -1,6 +1,6 @@
 const User = require('./user.controller');
 
-const Rol = require('./role.controller');
+const Role = require('./role.controller');
 
 module.exports = {
     User,

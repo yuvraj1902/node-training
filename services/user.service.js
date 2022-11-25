@@ -6,7 +6,7 @@ const { Op } = require("sequelize");
 const models = require("../models");
 
 module.exports = {
-  registration: async (data, callback) => {
+    registration: async (data, callback) => {
     try {
       const existingUser = await models.User.findOne({
         where: { email: data.email },

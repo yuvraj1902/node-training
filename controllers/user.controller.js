@@ -1,13 +1,11 @@
-const {registration}= require("../services/user.service")
+const registration= require("../services/user.service")
 
 module.exports = {
-    // login API
-    
     createUser: async (req, res,next) => {
-
-        registration(req.body, (data, result) => {
-            let value = result;
-            next();
+    registration(req.body, (status_code,result) => {
+            return res.status(status_code).json({
+                message:result
+            })
         })
         
     }
