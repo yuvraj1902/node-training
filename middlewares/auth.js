@@ -14,21 +14,14 @@ module.exports = {
             const user = await models.User.findOne({
               where: {
                   email: decoded.email
-              }
+              },
+              include:models.Role
           })
           if(!user) return res.status(400).json({
             error:"User not found"
           })
-          const role=await models.UserRoleMapping.findOne({
-              where:{
-                  user_id:user.id
-              },
-              include: 'roles'
-          })
-        
-
-          if(role){
-              req.user=role;
+         if(user){
+              req.user=user.Roles[0].dataValues;
               next();
           }else{
             return res.status(403).json({

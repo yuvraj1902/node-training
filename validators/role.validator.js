@@ -2,11 +2,12 @@ const Joi = require('joi')
 
 
 module.exports = {
-    loginSchema: async (req, res, next) => {
+    roleSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
-                email: Joi.string().email().lowercase().required(),
-                password: Joi.string().min(4).required()
+                role_key: Joi.string().uppercase().valid('ADM', 'USR','GST').required(),
+                role_code: Joi.number().min(4).required(),
+                role_title: Joi.string().valid('Admin', 'User',"Guest").required(),
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
