@@ -11,7 +11,6 @@ module.exports = {
                 error:"You are not authorized"
               })
             }
-           
             const user = await models.User.findOne({
               where: {
                   email: decoded.email
