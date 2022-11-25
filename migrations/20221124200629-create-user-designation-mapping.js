@@ -34,7 +34,6 @@ module.exports = {
       },
     });
   },
-
   async down(queryInterface, DataTypes) {
     await queryInterface.dropTable("user_designation_mapping");
   },
