@@ -3,12 +3,13 @@ module.exports = {
         try {
             if (req.user.role_code == 1001) {
                 next();
-            } else {
-                return res.status(403).json({ response: 'Access denied' });
+            }else{
+                return res.status(403).json({
+                    message:"Access Denied"
+                })
             }
         } catch (err) {
             return res.status(500).json({ error: `Something went wrong!` });
         }
-
     }
 }
