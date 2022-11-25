@@ -1,5 +1,5 @@
 const models=require('../models')
-
+const jwt=require('jsonwebtoken')
 module.exports = {
   checkToken: async (req, res, next) => {
     try {
@@ -11,13 +11,23 @@ module.exports = {
                 error:"You are not authorized"
               })
             }
+           
             const user = await models.User.findOne({
               where: {
                   email: decoded.email
               }
           })
-          if(user){
-              req.user=user;
+          if(!user) return res.status(400).json({
+            error:"User not found"
+          })
+          const role=await models.UserRoleMapping.findOne({
+              where:{
+                  user_id:user.id
+              }
+          })
+
+          if(role){
+              req.user=role;
               next();
           }else{
             return res.status(403).json({
