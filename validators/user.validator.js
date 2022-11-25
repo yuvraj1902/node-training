@@ -6,7 +6,7 @@ module.exports = {
         try {
             const checkSchema = Joi.object({
                 email: Joi.string().email().lowercase().required(),
-                password: Joi.string().min(5).required()
+                password: Joi.string().min(5).max(16).required()
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
@@ -17,5 +17,5 @@ module.exports = {
         } catch (error) {
             return res.status(500).json({ message: 'Something went wrong!' });
         }
-    }   
+    }
 }
