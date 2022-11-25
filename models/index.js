@@ -16,14 +16,14 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-var test = sequelize.authenticate()
-  .then(function () {
-    console.log("CONNECTED! ");
-  })
-  .catch(function (err) {
-    console.log(config.database);
-    console.log(err);
-  })
+// var test = sequelize.authenticate()
+//   .then(function () {
+//     console.log("CONNECTED! ");
+//   })
+//   .catch(function (err) {
+//     console.log(config.database);
+//     console.log(err);
+//   })
 
 fs
   .readdirSync(__dirname)
