@@ -1,4 +1,5 @@
 const Joi = require('joi')
+<<<<<<< HEAD
 const passwordComplexity = require("joi-password-complexity");
 
 const complexityOptions = {
@@ -9,13 +10,20 @@ const complexityOptions = {
     numeric: 1,
     symbol: 1
 };
+=======
+
+>>>>>>> 9fd29bc (Create user login API)
 
 module.exports = {
     loginSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
                 email: Joi.string().email().lowercase().required(),
+<<<<<<< HEAD
                 password: Joi.string().min(4).max(16).required()
+=======
+                password: Joi.string().min(5).required()
+>>>>>>> 9fd29bc (Create user login API)
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
@@ -26,6 +34,7 @@ module.exports = {
         } catch (error) {
             return res.status(500).json({ message: 'Something went wrong!' });
         }
+<<<<<<< HEAD
     },
     createUserSchema: async (req, res, next) => {
         try {
@@ -52,4 +61,7 @@ module.exports = {
             return res.status(500).json({ message: "Something went wrong" });
         }
     },
+=======
+    }   
+>>>>>>> 9fd29bc (Create user login API)
 }
