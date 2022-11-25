@@ -11,19 +11,11 @@ module.exports = {
       },
       user_id: {
         type: DataTypes.UUID,
-        references: {
-          model: 'User',
-          key: 'id',
-          allowNull: false,
-        },
+        primaryKey: true,
       },
       designation_id: {
-        type: DataTypes.INTEGER,
-        references: {
-          model: 'Designations',
-          key: 'designation_code',
-          allowNull: false,
-        },
+        type: DataTypes.UUID,
+        primaryKey: true,
       },
       created_at: {
         type: DataTypes.DATE,

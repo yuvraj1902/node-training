@@ -5,15 +5,15 @@ module.exports = {
     await queryInterface.createTable("designations", {
       id: {
         type: DataTypes.UUID,
-        allowNull: false,
-        defaultValue: DataTypes.literal("uuid_generate_v4()"),
+        allowNull: true,
+        primaryKey: true,
+        defaultValue: DataTypes.fn("uuid_generate_v4"),
       },
       designation_title: {
         type: DataTypes.STRING,
       },
       designation_code: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
       },
       created_at: {
         type: DataTypes.DATE,

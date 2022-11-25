@@ -70,8 +70,8 @@ const { hash } = require("bcrypt");
         },
       });
       const designation_user_mapping_designationID =
-        await models.DesignationUserMapping.create({
-          designation_code: designation.designation_code,
+        await models.UserDesignationMapping.create({
+          designation_id: designation.id,
           user_id: userId.id,
         });
       const role = await models.Role.findOne({
@@ -80,7 +80,7 @@ const { hash } = require("bcrypt");
         },
       });
       const user_role_mapping = await models.UserRoleMapping.create({
-        role_code: role.role_code,
+        role_id: role.id,
         user_id: userId.id,
       });
 
