@@ -8,6 +8,7 @@ const router = Router();
 
 router.post("/login", validator.userValidator.loginSchema, controllers.User.loginUsers, genericResponse.sendResponse);
 router.post("/createUser", controllers.User.createUser);
-router.delete("/deactiveUser/:id", checkToken,verifyUser,controllers.User.deactiveUsers,genericResponse.sendResponse);
+router.delete("/deactiveUser/:id", checkToken, verifyUser, controllers.User.deactiveUsers, genericResponse.sendResponse);
+router.post('/addReportee/:id', checkToken, validator.addReporteeValidator.addReporteeSchema, controllers.UserReportee.addReportee, genericResponse.sendResponse);
 
 module.exports = router;
