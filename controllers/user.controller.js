@@ -1,4 +1,4 @@
-const { createUser, loginUser, deactivateUser } = require("../services/user.service");
+const { createUser, loginUser, deactivateUser,userInfo } = require("../services/user.service");
 
 
 module.exports = {
@@ -24,8 +24,14 @@ module.exports = {
             req.result = result;
             next();
         })
-
-    }
+    },
+    getUserInfo: async (req, res, next) => {
+        userInfo(req.email, (statusCode, result) => {
+            req.statusCode = statusCode;
+            req.result = result;
+            next();
+        })
+    },
 };
 
 
