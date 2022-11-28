@@ -72,7 +72,7 @@ module.exports = {
             return res.status(500).json({ message: 'Something went wrong!' });
         }
     },
-   forgetPassword: async (req, res, next) => {
+    forgetPassword: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
                 email: Joi.string().email().lowercase().required(),
@@ -97,10 +97,11 @@ module.exports = {
 
             const result = checkresetPasswordSchema.validate(req.body,req.query);
             if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
-            } else {
-                next();
-            }
+                        return res.status(400).json(result.error.details[0].message);
+                    } else {
+                        next();
+                    }
+
         } catch (error) {
             return res.status(500).json({ message: 'Something went wrong!' });
         }
@@ -135,5 +136,22 @@ module.exports = {
             return res.status(500).json({ message: 'Something went wrong!' });
         }
     },
-}
+            resetUserPasswordSchema: async (req, res, next) => {
+                try {
+                    const checkresetPasswordSchema = Joi.object({
+                        password: passwordComplexity(complexityOptions).required(),
+                        token: Joi.string().required()
+                    });
 
+                    console.log(req.query);
+                    const result = checkresetPasswordSchema.validate(req.body, req.query);
+                    if (result.error) {
+                        return res.status(400).json(result.error.details[0].message);
+                    } else {
+                        next();
+                    }
+                } catch (error) {
+                    return res.status(500).json({ message: "Something went wrong" });
+                }
+            }
+        }
