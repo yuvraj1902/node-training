@@ -49,8 +49,16 @@ module.exports = {
             next();
         })
     },
-};
     
+    getAllUsers: async (req, res, next) => {
+        getAllUsers((statusCode, result) => {
+            req.statusCode = statusCode;
+            req.result = result;
+            next();
+         })
+    }
+}
+
 
 
 

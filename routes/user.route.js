@@ -15,5 +15,5 @@ router.patch("/enableUser", checkToken, verifyUser, validator.userValidator.enab
 router.get("/userDetails", checkToken, verifyUser, validator.userValidator.userDetailsSchema,controllers.User.userDetails, genericResponse.sendResponse);
 router.delete("/deactiveUser/:id", checkToken, verifyUser, controllers.User.deactiveUsers, genericResponse.sendResponse);
 router.post("/forgetpassword", validator.userValidator.forgetPassword, controllers.User.forgetPassword, genericResponse.sendResponse);
-
+router.get("/users",checkToken, verifyUser, controllers.User.getAllUsers, genericResponse.sendResponse);
 module.exports = router;
