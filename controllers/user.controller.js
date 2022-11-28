@@ -2,7 +2,7 @@ const { createUser, loginUser, deactivateUser } = require("../services/user.serv
 
 
 module.exports = {
-<<<<<<< HEAD
+
 
     // login API
     loginUsers: async (req, res, next) => {
@@ -26,20 +26,14 @@ module.exports = {
             next();
         })
 
-    }
-=======
+    },
+
   createUser: async (req, res, next) => {
     createUser(req.body, (data, result) => {
       (req.body = data), (req.statusCode = result);
       next();
     });
   },
-  deleteUser: async (req, res, next) => {
-    deleteUser(req, (data, result) => {
-      
-    });
-  }
->>>>>>> 13f241f (bugfix/create-user-API)
 };
 
 
