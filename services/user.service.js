@@ -8,6 +8,7 @@ const mailer = require("../helper/sendmail");
 const { Op } = require("sequelize");
 
 
+const { sequelize } = require("./models");
 module.exports = {
 
     // Login
@@ -52,6 +53,7 @@ module.exports = {
       if (existingUser) {
         return callback({ message: "User already exists" }, 409);
       }
+       const trans = await sequelize.transaction();
       const {
         first_name,
         last_name,
@@ -69,7 +71,7 @@ module.exports = {
         organization: data.organization,
         google_id: data.google_id,
         source: data.source,
-      });
+      },{transaction:trans});
       const userId = await models.User.findOne({
         where: {
           email: data.email,
@@ -80,12 +82,12 @@ module.exports = {
           where: {
             designation_title: data.designation_title,
           },
-        });
+        },{transaction:trans});
         const designation_user_mapping_designationID =
           await models.UserDesignationMapping.create({
             designation_id: designation.id,
             user_id: userId.id,
-          });
+          },{transaction:trans});
       }
 
       if (data.role_title) {
@@ -93,16 +95,16 @@ module.exports = {
           where: {
             role_title: data.role_title,
           },
-        });
+        },{transaction:trans});
         const user_role_mapping = await models.UserRoleMapping.create({
           role_id: role.id,
           user_id: userId.id,
-        });
+        },{transaction:trans});
       }
-
+      await trans.commit();
       return callback({ message: "User Created" }, 201);
     } catch (error) {
-      console.log(error);
+      await trans.rollback();
       return callback({ error: error }, 500);
     }
   },
