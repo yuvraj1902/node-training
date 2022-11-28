@@ -1,4 +1,4 @@
-const { registration, loginUser,deactivateUser } = require("../services/user.service");
+const { createUser, loginUser, deactivateUser } = require("../services/user.service");
 
 
 module.exports = {
@@ -13,11 +13,10 @@ module.exports = {
     },
 
     createUser: async (req, res, next) => {
-        registration(req.body, (data, result) => {
-            let value = result;
+        createUser(req.body, (data, result) => {
+            (req.body = data), (req.statusCode = result);
             next();
-        })
-
+        });
     },
     deactiveUsers: async (req, res, next) => {
         deactivateUser(req.params, (statusCode, result) => {
