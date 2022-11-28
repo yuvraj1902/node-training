@@ -2,12 +2,11 @@ const Joi = require('joi')
 
 
 module.exports = {
-    createRoleSchema: async (req, res, next) => {
+    createDesignationSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
-                role_key: Joi.string().uppercase().valid('ADM', 'USR').required().label("Role keys must be [ADM,USR] only"),
-                role_code: Joi.number().min(4).required(),
-                role_title: Joi.string().valid('Admin', 'User').required().label("Role title must be [Admin,User] only"),
+                designation_code: Joi.number().integer().valid(101,102,103,104).required().label("Desigantion codes must be [102(LEAD),103(EMPLOYEE),104(INTERN)] only"),
+                designation_title: Joi.string().uppercase().valid('LEAD','EMPLOYEE','INTERN').required().label("Desigantion title must be [LEAD,EMPLOYEE,INTERN] only"),
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
@@ -19,11 +18,11 @@ module.exports = {
             return res.status(500).json({ message: 'Something went wrong!' });
         }
     } ,
-    changeRoleSchema: async (req, res, next) => {
+    changeDesignationSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
                 user_id: Joi.string().required(),
-                role_title: Joi.string().valid("Admin","User").required().label("Role title must be [Admin,User] only"),
+                designation_title: Joi.string().valid("LEAD","EMPLOYEE","INTERN").required().label("Desigantion title must be [LEAD,EMPLOYEE,INTERN] only"),
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
@@ -34,5 +33,5 @@ module.exports = {
         } catch (error) {
             return res.status(500).json({ message: 'Something went wrong!' });
         }
-    }       
+    }     
 }

@@ -6,8 +6,8 @@ const validator = require('../validators');
 const genericResponse = require('../helper/generic-response');
 const router = Router();
 
+router.post("/createDesignation",checkToken,verifyUser,validator.designationValidator.createDesignationSchema,controllers.Designation.createDesignations,genericResponse.sendResponse);
+router.patch("/changeDesignation",checkToken,verifyUser,validator.designationValidator.changeDesignationSchema,controllers.Designation.changeDesignations,genericResponse.sendResponse);
 
-router.post("/createRole",checkToken,verifyUser,validator.roleValidator.createRoleSchema,controllers.Role.createRoles,genericResponse.sendResponse);
-router.patch("/changeRole",checkToken,verifyUser,validator.roleValidator.changeRoleSchema,controllers.Role.changeRoles,genericResponse.sendResponse);
 
 module.exports = router;
