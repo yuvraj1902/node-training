@@ -1,4 +1,4 @@
-const { createUser, loginUser, deactivateUser,enableUser,userDetail } = require("../services/user.service");
+const { createUser, loginUser, deactivateUser,enableUser,userDetail,forgetPassword, getAllUsers  } = require("../services/user.service");
 
 
 module.exports = {
@@ -41,8 +41,16 @@ module.exports = {
             next();
         })
     },
-};
 
+    forgetPassword: async (req, res, next) => {
+        forgetPassword(req.body, (statusCode, result) => {
+            req.statusCode = statusCode;
+            req.result = result;
+            next();
+        })
+    },
+};
+    
 
 
 
