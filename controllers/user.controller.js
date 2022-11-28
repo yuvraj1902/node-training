@@ -51,6 +51,7 @@ module.exports = {
         })
     },
 
+    
     getAllUsers: async (req, res, next) => {
         getAllUsers((statusCode, result) => {
             req.statusCode = statusCode;
@@ -59,7 +60,6 @@ module.exports = {
         })
     }
 };
-
 
 
 
