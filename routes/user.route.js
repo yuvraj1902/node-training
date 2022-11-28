@@ -11,4 +11,5 @@ const genericResponse = require("../helper/generic-response")
 router.post("/login", validator.userValidator.loginSchema, controllers.User.loginUsers, genericResponse.sendResponse);
 router.post("/createUser", checkToken, verifyUser, validator.userValidator.createUserSchema, controllers.User.createUser, genericResponse.sendResponse);
 router.delete("/deactiveUser/:id", checkToken, verifyUser, controllers.User.deactiveUsers, genericResponse.sendResponse);
+router.delete("/resetUserPassword",controllers.User.resetUserPassword, genericResponse.sendResponse);
 module.exports = router;

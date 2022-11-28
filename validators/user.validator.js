@@ -2,8 +2,8 @@ const Joi = require('joi')
 const passwordComplexity = require("joi-password-complexity");
 
 const complexityOptions = {
-    min: 5,
-    max: 250,
+    min: 4,
+    max: 16,
     lowerCase: 1,
     upperCase: 1,
     numeric: 1,
@@ -52,4 +52,22 @@ module.exports = {
             return res.status(500).json({ message: "Something went wrong" });
         }
     },
+    resetUserPasswordSchema: async (req, res, next) => {
+        try {
+            const checkresetPasswordSchema = Joi.object({
+                password: passwordComplexity(complexityOptions).required(),
+                token: Joi.string().required()
+            });
+
+            const result = checkresetPasswordSchema.validate(req.body,req.query);
+            if (result.error) {
+                return res.status(400).json(result.error.details[0].message);
+            } else {
+                next();
+            }
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: "Something went wrong" });
+        }
+    }
 }
