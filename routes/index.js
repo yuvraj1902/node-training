@@ -1,9 +1,8 @@
-const { Router } = require("express");
-const controllers = require("../controllers");
-const { checkToken } = require("../middlewares/auth");
-const router = Router();
-
-router.post("/login", controllers.User.loginUser);
-router.post("/createUser",controllers.User.createUser);
-
-module.exports = router;
+const express = require("express");
+const cors = require("cors");
+const userRoutes = require("./user");
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use("/", userRoutes);
+module.exports = app;
