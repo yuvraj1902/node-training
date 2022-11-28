@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const mailer = require("../helper/sendmail");
 
 const models = require("../models");
 
@@ -120,5 +121,44 @@ module.exports = {
       console.log(err);
       return callback(500, `Something went wrong!`);
     }
-  }
-};
+  },
+
+  forgetPassword: async (data, callback) => {
+    let email = data.email;
+    try {
+      const existingUser = await models.User.findOne({ where: { email: email } });
+      if (!existingUser) { return callback(404, "User not found "); }
+
+      let userEmail = {
+        email: email
+      }
+    
+      let userToken = jwt.sign(userEmail, process.env.secretKey);
+      let token = `http://localhost:3004/resetUserPassword?token=${userToken}`;
+
+      let expirationTime = (Date.now() + (1000 * 60 * 20));
+      const user = await models.User.update(
+        {
+          token_expiration: expirationTime,
+          token:userToken 
+        },
+        { where: { email: email } }
+      );
+
+      let recipient = email;
+      let subject = "Reset Password Link"
+      let body = `Password reset link- ${token}`;
+
+      await mailer.sendMail(body, subject,recipient )
+      return callback(200, "password reset link sent");
+
+    }
+    catch (err) {
+      console.log(err);
+      return callback(500, `Something went wrong!`);
+    }
+  },
+
+}
+
+

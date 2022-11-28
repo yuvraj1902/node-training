@@ -52,4 +52,19 @@ module.exports = {
             return res.status(500).json({ message: "Something went wrong" });
         }
     },
+    forgetPassword: async (req, res, next) => {
+        try {
+            const checkSchema = Joi.object({
+                email: Joi.string().email().lowercase().required(),
+            });
+            const result = checkSchema.validate(req.body);
+            if (result.error) {
+                return res.status(400).json(result.error.details[0].message);
+            } else {
+                next();
+            }
+        } catch (error) {
+            return res.status(500).json({ message: 'Something went wrong!' });
+        }
+    }
 }
