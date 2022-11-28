@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/", userRoutes);
-app.use("/", roleRoutes);
+// app.use("/", roleRoutes);
 app.use("/", userReporteeRoutes);
 
 
