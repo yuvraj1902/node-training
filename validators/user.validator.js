@@ -75,7 +75,7 @@ module.exports = {
     resetPasswordQuerySchema: async (req, res, next) => {
         try {
             const checkresetPasswordSchema = Joi.object({
-                token: Joi.string().required()
+                token: Joi.string().regex(/^.*$/).min(10).max(500).required()
             });
 
             console.log(req.query);
