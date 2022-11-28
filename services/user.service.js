@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const models = require("../models");
 const { sequelize } = require("../models");
 const { lock } = require("../routes/user.route");
+const mailer = require("../helper/sendmail");
+
 
 
 module.exports = {
@@ -50,7 +52,7 @@ module.exports = {
         return callback({ message: "User already exists" }, 409);
       }
       const trans = await sequelize.transaction();
-      const value={
+      const value = {
         first_name,
         last_name,
         email,
@@ -116,7 +118,7 @@ module.exports = {
       await trans.commit();
       if (data.reportee_id) {
         return callback(
-         userId,data.reportee_id
+          userId, data.reportee_id
         );
       } else {
         console.log("out");
@@ -162,12 +164,12 @@ module.exports = {
       for (let i = 0; i < userManagerDetails.length; ++i) {
         const userDetails = await models.User.findOne(
           { where: { id: userManagerDetails[i].dataValues.manager_id } });
-        
+
         const mangerDetails = {
           firstName: userDetails.dataValues.first_name,
           lastName: userDetails.dataValues.last_name,
           email: userDetails.dataValues.email
-        } 
+        }
 
         mangerDetailsArray.push(mangerDetails);
       }
@@ -185,11 +187,57 @@ module.exports = {
       }
 
       console.log(userInfo);
-      
+
       return callback(200, { response: userInfo });
     } catch (err) {
       console.log(err);
       return callback(500, `Something went wrong!`);
-    } 
+    }
+  },
+  resetUserPassword: async (query, data, callback) => {
+    try {
+      const reset_Token = query.token;
+      const password = data.password;
+
+      console.log(reset_Token, password);
+
+      const currentTime = Date.now();
+      console.log(currentTime);
+      const isUserExist = await models.User.findOne({
+        where: {
+          token: reset_Token,
+          token_expiration: { [Op.gt]: currentTime }
+        }
+      });
+
+
+      if (!isUserExist) {
+        return callback(400, { error: "Invalid reset token" });
+      }
+
+      const userEmail = isUserExist.dataValues.email;
+
+      await models.User.update({
+        password: await hash(password, 10),
+        token_expiration: Date.now()
+      }, {
+        where: {
+          email: userEmail
+        }
+      });
+
+
+      const emailBody = `Your password has been reset successfully`;
+      const emailSubject = `Password reset`
+
+
+      await mailer.sendMail(emailBody, emailSubject, userEmail);
+      return callback(200, { response: "Password reset success" });
+
+    } catch (err) {
+      return callback(500, { error: `something went wrong` });
+    }
   }
+
+
 };
