@@ -12,6 +12,7 @@ module.exports = {
         });
     },
 
+  // createUser API
     createUser: async (req, res, next) => {
         createUser(req.body, (data, result) => {
             (req.body = data), (req.statusCode = result);
