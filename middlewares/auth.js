@@ -22,6 +22,7 @@ module.exports = {
           })
           if (user) {
             req.user = user;
+            console.log(user);
             next();
           } else {
             return res.status(403).json({
