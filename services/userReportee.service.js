@@ -28,7 +28,6 @@ const addReportee = async (manager_id, reportee_id, callback) => {
         }
 
     } catch (err) {
-        console.log(err);
         return callback(500, { error: `Something went wrong!` });
     }
 }
@@ -65,9 +64,10 @@ const deleteReportee = async (manager_id, reportee_id, callback) => {
         console.log(err);
         return callback(500, { error: `Something went wrong!` });
     }
-
     
 }
+
+
 
 module.exports = {
     userAddReportee: async (body, user, callback) => {
@@ -84,6 +84,7 @@ module.exports = {
 
     },
 
+    
     userDeleteReportee: async (body, user, callback) => {
         const manager_id = user.dataValues.id;
         const reportee_id = body.reportee_id;
