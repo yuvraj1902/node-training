@@ -57,13 +57,31 @@ module.exports = {
         try {
             const checkresetPasswordSchema = Joi.object({
                 password: passwordComplexity(complexityOptions).required(),
-                token: Joi.string().required()
             });
 
             console.log(req.query);
             const result = checkresetPasswordSchema.validate(req.body,req.query);
             if (result.error) {
                 return res.status(400).json(result.error.details[0].message);
+            } else {
+                next();
+            }
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: "Something went wrong" });
+        }
+    },
+
+    resetPasswordQuerySchema: async (req, res, next) => {
+        try {
+            const checkresetPasswordSchema = Joi.object({
+                token: Joi.string().required()
+            });
+
+            console.log(req.query);
+            const result = checkresetPasswordSchema.validate(req.query);
+            if (result.error) {
+                return res.status(400).json({ error: result.error.details[0].message });
             } else {
                 next();
             }
