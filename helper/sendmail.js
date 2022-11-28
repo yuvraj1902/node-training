@@ -7,7 +7,6 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLEINT_SECRET = process.env.CLEINT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN
-
 const oAuth2Client = new google.auth.OAuth2(
   CLIENT_ID,
   CLEINT_SECRET,
@@ -31,7 +30,6 @@ async function sendMail(body, subject, recipient) {
         accessToken: accessToken,
       },
     });
-
     const mailOptions = {
       from: 'raghvendrakhatri121@gmail.com',
       to: recipient,

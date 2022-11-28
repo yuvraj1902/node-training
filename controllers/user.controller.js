@@ -9,8 +9,6 @@ const loginUser = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        // console.log('-----', error);
-        // console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -67,8 +65,6 @@ const resetPassword = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -87,8 +83,6 @@ const resetPasswordByLink = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -110,8 +104,6 @@ const adminResetPassword = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -125,22 +117,24 @@ const getUserInfo = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
 
 
 const getUserDetail = async (req, res, next) => {
-    const { body } = req;
-    const payload = {
-        user_id: body.user_id
-    };
+    try {
+        const { body } = req;
+        const payload = {
+            user_id: body.user_id
+        };
 
-    const data = await userService.userDetail(payload);
-    res.data = data;
-    next();
+        const data = await userService.userDetail(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
 }
 
 const forgetPassword = async (req, res, next) => {
