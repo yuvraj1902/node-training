@@ -51,6 +51,7 @@ const logoutUser = async (req, res, next) => {
     }
 }
 
+<<<<<<< HEAD
 const resetPassword = async (req, res, next) => {
     try {
         const { body, user, params } = req;
@@ -85,6 +86,24 @@ const resetPasswordByLink = async (req, res, next) => {
     } catch (error) {
         commonErrorHandler(req, res, error.message, 400, error);
     }
+=======
+    forgetPassword: async (req, res, next) => {
+        forgetPassword(req.body, (statusCode, result) => {
+            req.statusCode = statusCode;
+            req.result = result;
+            next();
+        })
+    },
+    
+    getAllUsers: async (req, res, next) => {
+        getAllUsers((statusCode, result) => {
+            req.statusCode = statusCode;
+            req.result = result;
+            next();
+         })
+    }
+    
+>>>>>>> 53e993f (get all users api completed)
 }
 
 
