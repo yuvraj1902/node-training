@@ -333,6 +333,7 @@ const registration = async (payload) => {
 const { Op } = require("sequelize");
 
 
+const { sequelize } = require("./models");
 module.exports = {
   loginUser,
   getAllUsers,
