@@ -60,6 +60,7 @@ module.exports = {
                 token: Joi.string().required()
             });
 
+            console.log(req.query);
             const result = checkresetPasswordSchema.validate(req.body,req.query);
             if (result.error) {
                 return res.status(400).json(result.error.details[0].message);
