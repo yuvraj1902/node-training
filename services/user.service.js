@@ -26,14 +26,11 @@ module.exports = {
       }
 
       // jwt token assignment
-      const jsonToken = jwt.sign({ email: email }, process.env.secretKey);
-      const expirationTime = Date.now() + 1 * 60 * 60 * 1000;
-      await models.User.update(
-        { token: jsonToken, token_expiration: expirationTime },
-        {
-          where: {
-            id: userWithEmail.id,
-          },
+      const jsonToken = jwt.sign({ email: email }, process.env.secretKey, { expiresIn: '1h' });
+      const expirationTime = (Date.now() + (1 * 60 * 60 * 1000));
+      await models.User.update({ token: jsonToken, token_expiration: expirationTime }, {
+        where: {
+          id: userWithEmail.id
         }
       );
       return callback(200, { token: jsonToken });
