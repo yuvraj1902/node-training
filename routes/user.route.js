@@ -14,8 +14,10 @@ router.delete("/deactivateUser", checkToken, verifyUser, validator.userValidator
 router.patch("/enableUser", checkToken, verifyUser, validator.userValidator.enableUserSchema,controllers.User.enableUsers, genericResponse.sendResponse);
 router.get("/userDetails", checkToken, verifyUser, validator.userValidator.userDetailsSchema,controllers.User.userDetails, genericResponse.sendResponse);
 router.delete("/deactiveUser/:id", checkToken, verifyUser, controllers.User.deactiveUsers, genericResponse.sendResponse);
+
 router.post("/forgetpassword", validator.userValidator.forgetPassword, controllers.User.forgetPassword, genericResponse.sendResponse);
 router.get("/users",checkToken, verifyUser, controllers.User.getAllUsers, genericResponse.sendResponse);
+
 router.get("/userInfo", checkToken, controllers.User.getUserInfo, genericResponse.sendResponse);
-router.delete("/resetUserPassword",controllers.User.resetUserPassword, genericResponse.sendResponse);
+router.post("/resetUserPassword",validator.userValidator.resetPasswordQuerySchema,validator.userValidator.resetUserPasswordSchema,controllers.User.resetUserPassword, genericResponse.sendResponse);
 module.exports = router;
