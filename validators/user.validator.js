@@ -20,8 +20,8 @@ module.exports = {
         organization: Joi.string().min(1).required(),
         google_id: Joi.string().min(1).required(),
         source: Joi.string().min(1).required(),
-        role_title: Joi.string().min(1).required(),
-        designation_title: Joi.string().min(1).required(),
+        role_title: Joi.string().min(1),
+        designation_title: Joi.string().min(1),
       });
 
       const result = checkUserSchema.validate(req.body);
@@ -31,7 +31,6 @@ module.exports = {
         next();
       }
     } catch (error) {
-      console.log(error);
       return res.status(500).json({ message: "Something went wrong" });
     }
   },
