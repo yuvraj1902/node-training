@@ -107,7 +107,7 @@ module.exports = {
   deactivateUser: async (data, callback) => {
     try {
 
-      let user_id = data.id;
+      let user_id = data.user_id;
       const existingUser = await models.User.findOne({ where: { id: user_id } });
       if (!existingUser) return callback(404, "User not found ")
       const user = await models.User.destroy({
@@ -116,6 +116,22 @@ module.exports = {
         }
       })
       return callback(202, `User deactivate successfully`);
+    } catch (err) {
+      console.log(err);
+      return callback(500, `Something went wrong!`);
+    }
+  },
+  enableUser: async (data, callback) => {
+    try {
+
+      let user_id = data.user_id;
+      const user = await models.User.restore({
+        where:{
+                id:user_id
+            }
+        })
+        if(!user) return callback(404, "User not found ")
+      return callback(202, `User activated again`);
     } catch (err) {
       console.log(err);
       return callback(500, `Something went wrong!`);
