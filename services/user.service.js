@@ -246,8 +246,18 @@ module.exports = {
       
     } catch (err) {
       console.log(err);
-      return callback(500, {error: "Something went wrong!" });
+      return callback(500, { error: "Something went wrong!" });
     }
+  },
+  userInfo: async (userEmail, callback) => {
+    try {
+      const userDetails = await models.User.findOne({ attributes: { exclude: ['password', 'token', 'token_expiration',""] } },{ where: { email: userEmail } });
+      console.log(userDetails.dataValues);
+      return callback(200, { response: userDetails.dataValues });
+    } catch (err) {
+      console.log(err);
+      return callback(500, `Something went wrong!`);
+    } 
   }
 
 }
