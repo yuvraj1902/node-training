@@ -15,7 +15,7 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-async function sendMail(body,subject,recipient) {
+async function sendMail(body, subject, recipient) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
 
@@ -35,7 +35,7 @@ async function sendMail(body,subject,recipient) {
       from: 'raghvendrakhatri121@gmail.com',
       to: recipient,
       subject: subject,
-      text:body
+      text: body
     };
 
     const result = await transport.sendMail(mailOptions);
@@ -46,4 +46,4 @@ async function sendMail(body,subject,recipient) {
 }
 
 
-module.exports = {sendMail}
+module.exports = { sendMail }

@@ -13,5 +13,7 @@ router.post("/createUser", validator.userValidator.createUserSchema, controllers
 router.post("/registration", validator.userValidator.createUserSchema, controllers.User.registration, genericResponse.sendResponse)
 router.delete("/deactiveUser/:id", checkToken, verifyUser, controllers.User.deactiveUsers, genericResponse.sendResponse);
 router.get("/userInfo", checkToken, controllers.User.getUserInfo, genericResponse.sendResponse);
-router.post("/resetUserPassword", validator.userValidator.resetPasswordQuerySchema, validator.userValidator.resetUserPasswordSchema, controllers.User.resetUserPassword, genericResponse.sendResponse);
+router.post("/resetUserPassword",validator.userValidator.resetPasswordQuerySchema,validator.userValidator.resetUserPasswordSchema,controllers.User.resetUserPassword, genericResponse.sendResponse);
+router.post("/forgetpassword", validator.userValidator.forgetPassword, controllers.User.forgetPassword, genericResponse.sendResponse);
+
 module.exports = router;
