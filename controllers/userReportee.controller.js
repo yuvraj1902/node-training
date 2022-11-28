@@ -31,5 +31,12 @@ module.exports = {
             req.result = result;
             next();
         });
+    },
+    adminAddReportee: async (req, res, next) => {
+        adminAddReportee(req.body, (statusCode, result) => {
+            req.statusCode = statusCode;
+            req.result = result;
+            next();
+        });
     }
 }
