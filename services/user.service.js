@@ -330,6 +330,7 @@ const registration = async (payload) => {
 }
 
 
+const { Op } = require("sequelize");
 
 
 module.exports = {
