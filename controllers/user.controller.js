@@ -38,6 +38,7 @@ module.exports = {
             next();
         })
     },
+
     resetUserPassword: async (req, res, next) => {
         resetUserPassword(req.query, req.body, (statusCode, result) => {
             req.statusCode = statusCode;
@@ -60,3 +61,9 @@ module.exports = {
         })
     }
 };
+
+
+
+
+
+

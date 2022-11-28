@@ -3,7 +3,8 @@ const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mailer = require("../helper/sendmail");
 const models = require("../models");
-const user = require("../models/user");
+
+
 
 module.exports = {
   // Login
@@ -119,7 +120,6 @@ module.exports = {
       if (data.reportee_id) {
         return callback(userId, data.reportee_id);
       } else {
-        console.log("out");
         return callback(data, 201);
       }
     } catch (error) {
@@ -239,4 +239,41 @@ module.exports = {
       return callback(500, { error: "Something went wrong!" });
     }
   },
+
+  resetUserPassword: async (query,data, callback) => {
+    try {
+      const reset_Token = query.token;
+      const password = data.password;
+
+      const isUserExist = await models.User.findOne({
+        where: {
+          [Op.and]: [
+            { token: reset_Token },
+            { [Op.gt]: Date.now() }
+          ]
+        }
+      });
+
+      if (!isUserExist) {
+        return callback(400, "Invalid reset token");
+      }
+
+      await models.User.update({ password: await hash(password, 10) }, {
+        where: {
+          email:isUserExist.dataValues.email
+        }
+      });
+      
+
+      const emailBody = `Your password has been reset successfully`;
+      const emailSubject = `Password reset`
+      await mailer.sendMail(emailBody, emailSubject, isUserExist.dataValues.email);
+      return callback(200,"Password reset success");
+
+    } catch (err) {
+      return callback(500,`something went wrong`);
+    }
+  }
+
+
 };
