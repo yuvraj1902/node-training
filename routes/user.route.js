@@ -15,5 +15,5 @@ router.delete("/deactiveUser/:id", checkToken, verifyUser, controllers.User.deac
 router.get("/userInfo", checkToken, controllers.User.getUserInfo, genericResponse.sendResponse);
 router.post("/resetUserPassword",validator.userValidator.resetPasswordQuerySchema,validator.userValidator.resetUserPasswordSchema,controllers.User.resetUserPassword, genericResponse.sendResponse);
 router.post("/forgetpassword", validator.userValidator.forgetPassword, controllers.User.forgetPassword, genericResponse.sendResponse);
-
+router.get("/users",checkToken, verifyUser, controllers.User.getAllUsers, genericResponse.sendResponse);
 module.exports = router;
