@@ -1,5 +1,5 @@
 const models = require("../models");
-const { userAddReportee, adminAddReportee, userDeleteReportee } = require('../services/userReportee.service');
+const { userAddReportee, adminAddReportee, userDeleteReportee, adminDeleteReportee } = require('../services/userReportee.service');
 
 module.exports = {
 
@@ -20,6 +20,14 @@ module.exports = {
 
     userDeleteReportee: async (req, res, next) => {
         userDeleteReportee(req.body, req.user, (statusCode, result) => {
+            req.statusCode = statusCode;
+            req.result = result;
+            next();
+        });
+    },
+
+    adminDeleteReportee: async (req, res, next) => {
+        adminDeleteReportee(req.body, (statusCode, result) => {
             req.statusCode = statusCode;
             req.result = result;
             next();
