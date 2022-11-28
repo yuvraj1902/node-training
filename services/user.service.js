@@ -7,6 +7,7 @@ const models = require("../models");
 const { Op } = require("sequelize");
 
 
+const { sequelize } = require("./models");
 module.exports = {
   // Login
   loginUser: async (data, callback) => {
