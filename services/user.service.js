@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
 const models = require("../models");
 const { sequelize } = require("../models");
 const { lock } = require("../routes/user.route");
@@ -146,4 +145,15 @@ module.exports = {
       return callback(500, `Something went wrong!`);
     }
   },
+
+  userInfo: async (userEmail, callback) => {
+    try {
+      const userDetails = await models.User.findOne({ attributes: { exclude: ['password', 'token', 'token_expiration',""] } },{ where: { email: userEmail } });
+      console.log(userDetails.dataValues);
+      return callback(200, { response: userDetails.dataValues });
+    } catch (err) {
+      console.log(err);
+      return callback(500, `Something went wrong!`);
+    } 
+  }
 };
