@@ -1,4 +1,4 @@
-const { userAddReportee, adminAddReportee } = require('../services/userReportee.service');
+const { userAddReportee, adminAddReportee, userDeleteReportee } = require('../services/userReportee.service');
 
 module.exports = {
 
@@ -11,6 +11,14 @@ module.exports = {
     },
     adminAddReportee: async (req, res, next) => {
         adminAddReportee(req.body, (statusCode, result) => {
+            req.statusCode = statusCode;
+            req.result = result;
+            next();
+        });
+    },
+
+    userDeleteReportee: async (req, res, next) => {
+        userDeleteReportee(req.body, req.user, (statusCode, result) => {
             req.statusCode = statusCode;
             req.result = result;
             next();
