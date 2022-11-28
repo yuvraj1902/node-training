@@ -44,7 +44,7 @@ module.exports = {
       return callback(500, { message: `Something went wrong!` });
     }
   },
-
+  // User creation API
   createUser: async (data, callback) => {
     try {
       const existingUser = await models.User.findOne({
