@@ -2,6 +2,7 @@
 const { createUser, loginUser, deactivateUser,enableUser,userDetail,forgetPassword, getAllUsers,userInfo ,resetUserPassword } = require("../services/user.service");
 module.exports = {
 
+
     // login API
     loginUsers: async (req, res, next) => {
         loginUser(req.body, (statusCode, result) => {
