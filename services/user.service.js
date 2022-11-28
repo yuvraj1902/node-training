@@ -5,15 +5,14 @@ const jwt = require("jsonwebtoken");
 const models = require("../models");
 const { sequelize } = require("./models");
 module.exports = {
-
   // Login
   loginUser: async (data, callback) => {
     try {
       const { email, password } = data;
       const userWithEmail = await models.User.findOne({
         where: {
-          email: email
-        }
+          email: email,
+        },
       });
 
       if (!userWithEmail) {
@@ -27,28 +26,31 @@ module.exports = {
 
       // jwt token assignment
       const jsonToken = jwt.sign({ email: email }, process.env.secretKey);
-      const expirationTime = (Date.now() + (1 * 60 * 60 * 1000));
-      await models.User.update({ token: jsonToken, token_expiration: expirationTime }, {
-        where: {
-          id: userWithEmail.id
+      const expirationTime = Date.now() + 1 * 60 * 60 * 1000;
+      await models.User.update(
+        { token: jsonToken, token_expiration: expirationTime },
+        {
+          where: {
+            id: userWithEmail.id,
+          },
         }
-      })
+      );
       return callback(200, { token: jsonToken });
     } catch (error) {
       return callback(500, { message: `Something went wrong!` });
     }
   },
-
+  // User creation API
   createUser: async (data, callback) => {
     try {
       const existingUser = await models.User.findOne({
         where: { email: data.email },
       });
-
+      //  checking existing User
       if (existingUser) {
         return callback({ message: "User already exists" }, 409);
       }
-       const trans = await sequelize.transaction();
+      const trans = await sequelize.transaction();
       const {
         first_name,
         last_name,
@@ -58,47 +60,71 @@ module.exports = {
         google_id,
         source,
       } = data;
-      const user = await models.User.create({
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
-        password: await hash(data.password, 10),
-        organization: data.organization,
-        google_id: data.google_id,
-        source: data.source,
-      },{transaction:trans});
+      // user creation
+      const user = await models.User.create(
+        {
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          password: await hash(data.password, 10),
+          organization: data.organization,
+          google_id: data.google_id,
+          source: data.source,
+        },
+        { transaction: trans }
+      );
+      // finding userId
       const userId = await models.User.findOne({
         where: {
           email: data.email,
         },
       });
+      // checking is designation_title from req.body
       if (data.designation_title) {
-        const designation = await models.Designation.findOne({
-          where: {
-            designation_title: data.designation_title,
+        const designation = await models.Designation.findOne(
+          {
+            where: {
+              designation_title: data.designation_title,
+            },
           },
-        },{transaction:trans});
+          { transaction: trans }
+        );
+        // entry in user-designation-mapping
         const designation_user_mapping_designationID =
-          await models.UserDesignationMapping.create({
-            designation_id: designation.id,
-            user_id: userId.id,
-          },{transaction:trans});
+          await models.UserDesignationMapping.create(
+            {
+              designation_id: designation.id,
+              user_id: userId.id,
+            },
+            { transaction: trans }
+          );
       }
-
+      // checking is role_title from req.body
       if (data.role_title) {
-        const role = await models.Role.findOne({
-          where: {
-            role_title: data.role_title,
+        const role = await models.Role.findOne(
+          {
+            where: {
+              role_title: data.role_title,
+            },
           },
-        },{transaction:trans});
-        const user_role_mapping = await models.UserRoleMapping.create({
-          role_id: role.id,
-          user_id: userId.id,
-        },{transaction:trans});
+          { transaction: trans }
+        );
+        // entry in user-role-mapping
+        const user_role_mapping = await models.UserRoleMapping.create(
+          {
+            role_id: role.id,
+            user_id: userId.id,
+          },
+          { transaction: trans }
+        );
       }
+      // transaction commit successfully
       await trans.commit();
-      return callback({ message: "User Created" }, 201);
+      if (data.reportee) { return callback({ user: data }, 201) }
+      else { return callback({ message: "User Created" }, 201); }
     } catch (error) {
+      
+      // rollback transaction if any error
       await trans.rollback();
       return callback({ error: error }, 500);
     }
@@ -106,19 +132,20 @@ module.exports = {
 
   deactivateUser: async (data, callback) => {
     try {
-
       let user_id = data.id;
-      const existingUser = await models.User.findOne({ where: { id: user_id } });
-      if (!existingUser) return callback(404, "User not found ")
+      const existingUser = await models.User.findOne({
+        where: { id: user_id },
+      });
+      if (!existingUser) return callback(404, "User not found ");
       const user = await models.User.destroy({
         where: {
-          id: user_id
-        }
-      })
+          id: user_id,
+        },
+      });
       return callback(202, `User deactivate successfully`);
     } catch (err) {
       console.log(err);
       return callback(500, `Something went wrong!`);
     }
-  }
+  },
 };
