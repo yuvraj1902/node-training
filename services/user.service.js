@@ -259,7 +259,7 @@ module.exports = {
 
 
       if (!isUserExist) {
-        return callback(400, { response: "Invalid reset token" });
+        return callback(400, { error: "Invalid reset token" });
       }
 
       const userEmail = isUserExist.dataValues.email;
