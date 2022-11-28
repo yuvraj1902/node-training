@@ -9,7 +9,7 @@ module.exports = {
           if (err) {
             return res.status(401).json({
               error: "You are not authorized"
-            })
+            });
           }
           const user = await models.User.findOne({
             where: {
@@ -17,7 +17,7 @@ module.exports = {
             },
             include: models.Role
           })
-          if (!user) return res.status(400).json({
+          if (!user) return res.status(404).json({
             error: "User not found"
           })
           if (user) {

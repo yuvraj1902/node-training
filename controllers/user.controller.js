@@ -1,5 +1,5 @@
 
-const { createUser, loginUser, deactivateUser, userInfo, resetUserPassword, forgetPassword, getAllUsers } = require(“../services/user.service”);
+const { createUser, loginUser, deactivateUser, userInfo, resetUserPassword, forgetPassword, getAllUsers } = require("../services/user.service");
 module.exports = {
     // login API
     loginUsers: async (req, res, next) => {
