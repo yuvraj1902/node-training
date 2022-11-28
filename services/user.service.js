@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const mailer = require("../helper/sendmail");
 const models = require("../models");
 
+const { Op } = require("sequelize");
 
 
 module.exports = {
@@ -245,29 +246,39 @@ module.exports = {
       const reset_Token = query.token;
       const password = data.password;
 
+      console.log(reset_Token, password);
+
+      const currentTime = Date.now();
+      console.log(currentTime);
       const isUserExist = await models.User.findOne({
         where: {
-          [Op.and]: [
-            { token: reset_Token },
-            { [Op.gt]: Date.now() }
-          ]
+          token: reset_Token,
+          token_expiration: {[Op.gt]:currentTime}
         }
       });
+
 
       if (!isUserExist) {
         return callback(400, "Invalid reset token");
       }
 
-      await models.User.update({ password: await hash(password, 10) }, {
+      const userEmail = isUserExist.dataValues.email;
+
+      await models.User.update({
+        password: await hash(password, 10),
+        token_expiration: Date.now()
+      }, {
         where: {
-          email:isUserExist.dataValues.email
+          email:userEmail
         }
       });
       
 
       const emailBody = `Your password has been reset successfully`;
       const emailSubject = `Password reset`
-      await mailer.sendMail(emailBody, emailSubject, isUserExist.dataValues.email);
+      
+
+      await mailer.sendMail(emailBody, emailSubject, userEmail);
       return callback(200,"Password reset success");
 
     } catch (err) {
