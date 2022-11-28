@@ -7,9 +7,5 @@ module.exports = {
       next();
     });
   },
-  deleteUser: async (req, res, next) => {
-    deleteUser(req, (data, result) => {
-      
-    });
-  }
+ 
 };
