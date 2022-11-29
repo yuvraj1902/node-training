@@ -137,7 +137,7 @@ module.exports = {
             return callback(500, `Something went wrong!`);
         }
     },
-    userDetail: async (data, callback) => {
+   userDetail: async (data, callback) => {
         try {
             let user_id = data.user_id;
             const user = await models.User.findOne({
@@ -155,15 +155,15 @@ module.exports = {
                 include: models.Role
             })
             if (!user) return callback(400, { error: " User not found" });
-            const reportee = await models.UserReportee.findOne({
+            const reportee = await models.UserReportee.findAll({
                 where: {
                     reportee_id: user_id
                 },
             })
-            if (!reportee) return callback(404, { error: " User not assigned as a reportee yet " })
+            if (!reportee[0]) return callback(404, { error: " User not assigned as a reportee yet " })
             const manager = await models.User.findOne({
                 where: {
-                    id: reportee.manager_id
+                    id: reportee[0].manager_id
                 },
             })
             if (manager) {
@@ -179,13 +179,14 @@ module.exports = {
                         role_title: user2.Roles[0].dataValues.role_title,
                         manager_first_name: manager.first_name,
                         manager_last_name: manager.last_name,
+                        manager_email:manager.email,
                         created_at: user.created_at,
                         updated_at: user.updated_at,
                         deleted_at: user.deleted_at
                     }
                 });
             } else {
-
+                console.log("hello")
             }
         } catch (err) {
             console.log(err);

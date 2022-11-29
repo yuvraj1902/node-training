@@ -3,9 +3,9 @@ module.exports = {
         try {
             if (req.user.Roles[0].dataValues.role_code == 1001) {
                 next();
-            }else{
+            } else {
                 return res.status(403).json({
-                    message:"Access Denied"
+                    message: "Access Denied"
                 })
             }
         } catch (err) {
