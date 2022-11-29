@@ -123,18 +123,20 @@ module.exports = {
   },
 
   forgetPassword: async (data, callback) => {
+
+    let expirationTime = (Date.now() + (60 *1000 *20));
     let email = data.email;
+
     try {
       const existingUser = await models.User.findOne({ where: { email: email } });
       if (!existingUser) { return callback(404, { response: "User not found " }); }
-       
-       let expirationTime = (Date.now());
+    
       let tokenData = {
         email: email,
-        expirationTime: expirationTime
+        expirationtime: Date.now()
       }
     
-      let userToken = jwt.sign(tokenData, process.env.secretKey);
+      let userToken = jwt.sign(JSON.stringify(tokenData), process.env.secretKey);
       let token = `http://localhost:3004/resetUserPassword?token=${userToken}`;
 
      
@@ -163,7 +165,7 @@ module.exports = {
   getAllUsers: async (callback) => {
     try {
       const user = await models.User.findAll({
-        attributes: { exclude: ['password', 'token', 'token_expiration'] },
+        attributes: { exclude: ['password', 'token', 'token_expiration', 'updated_at', 'deleted_at' ] },
       });
       
       return callback(200, { data: user });
