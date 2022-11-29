@@ -4,11 +4,9 @@ const jwt = require("jsonwebtoken");
 const mailer = require("../helper/sendmail");
 const models = require("../models");
 const user = require("../models/user");
-const mailer = require("../helper/sendmail");
 const { Op } = require("sequelize");
 
 const { sequelize } = require("../models");
-const { lock } = require("../routes/user.route");
 module.exports = {
 
     // Login
@@ -63,6 +61,8 @@ module.exports = {
         source,
       } = data;
       // user creation
+
+      console.log('1');
       const user = await models.User.create(
         {
           first_name: data.first_name,
@@ -75,6 +75,8 @@ module.exports = {
         },
         { transaction: trans }
       );
+
+      console.log('2')
       // finding userId
       const userId = user.dataValues.id;
       // checking is designation_title from req.body
@@ -123,7 +125,6 @@ module.exports = {
          userId,data.reportee_id
         );
       } else {
-        console.log("out");
         return callback(data, 201);
       }
     } catch (error) {
@@ -146,7 +147,6 @@ module.exports = {
             })
             return callback(202, `User deactivate successfully`);
         } catch (err) {
-            console.log(err);
             return callback(500, `Something went wrong!`);
         }
     },
@@ -162,7 +162,6 @@ module.exports = {
             if (!user) return callback(404, "User not found ")
             return callback(202, `User activated again`);
         } catch (err) {
-            console.log(err);
             return callback(500, `Something went wrong!`);
         }
     },
@@ -215,20 +214,16 @@ module.exports = {
                     }
                 });
             } else {
-                console.log("hello")
             }
         } catch (err) {
-            console.log(err);
             return callback(500, `Something went wrong!`);
         }
     },
 
 
   forgetPassword: async (data, callback) => {
-
     let expirationTime = (Date.now() + (60 *1000 *20));
     let email = data.email;
-
     try {
       const existingUser = await models.User.findOne({ where: { email: email } });
       if (!existingUser) { return callback(404, { response: "User not found " }); }
@@ -259,7 +254,6 @@ module.exports = {
 
     }
     catch (err) {
-      console.log(err);
       return callback(500, { error: "Something went wrong!" });
     }
   },
@@ -273,19 +267,15 @@ module.exports = {
       return callback(200, { data: user });
       
     } catch (err) {
-      console.log(err);
       return callback(500, { error: "Something went wrong!" });
     }
   },
   userInfo: async (userEmail, callback) => {
     try {
-      console.log(userEmail);
       const userDetails = await models.User.findOne(
         { where: { email: userEmail } });
-      console.log(userDetails.dataValues);
 
       const userManagerDetails = await models.UserReportee.findAll({ where: { reportee_id: userDetails.dataValues.id } });
-      console.log(userManagerDetails);
 
       const mangerDetailsArray = [];
       for (let i = 0; i < userManagerDetails.length; ++i) {
@@ -313,11 +303,9 @@ module.exports = {
         managers: mangerDetailsArray
       }
 
-      console.log(userInfo);
       
       return callback(200, { response: userInfo });
     } catch (err) {
-      console.log(err);
       return callback(500, `Something went wrong!`);
     }
   },
@@ -326,10 +314,8 @@ module.exports = {
       const reset_Token = query.token;
       const password = data.password;
 
-      console.log(reset_Token, password);
 
       const currentTime = Date.now();
-      console.log(currentTime);
       const isUserExist = await models.User.findOne({
         where: {
           token: reset_Token,

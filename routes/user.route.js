@@ -13,10 +13,10 @@ router.post("/createUser", checkToken, verifyUser, validator.userValidator.creat
 router.delete("/deactivateUser", checkToken, verifyUser, validator.userValidator.deactivateUserSchema,controllers.User.deactivateUsers, genericResponse.sendResponse);
 router.patch("/enableUser", checkToken, verifyUser, validator.userValidator.enableUserSchema,controllers.User.enableUsers, genericResponse.sendResponse);
 router.get("/userDetails", checkToken, verifyUser, validator.userValidator.userDetailsSchema,controllers.User.userDetails, genericResponse.sendResponse);
-router.post("/createUser",  validator.userValidator.createUserSchema, controllers.User.createUser, controllers.UserReportee.adminAddReportee, genericResponse.sendResponse);
 router.post("/registration",validator.userValidator.createUserSchema,controllers.User.registration,genericResponse.sendResponse)
-router.delete("/deactiveUser/:id", checkToken, verifyUser, controllers.User.deactiveUsers, genericResponse.sendResponse);
 router.get("/userInfo", checkToken, controllers.User.getUserInfo, genericResponse.sendResponse);
-router.post("/resetUserPassword",validator.userValidator.resetPasswordQuerySchema,validator.userValidator.resetUserPasswordSchema,controllers.User.resetUserPassword, genericResponse.sendResponse);
+router.post("/resetUserPassword", validator.userValidator.resetPasswordQuerySchema, validator.userValidator.resetUserPasswordSchema, controllers.User.resetUserPassword, genericResponse.sendResponse);
+router.post("/forgetpassword", validator.userValidator.forgetPassword, controllers.User.forgetPassword, genericResponse.sendResponse);
+router.get("/users",checkToken, verifyUser, controllers.User.getAllUsers, genericResponse.sendResponse);
 
 module.exports = router;

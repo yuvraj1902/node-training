@@ -41,7 +41,7 @@ const addReportee = async (manager_id, reportee_id, callback) => {
   }
 };
 
-<<<<<<< HEAD
+
 const deleteReportee = async (manager_id, reportee_id, callback) => {
     try {
         // check for valid request
@@ -84,20 +84,13 @@ module.exports = {
 
         return addReportee(manager_id, reportee_id, callback);
     },
-=======
-module.exports = {
-<<<<<<< HEAD
-    // addReportee: async (manager_id, reportee_id, callback) => {
-    //     
-    // },
->>>>>>> 10fea4b (Create addReportee function)
+
 
     adminAddReportee: async (body, callback) => {
         const { manager_id, reportee_id } = body;
 
         return addReportee(manager_id, reportee_id, callback);
 
-<<<<<<< HEAD
     },
 
     userDeleteReportee: async (body, user, callback) => {
@@ -111,17 +104,5 @@ module.exports = {
         const { manager_id, reportee_id } = body;
 
         return deleteReportee(manager_id, reportee_id, callback);
-=======
->>>>>>> 10fea4b (Create addReportee function)
     }
 }
-=======
-    adminAddReportee: async (body, data,callback) => {
-        console.log(data);
-    const manager_id = body;
-    const reportee_id = data;
-
-    return addReportee(manager_id, reportee_id, callback);
-  },
-};
->>>>>>> 92e8ebe (registration-API)

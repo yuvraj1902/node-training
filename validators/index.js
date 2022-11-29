@@ -6,12 +6,6 @@ const reporteeValidator = require('./userReportee.validator');
 module.exports = {
     userValidator,
     roleValidator,
-<<<<<<< HEAD
-    addReporteeValidator,
-    designationValidator
-}
-
-=======
+    designationValidator,
     reporteeValidator
 }
->>>>>>> eaed954 (Create admin and user addReportee API)
