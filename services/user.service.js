@@ -128,10 +128,28 @@ module.exports = {
   userInfo: async (userEmail, callback) => {
     try {
       console.log(userEmail);
-      const userDetails = await models.User.findOne(
-        { where: { email: userEmail } });
-      console.log(userDetails.dataValues);
+      const userDetails = await models.User.findOne({
+        where: { email: userEmail }, include: models.Role
+      });
 
+      // user Roles 
+      const userRolesArray = [];
+      for (let i = 0; i < userDetails.Roles.length; ++i){
+        userRolesArray.push(userDetails.Roles[i].role_title);
+      }
+
+      const userDetailsDesignation = await models.User.findOne({
+        where: { email: userEmail }, include: models.Designation
+      });
+
+
+
+      const userDesignationArray = [];
+      for (let i = 0; i < userDetails.Roles.length; ++i){
+        userDesignationArray.push(userDetailsDesignation.Designations[i].designation_title);
+      }
+
+      // user Manager
       const userManagerDetails = await models.UserReportee.findAll({ where: { reportee_id: userDetails.dataValues.id } });
       console.log(userManagerDetails);
 
@@ -158,6 +176,8 @@ module.exports = {
         google_id: userDetails.dataValues.organization,
         image_url: userDetails.dataValues.image_url,
         source: userDetails.dataValues.source,
+        roles: userRolesArray,
+        designation:userDesignationArray,
         managers: mangerDetailsArray
       }
 
