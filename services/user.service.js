@@ -3,7 +3,8 @@ const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const models = require("../models");
-const { sequelize } = require("./models");
+const { sequelize } = require("../models");
+const { lock } = require("../routes/user.route");
 module.exports = {
   // Login
   loginUser: async (data, callback) => {
@@ -51,11 +52,10 @@ module.exports = {
         return callback({ message: "User already exists" }, 409);
       }
       const trans = await sequelize.transaction();
-      const {
+      const value={
         first_name,
         last_name,
         email,
-        password,
         organization,
         google_id,
         source,
@@ -74,11 +74,7 @@ module.exports = {
         { transaction: trans }
       );
       // finding userId
-      const userId = await models.User.findOne({
-        where: {
-          email: data.email,
-        },
-      });
+      const userId = user.dataValues.id;
       // checking is designation_title from req.body
       if (data.designation_title) {
         const designation = await models.Designation.findOne(
@@ -94,7 +90,7 @@ module.exports = {
           await models.UserDesignationMapping.create(
             {
               designation_id: designation.id,
-              user_id: userId.id,
+              user_id: userId,
             },
             { transaction: trans }
           );
@@ -113,17 +109,22 @@ module.exports = {
         const user_role_mapping = await models.UserRoleMapping.create(
           {
             role_id: role.id,
-            user_id: userId.id,
+            user_id: userId,
           },
           { transaction: trans }
         );
       }
       // transaction commit successfully
       await trans.commit();
-      if (data.reportee) { return callback({ user: data }, 201) }
-      else { return callback({ message: "User Created" }, 201); }
+      if (data.reportee_id) {
+        return callback(
+         userId,data.reportee_id
+        );
+      } else {
+        console.log("out");
+        return callback(data, 201);
+      }
     } catch (error) {
-      
       // rollback transaction if any error
       await trans.rollback();
       return callback({ error: error }, 500);
