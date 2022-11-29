@@ -1,6 +1,6 @@
 module.exports = {
   sendResponse: async (req, res) => {
-    console.log(req);
+    // console.log(req.result);
     return res.status(req.statusCode).json(req.result);
   },
 };

@@ -6,6 +6,7 @@ const models = require("../models");
 const user = require("../models/user");
 const { Op } = require("sequelize");
 const { changeRole } = require("./role.service");
+const { adminAddReportee } = require("./userReportee.service");
 
 const { sequelize } = require("../models");
 module.exports = {
@@ -13,7 +14,7 @@ module.exports = {
     // Login
     loginUser: async (data, callback) => {
         try {
-            const { email, password } = data;
+          const { email, password } = data;
             const userWithEmail = await models.User.findOne({
                 where: {
                     email: email
@@ -24,7 +25,9 @@ module.exports = {
                 return callback(401, { message: `Credentials are invalid!` });
             }
             // check for correct password
-            const match = await bcrypt.compareSync(password, userWithEmail.password);
+          console.log(userWithEmail);
+          const match = await bcrypt.compareSync(password, userWithEmail.dataValues.password);
+          
             if (!match) {
                 return callback(401, { message: `Wrong email or password` });
             }
@@ -39,20 +42,21 @@ module.exports = {
             })
             return callback(200, { token: jsonToken });
         } catch (error) {
+          console.log(error);
             return callback(500, { message: `Something went wrong!` });
         }
     },
 
   createUser: async (data, callback) => {
+      const trans = await sequelize.transaction();
     try {
       const existingUser = await models.User.findOne({
         where: { email: data.email },
       });
       //  checking existing User
       if (existingUser) {
-        return callback({ message: "User already exists" }, 409);
+        return callback( 409,{ message: "User already exists" },);
       }
-      const trans = await sequelize.transaction();
       const value={
         first_name,
         last_name,
@@ -63,7 +67,6 @@ module.exports = {
       } = data;
       // user creation
 
-      console.log('1');
       const user = await models.User.create(
         {
           first_name: data.first_name,
@@ -77,9 +80,16 @@ module.exports = {
         { transaction: trans }
       );
 
-      console.log('2')
+
+      console.log("here");
+
+      if (!user) {
+        await trans.rollback();
+        return callback(500, {error:"Something went wrong"});
+      }
       // finding userId
       const userId = user.dataValues.id;
+
       // checking is designation_title from req.body
       if (data.designation_title) {
         const designation = await models.Designation.findOne(
@@ -90,6 +100,10 @@ module.exports = {
           },
           { transaction: trans }
         );
+        if (!designation) {
+          await trans.rollback();
+          return callback(400,{error:"Invalid Designation"});
+        }
         // entry in user-designation-mapping
         const designation_user_mapping_designationID =
           await models.UserDesignationMapping.create(
@@ -99,6 +113,11 @@ module.exports = {
             },
             { transaction: trans }
           );
+        if (!designation_user_mapping_designationID) {
+          await trans.rollback();
+          return callback(500, {error:"Something went wrong"})
+        }
+          
       }
       // checking is role_title from req.body
       if (data.role_title) {
@@ -110,6 +129,13 @@ module.exports = {
           },
           { transaction: trans }
         );
+
+
+        if (!role) {
+          await trans.rollback();
+          return callback(400,{error:"Invalid Role"});
+
+        }
         // entry in user-role-mapping
         const user_role_mapping = await models.UserRoleMapping.create(
           {
@@ -118,18 +144,26 @@ module.exports = {
           },
           { transaction: trans }
         );
+
+        if (!user_role_mapping) {
+          await trans.rollback();
+          return callback(500,`Something went wrong`);
+        }
       }
       // transaction commit successfully
+      console.log("commiting transaction");
       await trans.commit();
+      console.log("here also");
       if (data.reportee_id) {
-        return addReportee(userId, data.reportee_id, callback);
+        return adminAddReportee({ manager_id:userId, reportee_id:data.reportee_id }, callback);
       } else {
         return callback(201, { response: value });
       }
     } catch (error) {
       // rollback transaction if any error
+      console.log(error.message,"jfgff")
       await trans.rollback();
-      return callback({ error: error }, 500);
+      return callback(500,{ error: error.message });
     }
   },
 

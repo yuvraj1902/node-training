@@ -86,7 +86,7 @@ module.exports = {
     });
   },
   createUser: async (req, res, next) => {
-    createUser(req.body, (statusCode, data) => {
+    createUser(req.body, (statusCode,data) => {
       (req.statusCode = statusCode), (req.result = data);
       next();
     });
