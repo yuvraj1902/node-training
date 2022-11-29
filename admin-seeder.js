@@ -86,7 +86,6 @@ const { hash } = require("bcrypt");
       } catch (error) {
         await t.rollback();
       }
-
     }
   );
 })();
