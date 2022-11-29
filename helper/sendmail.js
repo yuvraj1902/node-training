@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
-const dotenv = require("dotenv").config();
+const dotenv = require('dotenv').config();
 
 
 const CLIENT_ID = process.env.CLIENT_ID;

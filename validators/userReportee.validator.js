@@ -4,11 +4,7 @@ module.exports = {
     userReporteeSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
-<<<<<<< HEAD
-                reportee_id: Joi.string().guid().required()
-=======
                 reportee_id: Joi.string().guid().required(),
->>>>>>> feature/temp
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {

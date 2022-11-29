@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-const bcrypt = require("bcrypt");
-const { hash } = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const mailer = require("../helper/sendmail");
-const models = require("../models");
-const { Op } = require("sequelize");
-
-=======
 const bcrypt = require('bcrypt');
 const { hash } = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -16,7 +7,6 @@ const models = require('../models');
 const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
 const { addReportee } = require('./userReportee.service');
->>>>>>> feature/temp
 
 module.exports = {
   // Login
@@ -39,13 +29,6 @@ module.exports = {
       }
 
       // jwt token assignment
-<<<<<<< HEAD
-      const jsonToken = jwt.sign({ email: email }, process.env.secretKey, { expiresIn: '1h' });
-      const expirationTime = (Date.now() + (1 * 60 * 60 * 1000));
-      await models.User.update({ token: jsonToken, token_expiration: expirationTime }, {
-        where: {
-          id: userWithEmail.id
-=======
       const jsonToken = jwt.sign({ email: email }, process.env.secretKey, {
         expiresIn: "1h",
       });
@@ -56,7 +39,6 @@ module.exports = {
           where: {
             id: userWithEmail.id,
           },
->>>>>>> feature/temp
         }
       );
       return callback(200, { data: { token: jsonToken } });
@@ -175,7 +157,7 @@ module.exports = {
     } catch (error) {
       // rollback transaction if any error
       await trans.rollback();
-      return callback(500, { message: error.message });
+      return callback(500, { message: `Something went wrong!` });
     }
   },
 
@@ -260,7 +242,7 @@ module.exports = {
 
     try {
       const existingUser = await models.User.findOne({ where: { email: email } });
-      if (!existingUser) { return callback(404, { response: "User not found " }); }
+      if (!existingUser) { return callback(404, { message: "User not found " }); }
 
       let tokenData = {
         email: email,
@@ -284,7 +266,7 @@ module.exports = {
       let body = `Password reset link- ${token}`;
 
       await mailer.sendMail(body, subject, recipient)
-      return callback(200, { response: "password reset link sent" });
+      return callback(200, { message: "password reset link sent" });
     } catch (err) {
       return callback(500, { error: "Something went wrong!" });
     }
@@ -337,7 +319,7 @@ module.exports = {
       const emailSubject = `Password reset`;
 
       await mailer.sendMail(emailBody, emailSubject, userEmail);
-      return callback(200, { response: "Password reset success" });
+      return callback(200, { message: "Password reset success" });
     } catch (err) {
       return callback(500, { error: `something went wrong` });
     }
@@ -353,11 +335,6 @@ module.exports = {
           id: user_id
         }
       })
-<<<<<<< HEAD
-      return callback(202, `User deactivate successfully`);
-    } catch (err) {
-      return callback(500, `Something went wrong!`);
-=======
       return callback(202, { message: `User deactivate successfully` });
     } catch (error) {
       return callback(500, { message: `Something went wrong!` });
@@ -442,7 +419,6 @@ module.exports = {
       });
     } catch (error) {
       return callback(500, { message: `Something went wrong!` });
->>>>>>> feature/temp
     }
   },
 
@@ -480,7 +456,7 @@ module.exports = {
       }
 
 
-      return callback(200, { response: userInfo });
+      return callback(200, { message: userInfo });
     } catch (err) {
       return callback(500, `Something went wrong!`);
     }
@@ -492,7 +468,7 @@ module.exports = {
 
     try {
       const existingUser = await models.User.findOne({ where: { email: email } });
-      if (!existingUser) { return callback(404, { response: "User not found " }); }
+      if (!existingUser) { return callback(404, { message: `User not found` }); }
 
       let tokenData = {
         email: email,
@@ -516,11 +492,11 @@ module.exports = {
       let body = `Password reset link- ${token}`;
 
       await mailer.sendMail(body, subject, recipient)
-      return callback(200, { response: "password reset link sent" });
+      return callback(200, { message: `password reset link sent` });
 
     }
     catch (err) {
-      return callback(500, { error: "Something went wrong!" });
+      return callback(500, { message: `Something went wrong!` });
     }
   },
   resetUserPassword: async (query, data, callback) => {
@@ -538,7 +514,7 @@ module.exports = {
 
 
       if (!isUserExist) {
-        return callback(400, { error: "Invalid reset token" });
+        return callback(400, { message: `Invalid reset token` });
       }
 
       const userEmail = isUserExist.dataValues.email;
@@ -558,10 +534,10 @@ module.exports = {
 
 
       await mailer.sendMail(emailBody, emailSubject, userEmail);
-      return callback(200, { response: "Password reset success" });
+      return callback(200, { message: `Password reset success` });
 
     } catch (err) {
-      return callback(500, { error: `something went wrong` });
+      return callback(500, { message: `something went wrong` });
     }
   },
 
@@ -574,7 +550,7 @@ module.exports = {
       return callback(200, { data: user });
 
     } catch (err) {
-      return callback(500, { error: "Something went wrong!" });
+      return callback(500, { message: `Something went wrong!` });
     }
   }
 

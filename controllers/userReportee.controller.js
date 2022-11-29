@@ -3,7 +3,7 @@ const {
     adminAddReportee,
     userDeleteReportee,
     adminDeleteReportee
-} = require("../services/userReportee.service");
+} = require('../services/userReportee.service');
 
 module.exports = {
     userAddReportee: async (req, res, next) => {
@@ -21,24 +21,6 @@ module.exports = {
         });
     },
 
-<<<<<<< HEAD
-    userAddReportee: async (req, res, next) => {
-        userAddReportee(req.body, req.user, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        });
-    },
-    adminAddReportee: async (req, res, next) => {
-        adminAddReportee(req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        });
-    },
-
-=======
->>>>>>> feature/temp
     userDeleteReportee: async (req, res, next) => {
         userDeleteReportee(req.body, req.user, (statusCode, result) => {
             req.statusCode = statusCode;
