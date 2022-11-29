@@ -18,7 +18,7 @@ module.exports = {
             });
 
             if (!userWithEmail) {
-                return callback(401, { message: `Credentials are invalid!` });
+                return callback(401, { message: `User not found !` });
             }
             // check for correct password
             const match = await bcrypt.compareSync(password, userWithEmail.password);
@@ -110,16 +110,16 @@ module.exports = {
 
             let user_id = data.user_id;
             const existingUser = await models.User.findOne({ where: { id: user_id } });
-            if (!existingUser) return callback(404, "User not found ")
+            if (!existingUser) return callback(404, { error: "User not found " })
             const user = await models.User.destroy({
                 where: {
                     id: user_id
                 }
             })
-            return callback(202, `User deactivate successfully`);
+            return callback(202, { message: `User deactivate successfully` });
         } catch (err) {
             console.log(err);
-            return callback(500, `Something went wrong!`);
+            return callback(500, { error: `Something went wrong!` });
         }
     },
     enableUser: async (data, callback) => {
@@ -131,11 +131,11 @@ module.exports = {
                     id: user_id
                 }
             })
-            if (!user) return callback(404, "User not found ")
-            return callback(202, `User activated again`);
+            if (!user) return callback(404, { error: "User not found " })
+            return callback(202, { message: `User activated successfully` });
         } catch (err) {
             console.log(err);
-            return callback(500, `Something went wrong!`);
+            return callback(500, { error: `Something went wrong!` });
         }
     },
     userDetail: async (data, callback) => {
@@ -161,43 +161,48 @@ module.exports = {
                 },
             })
             let manager;
-            let managers=[];
-            if(reportee[0]) {
-            for(let i=0;i<reportee.length;i++){
-            manager = await models.User.findOne({
-                where: {
-                    id: reportee[i].manager_id
-                },
-            })
-            let singleManager={
-                manager_first_name: manager.first_name,
-                manager_last_name: manager.last_name,
-                manager_email:manager.email
-            }
-            managers.push(singleManager);
-        }
-       
-        }
-           let obj =  {
-                    first_name: user.first_name,
-                    last_name: user.last_name,
-                    email: user.email,
-                    google_id: user.google_id,
-                    organization: user.organization,
-                    source: user.source,
-                    designation_title: user.Designations[0].dataValues.designation_title,
-                    role_title: user2.Roles[0].dataValues.role_title,
-                    manager_details:managers,
-                    created_at: user.created_at,
-                    updated_at: user.updated_at,
-                    deleted_at: user.deleted_at
+            let managers = [];
+            if (reportee[0]) {
+                for (let i = 0; i < reportee.length; i++) {
+                    manager = await models.User.findOne({
+                        where: {
+                            id: reportee[i].manager_id
+                        },
+                    })
+                    let singleManager = {
+                        manager_first_name: manager.first_name,
+                        manager_last_name: manager.last_name,
+                        manager_email: manager.email
+                    }
+                    managers.push(singleManager);
                 }
-                return callback(202, {
-                    message: obj
-                });
+            }
+            let designation_title = {};
+            let role_title = {};
+            if (user.Designations.length > 0 ) {
+                designation_title = { destignation_title: user.Designations[0].dataValues.designation_title };
+            }
+            if( user2.Roles.length > 0){
+                role_title = { role_title: user2.Roles[0].dataValues.role_title };
+            }
+            let obj = {
+                first_name: user.first_name,
+                last_name: user.last_name,
+                email: user.email,
+                google_id: user.google_id,
+                organization: user.organization,
+                source: user.source,
+                designation_title: designation_title,
+                role_title: role_title,
+                manager_details: managers,
+                created_at: user.created_at,
+                updated_at: user.updated_at,
+                deleted_at: user.deleted_at
+            }
+            return callback(200, { message: obj });
         } catch (err) {
             console.log(err);
-            return callback(500, `Something went wrong!`);
+            return callback(500, { error: `Something went wrong!` });
         }
     }
 };
