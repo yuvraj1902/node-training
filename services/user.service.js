@@ -3,7 +3,7 @@ const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mailer = require("../helper/sendmail");
 const models = require("../models");
-
+const redisClient = require("../redis");
 module.exports = {
 
   // Login
@@ -167,8 +167,18 @@ module.exports = {
       const user = await models.User.findAll({
         attributes: { exclude: ['password', 'token', 'token_expiration', 'updated_at', 'deleted_at' ] },
       });
-      
-      return callback(200, { data: user });
+       
+      // using redis 
+      let keyName = "userData";
+      let setCacheData = await redisClient.set(keyName, JSON.stringify(user));
+      // console.log("setCacheDatasetCacheDatasetCacheData", setCacheData);
+      if (setCacheData != null) {
+        let getCacheData = await redisClient.get(keyName);
+        let userData = JSON.parse(getCacheData);
+            return callback(200, { data: userData });
+      }
+
+      // return callback(200, { data: user });
       
     } catch (err) {
       console.log(err);
