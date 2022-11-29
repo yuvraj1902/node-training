@@ -35,7 +35,6 @@ module.exports = {
         })
     },
     getUserInfo: async (req, res, next) => {
-        console.log(req.user);
         userInfo(req.user.dataValues.email, (statusCode, result) => {
             req.statusCode = statusCode;
             req.result = result;

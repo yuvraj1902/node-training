@@ -61,7 +61,6 @@ const deleteReportee = async (manager_id, reportee_id, callback) => {
         }
 
     } catch (err) {
-        console.log(err);
         return callback(500, { error: `Something went wrong!` });
     }
 
