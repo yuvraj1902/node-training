@@ -3,6 +3,7 @@ const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mailer = require("../helper/sendmail");
 const models = require("../models");
+const user = require("../models/user");
 
 module.exports = {
 
@@ -251,9 +252,43 @@ module.exports = {
   },
   userInfo: async (userEmail, callback) => {
     try {
-      const userDetails = await models.User.findOne({ attributes: { exclude: ['password', 'token', 'token_expiration',""] } },{ where: { email: userEmail } });
+      console.log(userEmail);
+      const userDetails = await models.User.findOne(
+        { where: { email: userEmail } });
       console.log(userDetails.dataValues);
-      return callback(200, { response: userDetails.dataValues });
+
+      const userManagerDetails = await models.UserReportee.findAll({ where: { reportee_id: userDetails.dataValues.id } });
+      console.log(userManagerDetails);
+
+      const mangerDetailsArray = [];
+      for (let i = 0; i < userManagerDetails.length; ++i) {
+        const userDetails = await models.User.findOne(
+          { where: { id: userManagerDetails[i].dataValues.manager_id } });
+        
+        const mangerDetails = {
+          firstName: userDetails.dataValues.first_name,
+          lastName: userDetails.dataValues.last_name,
+          email: userDetails.dataValues.email
+        } 
+
+        mangerDetailsArray.push(mangerDetails);
+      }
+
+
+      const userInfo = {
+        firstName: userDetails.dataValues.first_name,
+        lastName: userDetails.dataValues.last_name,
+        email: userDetails.dataValues.email,
+        organization: userDetails.dataValues.organization,
+        google_id: userDetails.dataValues.organization,
+        image_url: userDetails.dataValues.image_url,
+        source: userDetails.dataValues.source,
+        managers: mangerDetailsArray
+      }
+
+      console.log(userInfo);
+      
+      return callback(200, { response: userInfo });
     } catch (err) {
       console.log(err);
       return callback(500, `Something went wrong!`);
