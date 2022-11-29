@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       tableName: "user_designation_mapping",
       modelName: "UserDesignationMapping",
+      defaultScope: {
+        attributes: {
+          exclude: ["created_at", "updated_at", "deleted_at"],
+        },
+      },
     }
   );
   return UserDesignationMapping;

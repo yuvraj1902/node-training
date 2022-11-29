@@ -122,11 +122,9 @@ module.exports = {
       // transaction commit successfully
       await trans.commit();
       if (data.reportee_id) {
-        return callback(
-         userId,data.reportee_id
-        );
+        return addReportee(userId, data.reportee_id, callback);
       } else {
-        return callback(data, 201);
+        return callback(201, { response: value });
       }
     } catch (error) {
       // rollback transaction if any error
@@ -382,8 +380,37 @@ module.exports = {
     } catch (err) {
       return callback(500, { error: `something went wrong` });
     }
-  }
+  },
+  registration: async (data,callback) => {
+    try {
+      const existingUser = await models.User.findOne({
+        where: { email: data.email },
+      });
+      //  checking existing User
+      if (existingUser) {
+        return callback({ message: "User already exists" }, 409);
+      }
 
-}
-
-
+      const value = ({
+        first_name,
+        last_name,
+        email,
+        organization,
+        google_id,
+        source,
+      } = data);
+      const user = await models.User.create({
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        password: await hash(data.password, 10),
+        organization: data.organization,
+        google_id: data.google_id,
+        source: data.source,
+      });
+      return callback(201, { response: value });
+    } catch (error) {
+       return callback(500, { error: error });
+    }
+  },
+};

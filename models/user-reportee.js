@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true,
       tableName: "user_reportee",
       modelName: "UserReportee",
+      defaultScope: {
+        attributes: {
+          exclude: ["created_at", "updated_at", "deleted_at"],
+        },
+      },
     }
   );
   return UserReportee;
