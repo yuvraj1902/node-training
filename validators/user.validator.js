@@ -1,5 +1,5 @@
-const Joi = require("joi");
-const passwordComplexity = require("joi-password-complexity");
+const Joi = require('joi');
+const passwordComplexity = require('joi-password-complexity');
 
 const complexityOptions = {
     min: 4,
@@ -19,12 +19,12 @@ module.exports = {
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
+                return res.status(400).json({ message: result.error.details[0].message });
             } else {
                 next();
             }
         } catch (error) {
-            return res.status(500).json({ message: "Something went wrong!" });
+            return res.status(500).json({ message: `Something went wrong!` });
         }
     },
     createUserSchema: async (req, res, next) => {
@@ -44,12 +44,12 @@ module.exports = {
 
             const result = checkUserSchema.validate(req.body);
             if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
+                return res.status(400).json({ message: result.error.details[0].message });
             } else {
                 next();
             }
         } catch (error) {
-            return res.status(500).json({ message: "Something went wrong" });
+            return res.status(500).json({ message: `Something went wrong` });
         }
     },
     resetUserPasswordSchema: async (req, res, next) => {
@@ -59,12 +59,12 @@ module.exports = {
             });
             const result = checkresetPasswordSchema.validate(req.body, req.query);
             if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
+                return res.status(400).json({ message: result.error.details[0].message });
             } else {
                 next();
             }
         } catch (error) {
-            return res.status(500).json({ message: "Something went wrong" });
+            return res.status(500).json({ message: `Something went wrong` });
         }
     },
 
@@ -76,12 +76,12 @@ module.exports = {
 
             const result = checkUserSchema.validate(req.body);
             if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
+                return res.status(400).json({ message: result.error.details[0].message });
             } else {
                 next();
             }
         } catch (error) {
-            return res.status(500).json({ message: "Something went wrong" });
+            return res.status(500).json({ message: `Something went wrong` });
         }
     },
     forgetPassword: async (req, res, next) => {
@@ -91,12 +91,57 @@ module.exports = {
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
+                return res.status(400).json({ message: result.error.details[0].message });
             } else {
                 next();
             }
         } catch (error) {
-            return res.status(500).json({ message: "Something went wrong!" });
+            return res.status(500).json({ message: `Something went wrong!` });
+        }
+    },
+    enableUserSchema: async (req, res, next) => {
+        try {
+            const checkSchema = Joi.object({
+                user_id: Joi.string().guid().required()
+            });
+            const result = checkSchema.validate(req.body);
+            if (result.error) {
+                return res.status(400).json({ message: result.error.details[0].message });
+            } else {
+                next();
+            }
+        } catch (error) {
+            return res.status(500).json({ message: `Something went wrong!` });
+        }
+    },
+    deactivateUserSchema: async (req, res, next) => {
+        try {
+            const checkSchema = Joi.object({
+                user_id: Joi.string().guid().required()
+            });
+            const result = checkSchema.validate(req.body);
+            if (result.error) {
+                return res.status(400).json({ message: result.error.details[0].message });
+            } else {
+                next();
+            }
+        } catch (error) {
+            return res.status(500).json({ message: 'Something went wrong!' });
+        }
+    },
+    userDetailsSchema: async (req, res, next) => {
+        try {
+            const checkSchema = Joi.object({
+                user_id: Joi.string().guid().required()
+            });
+            const result = checkSchema.validate(req.body);
+            if (result.error) {
+                return res.status(400).json({ message: result.error.details[0].message });
+            } else {
+                next();
+            }
+        } catch (error) {
+            return res.status(500).json({ message: 'Something went wrong!' });
         }
     },
 };

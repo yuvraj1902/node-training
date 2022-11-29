@@ -1,4 +1,4 @@
-const Joi = require("joi");
+const Joi = require('joi');
 
 module.exports = {
     userReporteeSchema: async (req, res, next) => {
@@ -8,12 +8,12 @@ module.exports = {
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
+                return res.status(400).json({ message: result.error.details[0].message });
             } else {
                 next();
             }
         } catch (error) {
-            return res.status(500).json({ message: "Something went wrong!" });
+            return res.status(500).json({ message: `Something went wrong!` });
         }
     },
 
@@ -25,12 +25,12 @@ module.exports = {
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
+                return res.status(400).json({ message: result.error.details[0].message });
             } else {
                 next();
             }
         } catch (error) {
-            return res.status(500).json({ message: "Something went wrong!" });
+            return res.status(500).json({ message: `Something went wrong!` });
         }
     }
 

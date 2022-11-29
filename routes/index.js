@@ -1,15 +1,17 @@
-const express = require("express");
-const cors = require("cors");
-const userRoutes = require("./user.route");
-// const roleRoutes = require("./role.route");
-const userReporteeRoutes = require("./userReportee.route");
+const express = require('express');
+const cors = require('cors');
+
+const userRoutes = require('./user.route');
+const roleRoutes = require('./role.route');
+const userReporteeRoutes = require('./userReportee.route');
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use("/", userRoutes);
-// app.use("/", roleRoutes);
-app.use("/", userReporteeRoutes);
+app.use('/', userRoutes);
+app.use('/', roleRoutes);
+app.use('/', userReporteeRoutes);
 
 
 module.exports = app;

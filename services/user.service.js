@@ -1,12 +1,12 @@
-const bcrypt = require("bcrypt");
-const { hash } = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
+const { hash } = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
 
-const models = require("../models");
-const { sequelize } = require("../models");
-const mailer = require("../helper/sendmail");
-const { Op } = require("sequelize");
-const { addReportee } = require("./userReportee.service");
+const models = require('../models');
+const { sequelize } = require('../models');
+const mailer = require('../helper/sendmail');
+const { addReportee } = require('./userReportee.service');
 
 module.exports = {
   // Login
@@ -41,7 +41,7 @@ module.exports = {
           },
         }
       );
-      return callback(200, { token: jsonToken });
+      return callback(200, { data: { token: jsonToken } });
     } catch (error) {
       return callback(500, { message: `Something went wrong!` });
     }
@@ -55,9 +55,8 @@ module.exports = {
       });
       //  checking existing User
       if (existingUser) {
-        return callback({ message: "User already exists" }, 409);
+        return callback(409, { message: `User already exists` },);
       }
-      const trans = await sequelize.transaction();
       const value = {
         first_name,
         last_name,
@@ -67,6 +66,7 @@ module.exports = {
         source,
       } = data;
       // user creation
+
       const user = await models.User.create(
         {
           first_name: data.first_name,
@@ -79,8 +79,14 @@ module.exports = {
         },
         { transaction: trans }
       );
+
+      if (!user) {
+        await trans.rollback();
+        return callback(500, { message: `Something went wrong` });
+      }
       // finding userId
       const userId = user.dataValues.id;
+
       // checking is designation_title from req.body
       if (data.designation_title) {
         const designation = await models.Designation.findOne(
@@ -91,6 +97,10 @@ module.exports = {
           },
           { transaction: trans }
         );
+        if (!designation) {
+          await trans.rollback();
+          return callback(400, { message: `Invalid Designation` });
+        }
         // entry in user-designation-mapping
         const designation_user_mapping_designationID =
           await models.UserDesignationMapping.create(
@@ -100,6 +110,11 @@ module.exports = {
             },
             { transaction: trans }
           );
+        if (!designation_user_mapping_designationID) {
+          await trans.rollback();
+          return callback(500, { message: `Something went wrong` })
+        }
+
       }
       // checking is role_title from req.body
       if (data.role_title) {
@@ -111,6 +126,13 @@ module.exports = {
           },
           { transaction: trans }
         );
+
+
+        if (!role) {
+          await trans.rollback();
+          return callback(400, { message: `Invalid Role` });
+
+        }
         // entry in user-role-mapping
         const user_role_mapping = await models.UserRoleMapping.create(
           {
@@ -119,41 +141,26 @@ module.exports = {
           },
           { transaction: trans }
         );
+
+        if (!user_role_mapping) {
+          await trans.rollback();
+          return callback(500, { message: `Something went wrong` });
+        }
       }
       // transaction commit successfully
       await trans.commit();
       if (data.reportee_id) {
-        return callback(
-          userId, data.reportee_id
-        );
+        return adminAddReportee({ manager_id: userId, reportee_id: data.reportee_id }, callback);
       } else {
-        return callback(data, 201);
-        return addReportee(userId, data.reportee_id, callback);
+        return callback(201, { data: value });
       }
     } catch (error) {
       // rollback transaction if any error
       await trans.rollback();
-      return callback(500, { error: error });
+      return callback(500, { message: error.message });
     }
   },
 
-  deactivateUser: async (data, callback) => {
-    try {
-      let user_id = data.id;
-      const existingUser = await models.User.findOne({
-        where: { id: user_id },
-      });
-      if (!existingUser) return callback(404, "User not found ");
-      const user = await models.User.destroy({
-        where: {
-          id: user_id,
-        },
-      });
-      return callback(202, `User deactivate successfully`);
-    } catch (err) {
-      return callback(500, `Something went wrong!`);
-    }
-  },
   userInfo: async (userEmail, callback) => {
     try {
       const userDetails = await models.User.findOne({
@@ -196,43 +203,36 @@ module.exports = {
     }
   },
 
-  userInfo: async (userEmail, callback) => {
+  registration: async (data, callback) => {
     try {
-      const userDetails = await models.User.findOne(
-        { where: { email: userEmail } });
-
-      const userManagerDetails = await models.UserReportee.findAll({ where: { reportee_id: userDetails.dataValues.id } });
-
-      const mangerDetailsArray = [];
-      for (let i = 0; i < userManagerDetails.length; ++i) {
-        const userDetails = await models.User.findOne(
-          { where: { id: userManagerDetails[i].dataValues.manager_id } });
-
-        const mangerDetails = {
-          firstName: userDetails.dataValues.first_name,
-          lastName: userDetails.dataValues.last_name,
-          email: userDetails.dataValues.email
-        }
-
-        mangerDetailsArray.push(mangerDetails);
+      const existingUser = await models.User.findOne({
+        where: { email: data.email },
+      });
+      //  checking existing User
+      if (existingUser) {
+        return callback(409, { message: `User already exists` });
       }
 
-
-      const userInfo = {
-        firstName: userDetails.dataValues.first_name,
-        lastName: userDetails.dataValues.last_name,
-        email: userDetails.dataValues.email,
-        organization: userDetails.dataValues.organization,
-        google_id: userDetails.dataValues.organization,
-        image_url: userDetails.dataValues.image_url,
-        source: userDetails.dataValues.source,
-        managers: mangerDetailsArray
-      }
-
-
-      return callback(200, { response: userInfo });
-    } catch (err) {
-      return callback(500, `Something went wrong!`);
+      const value = ({
+        first_name,
+        last_name,
+        email,
+        organization,
+        google_id,
+        source,
+      } = data);
+      const user = await models.User.create({
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        password: await hash(data.password, 10),
+        organization: data.organization,
+        google_id: data.google_id,
+        source: data.source,
+      });
+      return callback(201, { data: value });
+    } catch (error) {
+      return callback(500, { message: `Something went wrong!` });
     }
   },
   forgetPassword: async (data, callback) => {
@@ -280,7 +280,7 @@ module.exports = {
 
       return callback(200, { data: user });
     } catch (err) {
-      return callback(500, { error: "Something went wrong!" });
+      return callback(500, { message: `Something went wrong!` });
     }
   },
   resetUserPassword: async (query, data, callback) => {
@@ -324,4 +324,102 @@ module.exports = {
       return callback(500, { error: `something went wrong` });
     }
   },
+
+  deactivateUser: async (data, callback) => {
+    try {
+      let user_id = data.user_id;
+      const existingUser = await models.User.findOne({ where: { id: user_id } });
+      if (!existingUser) return callback(404, { message: `User not found` })
+      const user = await models.User.destroy({
+        where: {
+          id: user_id
+        }
+      })
+      return callback(202, { message: `User deactivate successfully` });
+    } catch (error) {
+      return callback(500, { message: `Something went wrong!` });
+    }
+  },
+  enableUser: async (data, callback) => {
+    try {
+      let user_id = data.user_id;
+      const user = await models.User.restore({
+        where: {
+          id: user_id
+        }
+      })
+      if (!user) return callback(404, { message: `User not found` })
+      return callback(202, { message: `User activated again` });
+    } catch (error) {
+      return callback(500, { message: `Something went wrong!` });
+    }
+  },
+
+  userDetail: async (data, callback) => {
+    try {
+      let user_id = data.user_id;
+      const user = await models.User.findOne({
+        where: {
+          id: user_id
+        },
+        include: models.Designation
+      });
+
+      const user2 = await models.User.findOne({
+        where: {
+          id: user_id
+        },
+        include: models.Role
+      })
+      if (!user) return callback(400, { message: `User not found` });
+      const reportee = await models.UserReportee.findAll({
+        where: {
+          reportee_id: user_id
+        },
+      })
+      let manager;
+      let managers = [];
+      if (reportee[0]) {
+        for (let i = 0; i < reportee.length; i++) {
+          manager = await models.User.findOne({
+            where: {
+              id: reportee[i].manager_id
+            },
+          })
+          let singleManager = {
+            manager_first_name: manager.first_name,
+            manager_last_name: manager.last_name,
+            manager_email: manager.email
+          }
+          managers.push(singleManager);
+        }
+      }
+      let designation_title = {};
+      let role_title = {};
+      if (!user.Designations && !user.Roles) {
+        designation_title = { destignation_title: user.Designations[0].dataValues.designation_title };
+        role_title = { role_title: user2.Roles[0].dataValues.role_title };
+      }
+      let obj = {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        google_id: user.google_id,
+        organization: user.organization,
+        source: user.source,
+        designation_title: designation_title,
+        role_title: role_title,
+        manager_details: managers,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+        deleted_at: user.deleted_at
+      }
+      return callback(202, {
+        data: obj
+      });
+    } catch (error) {
+      return callback(500, { message: `Something went wrong!` });
+    }
+  }
+
 };
