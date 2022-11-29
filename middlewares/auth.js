@@ -22,7 +22,6 @@ module.exports = {
           })
           if (user) {
             req.user = user;
-            console.log(user);
             next();
           } else {
             return res.status(403).json({
@@ -34,7 +33,6 @@ module.exports = {
         return res.status(401).json({ response: "Access denied" });
       }
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ error: "Something went wrong!" });
     }
   },

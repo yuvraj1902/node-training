@@ -280,13 +280,14 @@ module.exports = {
   },
   userInfo: async (userEmail, callback) => {
     try {
-      console.log(userEmail);
       const userDetails = await models.User.findOne({
         where: { email: userEmail }, include: models.Role
       });
 
       // user Roles 
       const userRolesArray = [];
+
+      console.log("here")
       for (let i = 0; i < userDetails.Roles.length; ++i){
         userRolesArray.push(userDetails.Roles[i].role_title);
       }
@@ -294,11 +295,9 @@ module.exports = {
       const userDetailsDesignation = await models.User.findOne({
         where: { email: userEmail }, include: models.Designation
       });
-
-
-
+      
       const userDesignationArray = [];
-      for (let i = 0; i < userDetails.Roles.length; ++i){
+      for (let i = 0; i < userDetailsDesignation.Designations.length; ++i){
         userDesignationArray.push(userDetailsDesignation.Designations[i].designation_title);
       }
 
@@ -334,12 +333,12 @@ module.exports = {
         managers: mangerDetailsArray
       }
 
-      console.log(userInfo);
+      // console.log(userInfo);
       
       return callback(200, { response: userInfo });
     } catch (err) {
       console.log(err);
-      return callback(500, `Something went wrong!`);
+      return callback(500, { error: `Something went wrong!` });
     }
   },
   resetUserPassword: async (query,data, callback) => {
