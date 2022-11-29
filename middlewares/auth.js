@@ -21,7 +21,7 @@ module.exports = {
             error: "User not found"
           })
           if (user) {
-            req.user = user.Roles[0].dataValues;
+            req.user = user;
             next();
           } else {
             return res.status(403).json({
