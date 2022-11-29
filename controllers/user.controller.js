@@ -15,7 +15,6 @@ module.exports = {
     // createUser API
     registration: async (req, res, next) => {
         createUser(req.body, (result, statusCode) => {
-            // console.log(result," ",statusCode);
             (req.result = result), (req.statusCode = statusCode);
             next();
         });

@@ -103,7 +103,6 @@ const { hash } = require("bcrypt");
         console.log(colors.cyan("You are good to go."));
         await t.commit();
       } catch (error) {
-        console.log(error);
         await t.rollback();
       }
     }

@@ -6,7 +6,7 @@ const models = require("../models");
 const { sequelize } = require("../models");
 const mailer = require("../helper/sendmail");
 const { Op } = require("sequelize");
-
+const { addReportee } = require("./userReportee.service");
 
 module.exports = {
   // Login
@@ -29,13 +29,18 @@ module.exports = {
       }
 
       // jwt token assignment
-      const jsonToken = jwt.sign({ email: email }, process.env.secretKey, { expiresIn: '1h' });
-      const expirationTime = (Date.now() + (1 * 60 * 60 * 1000));
-      await models.User.update({ token: jsonToken, token_expiration: expirationTime }, {
-        where: {
-          id: userWithEmail.id
+      const jsonToken = jwt.sign({ email: email }, process.env.secretKey, {
+        expiresIn: "1h",
+      });
+      const expirationTime = Date.now() + (1 * 60 * 60 * 1000);
+      await models.User.update(
+        { token: jsonToken, token_expiration: expirationTime },
+        {
+          where: {
+            id: userWithEmail.id,
+          },
         }
-      })
+      );
       return callback(200, { token: jsonToken });
     } catch (error) {
       return callback(500, { message: `Something went wrong!` });
@@ -43,6 +48,7 @@ module.exports = {
   },
   // User creation API
   createUser: async (data, callback) => {
+    const trans = await sequelize.transaction();
     try {
       const existingUser = await models.User.findOne({
         where: { email: data.email },
@@ -121,13 +127,13 @@ module.exports = {
           userId, data.reportee_id
         );
       } else {
-        console.log("out");
         return callback(data, 201);
+        return addReportee(userId, data.reportee_id, callback);
       }
     } catch (error) {
       // rollback transaction if any error
       await trans.rollback();
-      return callback({ error: error }, 500);
+      return callback(500, { error: error });
     }
   },
 
@@ -144,6 +150,47 @@ module.exports = {
         },
       });
       return callback(202, `User deactivate successfully`);
+    } catch (err) {
+      return callback(500, `Something went wrong!`);
+    }
+  },
+  userInfo: async (userEmail, callback) => {
+    try {
+      const userDetails = await models.User.findOne({
+        where: { email: userEmail },
+      });
+
+      const userManagerDetails = await models.UserReportee.findAll({
+        where: { reportee_id: userDetails.dataValues.id },
+      });
+
+      const mangerDetailsArray = [];
+      for (let i = 0; i < userManagerDetails.length; ++i) {
+        const userDetails = await models.User.findOne({
+          where: { id: userManagerDetails[i].dataValues.manager_id },
+        });
+
+        const mangerDetails = {
+          firstName: userDetails.dataValues.first_name,
+          lastName: userDetails.dataValues.last_name,
+          email: userDetails.dataValues.email,
+        };
+
+        mangerDetailsArray.push(mangerDetails);
+      }
+
+      const userInfo = {
+        firstName: userDetails.dataValues.first_name,
+        lastName: userDetails.dataValues.last_name,
+        email: userDetails.dataValues.email,
+        organization: userDetails.dataValues.organization,
+        google_id: userDetails.dataValues.organization,
+        image_url: userDetails.dataValues.image_url,
+        source: userDetails.dataValues.source,
+        managers: mangerDetailsArray,
+      };
+
+      return callback(200, { response: userInfo });
     } catch (err) {
       return callback(500, `Something went wrong!`);
     }
@@ -220,9 +267,19 @@ module.exports = {
 
       await mailer.sendMail(body, subject, recipient)
       return callback(200, { response: "password reset link sent" });
-
+    } catch (err) {
+      return callback(500, { error: "Something went wrong!" });
     }
-    catch (err) {
+  },
+
+  getAllUsers: async (callback) => {
+    try {
+      const user = await models.User.findAll({
+        attributes: { exclude: ["password", "token", "token_expiration"] },
+      });
+
+      return callback(200, { data: user });
+    } catch (err) {
       return callback(500, { error: "Something went wrong!" });
     }
   },
@@ -232,13 +289,13 @@ module.exports = {
       const password = data.password;
 
       const currentTime = Date.now();
+
       const isUserExist = await models.User.findOne({
         where: {
           token: reset_Token,
-          token_expiration: { [Op.gt]: currentTime }
-        }
+          token_expiration: { [Op.gt]: currentTime },
+        },
       });
-
 
       if (!isUserExist) {
         return callback(400, { error: "Invalid reset token" });
@@ -246,44 +303,25 @@ module.exports = {
 
       const userEmail = isUserExist.dataValues.email;
 
-      await models.User.update({
-        password: await hash(password, 10),
-        token_expiration: Date.now()
-      }, {
-        where: {
-          email: userEmail
+      await models.User.update(
+        {
+          password: await hash(password, 10),
+          token_expiration: Date.now(),
+        },
+        {
+          where: {
+            email: userEmail,
+          },
         }
-      });
-
+      );
 
       const emailBody = `Your password has been reset successfully`;
-      const emailSubject = `Password reset`
-
+      const emailSubject = `Password reset`;
 
       await mailer.sendMail(emailBody, emailSubject, userEmail);
       return callback(200, { response: "Password reset success" });
-
     } catch (err) {
       return callback(500, { error: `something went wrong` });
     }
   },
-
-  getAllUsers: async (callback) => {
-    try {
-      const user = await models.User.findAll({
-        attributes: { exclude: ['password', 'token', 'token_expiration', 'updated_at', 'deleted_at'] },
-      });
-
-      return callback(200, { data: user });
-
-    } catch (err) {
-      return callback(500, { error: "Something went wrong!" });
-    }
-  }
-
-
 };
-
-
-
-

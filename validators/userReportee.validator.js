@@ -4,7 +4,7 @@ module.exports = {
     userReporteeSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
-                reportee_id: Joi.string().guid().required()
+                reportee_id: Joi.string().guid().required(),
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
@@ -13,7 +13,7 @@ module.exports = {
                 next();
             }
         } catch (error) {
-            return res.status(500).json({ message: 'Something went wrong!' });
+            return res.status(500).json({ message: "Something went wrong!" });
         }
     },
 
@@ -21,7 +21,7 @@ module.exports = {
         try {
             const checkSchema = Joi.object({
                 manager_id: Joi.string().guid().required(),
-                reportee_id: Joi.string().guid().required()
+                reportee_id: Joi.string().guid().required(),
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
@@ -29,9 +29,8 @@ module.exports = {
             } else {
                 next();
             }
-
         } catch (error) {
-            return res.status(500).json({ message: 'Something went wrong!' });
+            return res.status(500).json({ message: "Something went wrong!" });
         }
     }
 

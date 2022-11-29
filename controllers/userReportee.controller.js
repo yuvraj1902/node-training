@@ -1,9 +1,13 @@
-const { userAddReportee, adminAddReportee, userDeleteReportee, adminDeleteReportee } = require('../services/userReportee.service');
+const {
+    userAddReportee,
+    adminAddReportee,
+    userDeleteReportee,
+    adminDeleteReportee
+} = require("../services/userReportee.service");
 
 module.exports = {
-
     userAddReportee: async (req, res, next) => {
-        userAddReportee(req.body, req.user, (statusCode, result) => {
+        userAddReportee(req.params.id, req.body.id, (statusCode, result) => {
             req.statusCode = statusCode;
             req.result = result;
             next();
@@ -27,13 +31,6 @@ module.exports = {
 
     adminDeleteReportee: async (req, res, next) => {
         adminDeleteReportee(req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        });
-    },
-    adminAddReportee: async (req, res, next) => {
-        adminAddReportee(req.body, (statusCode, result) => {
             req.statusCode = statusCode;
             req.result = result;
             next();
