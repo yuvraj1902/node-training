@@ -22,7 +22,7 @@ module.exports = {
     changeRoleSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
-                user_id: Joi.string().required(),
+                user_id: Joi.string().guid().required(),
                 role_title: Joi.string().valid("Admin","User").required().label("Role title must be [Admin,User] only"),
             });
             const result = checkSchema.validate(req.body);

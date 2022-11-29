@@ -10,7 +10,7 @@ const genericResponse = require("../helper/generic-response")
 
 router.post("/login", validator.userValidator.loginSchema, controllers.User.loginUsers, genericResponse.sendResponse);
 router.post("/createUser", checkToken, verifyUser, validator.userValidator.createUserSchema, controllers.User.createUser, genericResponse.sendResponse);
-router.delete("/deactivateUser", checkToken, verifyUser, controllers.User.deactivateUsers, genericResponse.sendResponse);
-router.patch("/enableUser", checkToken, verifyUser, controllers.User.enableUsers, genericResponse.sendResponse);
-//router.patch("/userDetails", checkToken, verifyUser, controllers.User.enableUsers, genericResponse.sendResponse);
+router.delete("/deactivateUser", checkToken, verifyUser, validator.userValidator.deactivateUserSchema,controllers.User.deactivateUsers, genericResponse.sendResponse);
+router.patch("/enableUser", checkToken, verifyUser, validator.userValidator.enableUserSchema,controllers.User.enableUsers, genericResponse.sendResponse);
+router.get("/userDetails", checkToken, verifyUser, validator.userValidator.userDetailsSchema,controllers.User.userDetails, genericResponse.sendResponse);
 module.exports = router;

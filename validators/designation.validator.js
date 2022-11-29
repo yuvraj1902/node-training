@@ -21,8 +21,8 @@ module.exports = {
     changeDesignationSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
-                user_id: Joi.string().required(),
-                designation_title: Joi.string().valid("LEAD","EMPLOYEE","INTERN").required().label("Desigantion title must be [LEAD,EMPLOYEE,INTERN] only"),
+                user_id: Joi.string().guid().required(),
+                designation_title: Joi.string().uppercase().valid("LEAD","EMPLOYEE","INTERN").required().label("Desigantion title must be [LEAD,EMPLOYEE,INTERN] only"),
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
