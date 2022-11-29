@@ -331,11 +331,8 @@ const registration = async (payload) => {
 
 
 const { Op } = require("sequelize");
-
-
-const { sequelize } = require("./models");
 const { sequelize } = require("../models");
-const { lock } = require("../routes/user.route");
+const { addReportee } = require("./userReportee.service");
 module.exports = {
   loginUser,
   getAllUsers,
