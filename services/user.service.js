@@ -3,6 +3,7 @@ const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const models = require("../models");
+const { changeRole } = require("./role.service");
 
 module.exports = {
 
@@ -151,7 +152,6 @@ module.exports = {
                 where: {
                     id: user_id
                 },
-
                 include: models.Role
             })
             if (!user) return callback(400, { error: " User not found" });
@@ -160,34 +160,41 @@ module.exports = {
                     reportee_id: user_id
                 },
             })
-            if (!reportee[0]) return callback(404, { error: " User not assigned as a reportee yet " })
-            const manager = await models.User.findOne({
+            let manager;
+            let managers=[];
+            if(reportee[0]) {
+            for(let i=0;i<reportee.length;i++){
+            manager = await models.User.findOne({
                 where: {
-                    id: reportee[0].manager_id
+                    id: reportee[i].manager_id
                 },
             })
-            if (manager) {
-                return callback(202, {
-                    message: {
-                        first_name: user.first_name,
-                        last_name: user.last_name,
-                        email: user.email,
-                        google_id: user.google_id,
-                        organization: user.organization,
-                        source: user.source,
-                        designation_title: user.Designations[0].dataValues.designation_title,
-                        role_title: user2.Roles[0].dataValues.role_title,
-                        manager_first_name: manager.first_name,
-                        manager_last_name: manager.last_name,
-                        manager_email:manager.email,
-                        created_at: user.created_at,
-                        updated_at: user.updated_at,
-                        deleted_at: user.deleted_at
-                    }
-                });
-            } else {
-                console.log("hello")
+            let singleManager={
+                manager_first_name: manager.first_name,
+                manager_last_name: manager.last_name,
+                manager_email:manager.email
             }
+            managers.push(singleManager);
+        }
+       
+        }
+           let obj =  {
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                    email: user.email,
+                    google_id: user.google_id,
+                    organization: user.organization,
+                    source: user.source,
+                    designation_title: user.Designations[0].dataValues.designation_title,
+                    role_title: user2.Roles[0].dataValues.role_title,
+                    manager_details:managers,
+                    created_at: user.created_at,
+                    updated_at: user.updated_at,
+                    deleted_at: user.deleted_at
+                }
+                return callback(202, {
+                    message: obj
+                });
         } catch (err) {
             console.log(err);
             return callback(500, `Something went wrong!`);
