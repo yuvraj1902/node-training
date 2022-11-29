@@ -64,7 +64,8 @@ const deleteReportee = async (manager_id, reportee_id, callback) => {
     } else {
         throw new Error(`Unprocessable`);
     }
-}
+  
+};
 
 
 

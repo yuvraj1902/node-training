@@ -334,6 +334,8 @@ const { Op } = require("sequelize");
 
 
 const { sequelize } = require("./models");
+const { sequelize } = require("../models");
+const { lock } = require("../routes/user.route");
 module.exports = {
   loginUser,
   getAllUsers,
