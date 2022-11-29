@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 
 const models = require("../models");
 const { sequelize } = require("../models");
-const { lock } = require("../routes/user.route");
 const mailer = require("../helper/sendmail");
 const { Op } = require("sequelize");
 
@@ -16,8 +15,8 @@ module.exports = {
       const { email, password } = data;
       const userWithEmail = await models.User.findOne({
         where: {
-          email: email,
-        },
+          email: email
+        }
       });
 
       if (!userWithEmail) {
@@ -36,7 +35,7 @@ module.exports = {
         where: {
           id: userWithEmail.id
         }
-      );
+      })
       return callback(200, { token: jsonToken });
     } catch (error) {
       return callback(500, { message: `Something went wrong!` });
