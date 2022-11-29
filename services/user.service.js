@@ -272,10 +272,31 @@ module.exports = {
   },
   userInfo: async (userEmail, callback) => {
     try {
-      const userDetails = await models.User.findOne(
-        { where: { email: userEmail } });
+      console.log(userEmail);
+      const userDetails = await models.User.findOne({
+        where: { email: userEmail }, include: models.Role
+      });
 
+      // user Roles 
+      const userRolesArray = [];
+      for (let i = 0; i < userDetails.Roles.length; ++i){
+        userRolesArray.push(userDetails.Roles[i].role_title);
+      }
+
+      const userDetailsDesignation = await models.User.findOne({
+        where: { email: userEmail }, include: models.Designation
+      });
+
+
+
+      const userDesignationArray = [];
+      for (let i = 0; i < userDetails.Roles.length; ++i){
+        userDesignationArray.push(userDetailsDesignation.Designations[i].designation_title);
+      }
+
+      // user Manager
       const userManagerDetails = await models.UserReportee.findAll({ where: { reportee_id: userDetails.dataValues.id } });
+      console.log(userManagerDetails);
 
       const mangerDetailsArray = [];
       for (let i = 0; i < userManagerDetails.length; ++i) {
@@ -300,12 +321,16 @@ module.exports = {
         google_id: userDetails.dataValues.organization,
         image_url: userDetails.dataValues.image_url,
         source: userDetails.dataValues.source,
+        roles: userRolesArray,
+        designation:userDesignationArray,
         managers: mangerDetailsArray
       }
 
+      console.log(userInfo);
       
       return callback(200, { response: userInfo });
     } catch (err) {
+      console.log(err);
       return callback(500, `Something went wrong!`);
     }
   },
