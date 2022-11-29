@@ -7,7 +7,8 @@ const user = require("../models/user");
 const mailer = require("../helper/sendmail");
 const { Op } = require("sequelize");
 
-
+const { sequelize } = require("../models");
+const { lock } = require("../routes/user.route");
 module.exports = {
 
     // Login
@@ -48,21 +49,20 @@ module.exports = {
       const existingUser = await models.User.findOne({
         where: { email: data.email },
       });
-
+      //  checking existing User
       if (existingUser) {
         return callback({ message: "User already exists" }, 409);
       }
-      const {
+      const trans = await sequelize.transaction();
+      const value={
         first_name,
         last_name,
         email,
-        password,
         organization,
         google_id,
         source,
-        role_title,
-        designation_title,
       } = data;
+      // user creation
       const user = await models.User.create(
         {
           first_name: data.first_name,
@@ -73,41 +73,65 @@ module.exports = {
           google_id: data.google_id,
           source: data.source,
         },
-        { exclude: "password" }
+        { transaction: trans }
       );
-      const designation = await models.Designation.findOne({
-        where: {
-          designation_title: data.designation_title,
-        },
-      });
-
-      const userId = await models.User.findOne({
-        where: {
-          email: data.email,
-        },
-      });
-
-      const designation_user_mapping_designationID =
-        await models.UserDesignationMapping.create({
-          designation_id: designation.id,
-          user_id: userId.id,
-        });
-      const role = await models.Role.findOne({
-        where: {
-          role_title: data.role_title,
-        },
-      });
-      const user_role_mapping = await models.UserRoleMapping.create({
-        role_id: role.id,
-        user_id: userId.id,
-      });
-
-      return callback({ message: "User Created" }, 201);
+      // finding userId
+      const userId = user.dataValues.id;
+      // checking is designation_title from req.body
+      if (data.designation_title) {
+        const designation = await models.Designation.findOne(
+          {
+            where: {
+              designation_title: data.designation_title,
+            },
+          },
+          { transaction: trans }
+        );
+        // entry in user-designation-mapping
+        const designation_user_mapping_designationID =
+          await models.UserDesignationMapping.create(
+            {
+              designation_id: designation.id,
+              user_id: userId,
+            },
+            { transaction: trans }
+          );
+      }
+      // checking is role_title from req.body
+      if (data.role_title) {
+        const role = await models.Role.findOne(
+          {
+            where: {
+              role_title: data.role_title,
+            },
+          },
+          { transaction: trans }
+        );
+        // entry in user-role-mapping
+        const user_role_mapping = await models.UserRoleMapping.create(
+          {
+            role_id: role.id,
+            user_id: userId,
+          },
+          { transaction: trans }
+        );
+      }
+      // transaction commit successfully
+      await trans.commit();
+      if (data.reportee_id) {
+        return callback(
+         userId,data.reportee_id
+        );
+      } else {
+        console.log("out");
+        return callback(data, 201);
+      }
     } catch (error) {
+      // rollback transaction if any error
+      await trans.rollback();
       return callback({ error: error }, 500);
     }
   },
-     
 
     deactivateUser: async (data, callback) => {
         try {

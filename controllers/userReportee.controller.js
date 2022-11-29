@@ -10,7 +10,8 @@ module.exports = {
     });
   },
   adminAddReportee: async (req, res, next) => {
-    adminAddReportee(req.body, (statusCode, result) => {
+    console.log(req.body);
+    adminAddReportee(req.manager_id,req.reportee_id,(statusCode, result) => {
       req.statusCode = statusCode;
       req.result = result;
       next();

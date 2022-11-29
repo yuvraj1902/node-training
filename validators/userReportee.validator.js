@@ -18,19 +18,11 @@ module.exports = {
         }
     },
 
-<<<<<<< HEAD
     adminReporteeSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
                 manager_id: Joi.string().guid().required(),
                 reportee_id: Joi.string().guid().required()
-=======
-    adminAddReporteeSchema: async (req, res, next) => {
-        try {
-            const checkSchema = Joi.object({
-                manager_id: Joi.string().guid(),
-                reportee_id: Joi.string().guid()
->>>>>>> 10fea4b (Create addReportee function)
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {
