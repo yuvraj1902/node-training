@@ -1,12 +1,14 @@
 const models = require("../models");
 const {
-  addReportee,
+  userAddReportee,
   adminAddReportee,
+  userDeleteReportee,
+  adminDeleteReportee
 } = require("../services/userReportee.service");
 
 module.exports = {
-  addReportee: async (req, res, next) => {
-    addReportee(req.params.id, req.body.id, (statusCode, result) => {
+  userAddReportee: async (req, res, next) => {
+    userAddReportee(req.params.id, req.body.id, (statusCode, result) => {
       req.statusCode = statusCode;
       req.result = result;
       next();

@@ -19,12 +19,10 @@ router.post(
   verifyUser,
   validator.userValidator.createUserSchema,
   controllers.User.createUser,
-  controllers.UserReportee.adminAddReportee,
   genericResponse.sendResponse
 );
 router.post(
   "/registration",
-  checkToken,
   validator.userValidator.createUserSchema,
   controllers.User.registration,
   genericResponse.sendResponse

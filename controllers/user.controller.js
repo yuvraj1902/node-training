@@ -17,10 +17,10 @@ module.exports = {
     });
   },
   createUser: async (req, res, next) => {
-    createUser(req.body, (data, result) => {
-      req.reportee_id = result;
-      req.manager_id = data;
-      next();
+      createUser(req.body, (statusCode,data) => {
+          req.statusCode = statusCode,
+          req.result=data
+          next();
     });
   },
     deactiveUsers: async (req, res, next) => {
@@ -31,7 +31,6 @@ module.exports = {
         })
     },
     getUserInfo: async (req, res, next) => {
-        console.log(req.user);
         userInfo(req.user.dataValues.email, (statusCode, result) => {
             req.statusCode = statusCode;
             req.result = result;

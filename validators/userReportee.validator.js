@@ -1,10 +1,10 @@
 const Joi = require("joi");
 
 module.exports = {
-  addReporteeSchema: async (req, res, next) => {
+  userReporteeSchema: async (req, res, next) => {
     try {
       const checkSchema = Joi.object({
-        id: Joi.string().guid(),
+        reportee_id: Joi.string().guid().required(),
       });
       const result = checkSchema.validate(req.body);
       if (result.error) {
@@ -17,11 +17,11 @@ module.exports = {
     }
   },
 
-  adminAddReporteeSchema: async (req, res, next) => {
+  adminReporteeSchema: async (req, res, next) => {
     try {
       const checkSchema = Joi.object({
-        manager_id: Joi.string().guid(),
-        reportee_id: Joi.string().guid(),
+        manager_id: Joi.string().guid().required(),
+        reportee_id: Joi.string().guid().required(),
       });
       const result = checkSchema.validate(req.body);
       if (result.error) {

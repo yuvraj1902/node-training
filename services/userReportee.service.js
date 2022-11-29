@@ -33,9 +33,10 @@ const addReportee = async (manager_id, reportee_id, callback) => {
       });
       return callback(200, { response: reporteeAdded });
     } else {
-      return callback(422, { message: `Unprocessable` });
+      return callback(422, { message: `This relation is not valid` });
     }
   } catch (err) {
+    console.log(err);
     return callback(500, { error: `Something went wrong!` });
   }
 };
@@ -82,30 +83,38 @@ const deleteReportee = async (manager_id, reportee_id, callback) => {
   }
 };
 
+
+ const userAddReportee= async (body, user, callback) => {
+    const manager_id = user.dataValues.id;
+    const reportee_id = body.reportee_id;
+
+    return addReportee(manager_id, reportee_id, callback);
+  }
+
+  const adminAddReportee= async (body, callback) => {
+    const { manager_id, reportee_id } = body;
+
+    return addReportee(manager_id, reportee_id, callback);
+  }
+
+  const userDeleteReportee= async (body, user, callback) => {
+    const manager_id = user.dataValues.id;
+    const reportee_id = body.reportee_id;
+
+    return deleteReportee(manager_id, reportee_id, callback);
+  }
+  const adminDeleteReportee=async (body, callback) => {
+    const { manager_id, reportee_id } = body;
+
+    return deleteReportee(manager_id, reportee_id, callback);
+  }
+
 module.exports = {
-  userAddReportee: async (body, user, callback) => {
-    const manager_id = user.dataValues.id;
-    const reportee_id = body.reportee_id;
-
-    return addReportee(manager_id, reportee_id, callback);
-  },
-
-  adminAddReportee: async (body, callback) => {
-    const { manager_id, reportee_id } = body;
-
-    return addReportee(manager_id, reportee_id, callback);
-  },
-
-  userDeleteReportee: async (body, user, callback) => {
-    const manager_id = user.dataValues.id;
-    const reportee_id = body.reportee_id;
-
-    return deleteReportee(manager_id, reportee_id, callback);
-  },
-
-  adminDeleteReportee: async (body, callback) => {
-    const { manager_id, reportee_id } = body;
-
-    return deleteReportee(manager_id, reportee_id, callback);
-  },
-};
+  addReportee,
+  deleteReportee,
+  userAddReportee,
+  adminAddReportee,
+  userDeleteReportee,
+  adminDeleteReportee
+  }
+ 

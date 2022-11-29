@@ -2,12 +2,12 @@ const Joi = require("joi");
 const passwordComplexity = require("joi-password-complexity");
 
 const complexityOptions = {
-    min: 4,
-    max: 16,
-    lowerCase: 1,
-    upperCase: 1,
-    numeric: 1,
-    symbol: 1
+  min: 4,
+  max: 16,
+  lowerCase: 1,
+  upperCase: 1,
+  numeric: 1,
+  symbol: 1,
 };
 
 module.exports = {
@@ -42,42 +42,6 @@ module.exports = {
         reportee_id: Joi.string().guid(),
       });
 
-            const result = checkUserSchema.validate(req.body);
-            if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
-            } else {
-                next();
-            }
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ message: "Something went wrong" });
-        }
-    },
-    resetUserPasswordSchema: async (req, res, next) => {
-        try {
-            const checkresetPasswordSchema = Joi.object({
-                password: passwordComplexity(complexityOptions).required(),
-            });
-
-            console.log(req.query);
-            const result = checkresetPasswordSchema.validate(req.body,req.query);
-            if (result.error) {
-                return res.status(400).json(result.error.details[0].message);
-            } else {
-                next();
-            }
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ message: "Something went wrong" });
-        }
-    },
-
-    resetPasswordQuerySchema: async (req, res, next) => {
-        try {
-            const checkresetPasswordSchema = Joi.object({
-                token: Joi.string().regex(/^.*$/).min(10).max(500).required()
-            });
-
       const result = checkUserSchema.validate(req.body);
       if (result.error) {
         return res.status(400).json(result.error.details[0].message);
@@ -86,6 +50,38 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  },
+  resetUserPasswordSchema: async (req, res, next) => {
+    try {
+      const checkresetPasswordSchema = Joi.object({
+        password: passwordComplexity(complexityOptions).required(),
+      });
+      const result = checkresetPasswordSchema.validate(req.body, req.query);
+      if (result.error) {
+        return res.status(400).json(result.error.details[0].message);
+      } else {
+        next();
+      }
+    } catch (error) {
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  },
+
+  resetPasswordQuerySchema: async (req, res, next) => {
+    try {
+      const checkresetPasswordSchema = Joi.object({
+        token: Joi.string().regex(/^.*$/).min(10).max(500).required(),
+      });
+
+      const result = checkUserSchema.validate(req.body);
+      if (result.error) {
+        return res.status(400).json(result.error.details[0].message);
+      } else {
+        next();
+      }
+    } catch (error) {
       return res.status(500).json({ message: "Something went wrong" });
     }
   },

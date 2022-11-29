@@ -3,13 +3,9 @@ const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mailer = require("../helper/sendmail");
 const models = require("../models");
-
 const { Op } = require("sequelize");
-
-
-const { sequelize } = require("./models");
 const { sequelize } = require("../models");
-const { lock } = require("../routes/user.route");
+const { addReportee } = require("./userReportee.service");
 module.exports = {
   // Login
   loginUser: async (data, callback) => {
@@ -31,7 +27,9 @@ module.exports = {
       }
 
       // jwt token assignment
-      const jsonToken = jwt.sign({ email: email }, process.env.secretKey);
+      const jsonToken = jwt.sign({ email: email }, process.env.secretKey, {
+        expiresIn: "1h",
+      });
       const expirationTime = Date.now() + 1 * 60 * 60 * 1000;
       await models.User.update(
         { token: jsonToken, token_expiration: expirationTime },
@@ -48,6 +46,7 @@ module.exports = {
   },
   // User creation API
   createUser: async (data, callback) => {
+    const trans = await sequelize.transaction();
     try {
       const existingUser = await models.User.findOne({
         where: { email: data.email },
@@ -56,7 +55,7 @@ module.exports = {
       if (existingUser) {
         return callback({ message: "User already exists" }, 409);
       }
-      const trans = await sequelize.transaction();
+
       const value = ({
         first_name,
         last_name,
@@ -122,14 +121,16 @@ module.exports = {
       // transaction commit successfully
       await trans.commit();
       if (data.reportee_id) {
-        return callback(userId, data.reportee_id);
+        return addReportee(userId, data.reportee_id,callback);
       } else {
-        return callback(data, 201);
+        console.log(value);
+        return callback(201, { response: value });
       }
     } catch (error) {
       // rollback transaction if any error
+      console.log(error);
       await trans.rollback();
-      return callback({ error: error }, 500);
+      return callback(500, { error: error });
     }
   },
   deactivateUser: async (data, callback) => {
@@ -146,7 +147,47 @@ module.exports = {
       });
       return callback(202, `User deactivate successfully`);
     } catch (err) {
-      console.log(err);
+      return callback(500, `Something went wrong!`);
+    }
+  },
+  userInfo: async (userEmail, callback) => {
+    try {
+      const userDetails = await models.User.findOne({
+        where: { email: userEmail },
+      });
+
+      const userManagerDetails = await models.UserReportee.findAll({
+        where: { reportee_id: userDetails.dataValues.id },
+      });
+
+      const mangerDetailsArray = [];
+      for (let i = 0; i < userManagerDetails.length; ++i) {
+        const userDetails = await models.User.findOne({
+          where: { id: userManagerDetails[i].dataValues.manager_id },
+        });
+
+        const mangerDetails = {
+          firstName: userDetails.dataValues.first_name,
+          lastName: userDetails.dataValues.last_name,
+          email: userDetails.dataValues.email,
+        };
+
+        mangerDetailsArray.push(mangerDetails);
+      }
+
+      const userInfo = {
+        firstName: userDetails.dataValues.first_name,
+        lastName: userDetails.dataValues.last_name,
+        email: userDetails.dataValues.email,
+        organization: userDetails.dataValues.organization,
+        google_id: userDetails.dataValues.organization,
+        image_url: userDetails.dataValues.image_url,
+        source: userDetails.dataValues.source,
+        managers: mangerDetailsArray,
+      };
+
+      return callback(200, { response: userInfo });
+    } catch (err) {
       return callback(500, `Something went wrong!`);
     }
   },
@@ -185,7 +226,6 @@ module.exports = {
       await mailer.sendMail(body, subject, recipient);
       return callback(200, { response: "password reset link sent" });
     } catch (err) {
-      console.log(err);
       return callback(500, { error: "Something went wrong!" });
     }
   },
@@ -193,32 +233,27 @@ module.exports = {
   getAllUsers: async (callback) => {
     try {
       const user = await models.User.findAll({
-        attributes: { exclude: ['password', 'token', 'token_expiration'] },
+        attributes: { exclude: ["password", "token", "token_expiration"] },
       });
-      
+
       return callback(200, { data: user });
-      
     } catch (err) {
-      console.log(err);
       return callback(500, { error: "Something went wrong!" });
     }
   },
- resetUserPassword: async (query, data, callback) => {
+  resetUserPassword: async (query, data, callback) => {
     try {
       const reset_Token = query.token;
       const password = data.password;
 
-      console.log(reset_Token, password);
-
       const currentTime = Date.now();
-      console.log(currentTime);
+
       const isUserExist = await models.User.findOne({
         where: {
           token: reset_Token,
-          token_expiration: { [Op.gt]: currentTime }
-        }
+          token_expiration: { [Op.gt]: currentTime },
+        },
       });
-
 
       if (!isUserExist) {
         return callback(400, { error: "Invalid reset token" });
@@ -226,25 +261,25 @@ module.exports = {
 
       const userEmail = isUserExist.dataValues.email;
 
-      await models.User.update({
-        password: await hash(password, 10),
-        token_expiration: Date.now()
-      }, {
-        where: {
-          email: userEmail
+      await models.User.update(
+        {
+          password: await hash(password, 10),
+          token_expiration: Date.now(),
+        },
+        {
+          where: {
+            email: userEmail,
+          },
         }
-      });
-      
+      );
 
       const emailBody = `Your password has been reset successfully`;
-      const emailSubject = `Password reset`
-      
+      const emailSubject = `Password reset`;
 
       await mailer.sendMail(emailBody, emailSubject, userEmail);
       return callback(200, { response: "Password reset success" });
-
     } catch (err) {
       return callback(500, { error: `something went wrong` });
     }
-  }
-}
+  },
+};
