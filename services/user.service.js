@@ -3,6 +3,9 @@ const { hash } = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const models = require("../models");
 const user = require("../models/user");
+const mailer = require("../helper/sendmail");
+const { Op } = require("sequelize");
+
 
 module.exports = {
 
@@ -141,7 +144,7 @@ module.exports = {
           firstName: userDetails.dataValues.first_name,
           lastName: userDetails.dataValues.last_name,
           email: userDetails.dataValues.email
-        } 
+        }
 
         mangerDetailsArray.push(mangerDetails);
       }
@@ -164,6 +167,50 @@ module.exports = {
     } catch (err) {
       console.log(err);
       return callback(500, `Something went wrong!`);
-    } 
+    }
+  },
+  resetUserPassword: async (query,data, callback) => {
+    try {
+      const reset_Token = query.token;
+      const password = data.password;
+
+      console.log(reset_Token, password);
+
+      const currentTime = Date.now();
+      console.log(currentTime);
+      const isUserExist = await models.User.findOne({
+        where: {
+          token: reset_Token,
+          token_expiration: {[Op.gt]:currentTime}
+        }
+      });
+
+
+      if (!isUserExist) {
+        return callback(400, { error: "Invalid reset token" });
+      }
+
+      const userEmail = isUserExist.dataValues.email;
+
+      await models.User.update({
+        password: await hash(password, 10),
+        token_expiration: Date.now()
+      }, {
+        where: {
+          email:userEmail
+        }
+      });
+      
+
+      const emailBody = `Your password has been reset successfully`;
+      const emailSubject = `Password reset`
+      
+
+      await mailer.sendMail(emailBody, emailSubject, userEmail);
+      return callback(200, { response: "Password reset success" });
+
+    } catch (err) {
+      return callback(500, { error: `something went wrong` });
+    }
   }
 };

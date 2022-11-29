@@ -12,4 +12,5 @@ router.post("/login", validator.userValidator.loginSchema, controllers.User.logi
 router.post("/createUser", checkToken, verifyUser, validator.userValidator.createUserSchema, controllers.User.createUser, genericResponse.sendResponse);
 router.delete("/deactiveUser/:id", checkToken, verifyUser, controllers.User.deactiveUsers, genericResponse.sendResponse);
 router.get("/userInfo", checkToken, controllers.User.getUserInfo, genericResponse.sendResponse);
+router.post("/resetUserPassword",validator.userValidator.resetPasswordQuerySchema,validator.userValidator.resetUserPasswordSchema,controllers.User.resetUserPassword, genericResponse.sendResponse);
 module.exports = router;
