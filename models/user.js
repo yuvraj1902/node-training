@@ -59,6 +59,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         isAlphanumeric: true,
       },
+      is_firsttime: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
+      },
       token: {
         type: DataTypes.TEXT,
         allowNull: true,

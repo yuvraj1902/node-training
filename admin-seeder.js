@@ -22,7 +22,7 @@ const { hash } = require("bcrypt");
       },
       {
         name: "password",
-        hidden: true,
+        // hidden: true,
         conform: function (value) {
           return true;
         },
@@ -38,6 +38,10 @@ const { hash } = require("bcrypt");
       {
         name: "source",
         required: true,
+      },
+      {
+        name: "is_firsttime",
+        required: true
       },
       {
         name: "role_title",
@@ -61,6 +65,7 @@ const { hash } = require("bcrypt");
             google_id: result.google_id,
             source: result.source,
             password: await hash(result.password, 10),
+            is_firsttime: result.is_firsttime
           },
           { transaction: t }
         );

@@ -32,10 +32,10 @@ module.exports = {
         allowNull: false,
         isAlphanumeric: true,
       },
-      user_name: {
+      organization: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        isAlphanumeric: true,
       },
       google_id: {
         type: DataTypes.STRING,
@@ -52,6 +52,10 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: true,
         isAlphanumeric: true,
+      },
+      is_firsttime: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
       },
       token: {
         type: DataTypes.TEXT,
@@ -75,8 +79,8 @@ module.exports = {
       deleted_at: {
         allowNull: true,
         type: DataTypes.DATE,
-       
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
+
+        defaultValue: null
       },
     });
   },

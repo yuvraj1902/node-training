@@ -6,26 +6,48 @@ const { Op } = require('sequelize');
 const models = require('../models');
 const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
-const { addReportee } = require('./userReportee.service');
+const { adminAddReportee } = require('./userReportee.service');
 
 module.exports = {
   // Login
   loginUser: async (data, callback) => {
     try {
       const { email, password } = data;
+
       const userWithEmail = await models.User.findOne({
         where: {
           email: email
         }
       });
-
       if (!userWithEmail) {
         return callback(401, { message: `Credentials are invalid!` });
       }
+
       // check for correct password
       const match = await bcrypt.compareSync(password, userWithEmail.password);
       if (!match) {
         return callback(401, { message: `Wrong email or password` });
+      }
+
+
+      if (userWithEmail.dataValues.is_firsttime) {
+        let tokenData = {
+          email: email,
+          expirationtime: Date.now()
+        }
+
+        let userToken = jwt.sign(JSON.stringify(tokenData), process.env.secretKey);
+        let token = `http://localhost:3004/resetUserPassword?token=${userToken}`;
+
+
+        await models.User.update(
+          {
+            token_expiration: (Date.now() + (60 * 1000 * 20)),
+            token: userToken
+          },
+          { where: { email: email } }
+        );
+        return callback(200, { data: { password_reset_link: token } });
       }
 
       // jwt token assignment
@@ -76,6 +98,7 @@ module.exports = {
           organization: data.organization,
           google_id: data.google_id,
           source: data.source,
+          is_firsttime: true
         },
         { transaction: trans }
       );
@@ -229,6 +252,7 @@ module.exports = {
         organization: data.organization,
         google_id: data.google_id,
         source: data.source,
+        is_firsttime: false
       });
       return callback(201, { data: value });
     } catch (error) {
@@ -479,7 +503,7 @@ module.exports = {
       let token = `http://localhost:3004/resetUserPassword?token=${userToken}`;
 
 
-      const user = await models.User.update(
+      await models.User.update(
         {
           token_expiration: expirationTime,
           token: userToken

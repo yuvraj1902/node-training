@@ -48,8 +48,10 @@ router.get(
     controllers.User.getUserInfo,
     genericResponse.sendResponse
 );
-router.delete(
+router.post(
     '/resetUserPassword',
+    validator.userValidator.resetPasswordQuerySchema,
+    validator.userValidator.resetUserPasswordSchema,
     controllers.User.resetUserPassword,
     genericResponse.sendResponse
 );
