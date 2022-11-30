@@ -11,11 +11,11 @@ const router = Router();
 router.post(
     '/login',
     validator.userValidator.loginSchema,
-    controllers.User.loginUsers,
+    controllers.User.loginUser,
     genericResponse.sendResponse
 );
 router.post(
-    '/createUser',
+    '/create-user',
     checkToken,
     verifyUser,
     validator.userValidator.createUserSchema,
@@ -43,20 +43,20 @@ router.get(
     genericResponse.sendResponse
 );
 router.get(
-    '/userInfo',
+    '/user-info',
     checkToken,
     controllers.User.getUserInfo,
     genericResponse.sendResponse
 );
 router.post(
-    '/resetUserPassword',
+    '/reset-user-password',
     validator.userValidator.resetPasswordQuerySchema,
     validator.userValidator.resetUserPasswordSchema,
     controllers.User.resetUserPassword,
     genericResponse.sendResponse
 );
 router.delete(
-    '/deactivateUser',
+    '/deactivate-user',
     checkToken,
     verifyUser,
     validator.userValidator.deactivateUserSchema,
@@ -64,7 +64,7 @@ router.delete(
     genericResponse.sendResponse
 );
 router.patch(
-    '/enableUser',
+    '/enable-user',
     checkToken,
     verifyUser,
     validator.userValidator.enableUserSchema,
@@ -72,7 +72,7 @@ router.patch(
     genericResponse.sendResponse
 );
 router.get(
-    '/userDetails',
+    '/user-details',
     checkToken,
     verifyUser,
     validator.userValidator.userDetailsSchema,

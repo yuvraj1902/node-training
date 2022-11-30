@@ -1,5 +1,5 @@
 module.exports = {
   sendResponse: async (req, res) => {
-    return res.status(req.statusCode).json(req.result);
+    return res.status(200).json(res.data);
   },
 };

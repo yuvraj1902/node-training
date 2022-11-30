@@ -1,85 +1,38 @@
-const express = require('express');
-const cors = require('cors');
+const fs = require('fs');
+const { resolve } = require('path');
+const routesFolder = resolve('./routes');
 
-const userRoutes = require('./user.route');
-const roleRoutes = require('./role.route');
-const userReporteeRoutes = require('./userReportee.route');
+function camelCaseToDash(myStr) {
+  return myStr.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+}
 
-const app = express();
+// HELPER FUNCTION TO GET ALL ROUTES PATH
+const getAllRoutesPath = function () {
+  const allRoutesPath = [];
 
-app.use(cors());
-app.use(express.json());
-app.use('/', userRoutes);
-app.use('/', roleRoutes);
-app.use('/', userReporteeRoutes);
+  fs.readdirSync(routesFolder).forEach(file => {
+    const fullPath = `${routesFolder}/${file}`;
+    if (fs.existsSync(fullPath) && fullPath.endsWith('.route.js')) {
+      allRoutesPath.push({
+        fullPath: fullPath.replace('.js', ''),
+        fileName: file.replace('.route.js', '')
+      });
+    }
+  });
 
+  return allRoutesPath;
+};
 
-module.exports = app;
+// MAIN FUNCTION TO REGISTER ALL ROUTES
+const registerRoutes = function (expressInstance) {
+  const allRoutesPath = getAllRoutesPath();
+  // LOAD ALL NESTED ROUTES FILE
+  for (const routeFile of allRoutesPath) {
+    const router = require(routeFile.fullPath);
+    expressInstance.use(`/api/${camelCaseToDash(routeFile.fileName)}`, router);
+  }
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const { Router } = require("express");
-// const controllers = require("../controllers");
-// const { checkToken } = require("../middlewares/auth");
-// const { verifyUser } = require("../middlewares/user-verification");
-// const validator = require('../validators');
-// const genericResponse = require('../helper/generic-response');
-// const router = Router();
-
-// router.post("/login", validator.userValidator.loginSchema, controllers.User.loginUsers, genericResponse.sendResponse);
-// router.post("/createUser", checkToken, verifyUser, validator.userValidator.createUserSchema, controllers.User.createUser, genericResponse.sendResponse);
-// router.delete("/deactiveUser/:id", checkToken, verifyUser, controllers.User.deactiveUsers, genericResponse.sendResponse);
-// router.post('/addReportee/:id', checkToken, validator.addReporteeValidator.addReporteeSchema, controllers.UserReportee.addReportee, genericResponse.sendResponse);
-
-// module.exports = router;
+module.exports = {
+  registerRoutes
+};

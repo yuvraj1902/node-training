@@ -1,5 +1,4 @@
 const { createUser,
-    loginUser,
     deactivateUser,
     userInfo,
     resetUserPassword,
@@ -8,17 +7,66 @@ const { createUser,
     enableUser,
     userDetail} = require('../services/user.service');
 
+const { commonErrorHandler } = require('../helper/errorHandler')
+
+
+const userService = require('../services/user.service');
+
+
+const loginUser = async (req, res, next) => {
+    try {
+        const { body: payload } = req;
+        const data = await userService.loginUser(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+// user level accell
+// self pwd reset
+const resetpPwd = async (req, res, next) => {
+    try {
+        const { body, user } = req;
+        const payload = {
+            userId: user.id,
+            newPassword: body.password
+        }
+        const data = await userService.loginUser(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+// admin level accell
+// admin pwd reset
+const adminPwdReset = async (req, res, next) => {
+    try {
+        const { body } = req;
+        const payload = {
+            userId: body.id,
+            newPassword: body.password
+        }
+        const data = await userService.loginUser(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
 
 module.exports = {
-    // login API
-    loginUsers: async (req, res, next) => {
-        loginUser(req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        });
-    },
-
+    loginUser,
     // createUser API
     registration: async (req, res, next) => {
         createUser(req.body, (result, statusCode) => {

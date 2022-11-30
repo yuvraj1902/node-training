@@ -3,7 +3,8 @@ const { sequelize } = require("./models");
 const prompt = require("prompt");
 const colors = require("@colors/colors/safe");
 const { hash } = require("bcrypt");
-(async function admin() {
+
+async function admin() {
   await prompt.start();
 
   await prompt.get(
@@ -112,4 +113,6 @@ const { hash } = require("bcrypt");
       }
     }
   );
-})();
+}
+
+admin();

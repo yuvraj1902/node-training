@@ -8,9 +8,36 @@ const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
 
+const userHelper = require('../helper/user.helper');
+
+// const getUser = () => {
+  
+// }
+
+const loginUser = async(payload) => {
+  const { email, password } = payload;
+  const user = await userHelper.getUserByEmail(email);
+
+  const match = await bcrypt.compareSync(password, user.password);
+  if (!match) {
+    throw new Error('Wrong email or password');
+  }
+
+  // jwt token assignment
+  const jsonToken = jwt.sign({ userId: user.id, email: email }, process.env.secretKey, {
+    expiresIn: "1h",
+  });
+
+  return {
+    user: user,
+    token: jsonToken
+  }
+}
+
 module.exports = {
   // Login
-  loginUser: async (data, callback) => {
+  loginUser,
+  loginUser1: async (data, callback) => {
     try {
       const { email, password } = data;
 

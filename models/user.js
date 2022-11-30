@@ -63,14 +63,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false
       },
-      token: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      token_expiration: {
-        type: DataTypes.BIGINT,
-        allowNull: true,
-      },
+      // token: {
+      //   type: DataTypes.TEXT,
+      //   allowNull: true,
+      // },
+      // token_expiration: {
+      //   type: DataTypes.BIGINT,
+      //   allowNull: true,
+      // },
     },
 
     {
