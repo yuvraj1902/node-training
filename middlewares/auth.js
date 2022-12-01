@@ -15,12 +15,14 @@ module.exports = {
                 message: `You are not authorized`
               });
             }
+            console.log('in auth hello');
             const user = await models.User.findOne({
               where: {
-                email: decoded.email
+                id: decoded.userId
               },
               include: models.Role
             });
+            console.log('in auth hello');
             if (!user) return res.status(404).json({
               message: `User not found`
             })

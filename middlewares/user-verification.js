@@ -1,6 +1,7 @@
 module.exports = {
     verifyUser: async (req, res, next) => {
         try {
+            console.log('in verification hello');
             if (req.user.Roles[0].dataValues.role_code == 1001) {
                 next();
             } else {

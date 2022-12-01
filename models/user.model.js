@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
 
       this.belongsToMany(models.User, { through: 'user_reportee', as: 'manager_id' });
       this.belongsToMany(models.User, { through: 'user_reportee', as: 'reportee_id' });
+      this.hasOne(models.RefreshToken, {
+        foreignKey: 'user_id',
+        targetKey: 'id'
+      })
     }
   }
 
@@ -63,14 +67,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false
       },
-      // token: {
-      //   type: DataTypes.TEXT,
-      //   allowNull: true,
-      // },
-      // token_expiration: {
-      //   type: DataTypes.BIGINT,
-      //   allowNull: true,
-      // },
     },
 
     {

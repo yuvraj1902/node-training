@@ -3,9 +3,8 @@ const { createUser,
     userInfo,
     resetUserPassword,
     forgetPassword,
-    getAllUsers,
     enableUser,
-    userDetail} = require('../services/user.service');
+    userDetail } = require('../services/user.service');
 
 const { commonErrorHandler } = require('../helper/errorHandler')
 
@@ -17,6 +16,44 @@ const loginUser = async (req, res, next) => {
     try {
         const { body: payload } = req;
         const data = await userService.loginUser(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        // console.log('-----', error);
+        // console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+const refreshToken = async (req, res, next) => {
+    try {
+        const { refreshToken: requestToken } = req.body;
+        const data = await userService.refreshToken(requestToken);
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+const getAllUsers = async (req, res, next) => {
+    try {
+        const data = await userService.getAllUsers();
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+const logoutUser = async (req, res, next) => {
+    try {
+        const { refreshToken: requestToken } = req.body;
+        const data = await userService.logoutUser(requestToken);
         res.data = data;
         next();
     } catch (error) {
@@ -67,6 +104,9 @@ const adminPwdReset = async (req, res, next) => {
 
 module.exports = {
     loginUser,
+    getAllUsers,
+    refreshToken,
+    logoutUser,
     // createUser API
     registration: async (req, res, next) => {
         createUser(req.body, (result, statusCode) => {
@@ -112,13 +152,7 @@ module.exports = {
         })
     },
 
-    getAllUsers: async (req, res, next) => {
-        getAllUsers((statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        });
-    },
+
 
     enableUsers: async (req, res, next) => {
         enableUser(req.body, (statusCode, result) => {

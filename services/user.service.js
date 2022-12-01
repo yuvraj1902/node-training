@@ -8,15 +8,20 @@ const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
 
-const userHelper = require('../helper/user.helper');
 
-// const getUser = () => {
-  
-// }
 
-const loginUser = async(payload) => {
+
+const loginUser = async (payload) => {
   const { email, password } = payload;
-  const user = await userHelper.getUserByEmail(email);
+
+  const user = await models.User.findOne({
+    where: {
+      email: email
+    }
+  });
+  if (!user) {
+    throw new Error('Credentials are invalid!');
+  }
 
   const match = await bcrypt.compareSync(password, user.password);
   if (!match) {
@@ -24,77 +29,84 @@ const loginUser = async(payload) => {
   }
 
   // jwt token assignment
-  const jsonToken = jwt.sign({ userId: user.id, email: email }, process.env.secretKey, {
-    expiresIn: "1h",
+  const accessToken = jwt.sign({ userId: user.id }, process.env.secretKey, {
+    expiresIn: process.env.jwtExpiration
+  });
+  let refreshToken = await models.RefreshToken.createToken(user);
+
+  let userRoles = await models.UserRoleMapping.findAll({
+    where: {
+      user_id: user.id
+    }
+  });
+  let authorities = [];
+  for (let i = 0; i < userRoles.length; i++) {
+    const role = await models.Role.findOne({
+      where: {
+        id: userRoles[i].role_id
+      }
+    });
+    authorities.push(role.role_title);
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    roles: authorities,
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  }
+}
+
+const refreshToken = async (requestToken) => {
+  if (!requestToken) throw new Error('Refresh Token is required!');
+
+  let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
+  if (!refreshToken) {
+    throw new Error('Refresh token is not in database!');
+  }
+
+  if (models.RefreshToken.verifyExpiration(refreshToken.expiry_date)) {
+    models.RefreshToken.destroy({ where: { token: refreshToken.token } });
+    throw new Error('Refresh token was expired. Please make a new signin request');
+  }
+
+  const userId = refreshToken.user_id;
+  let newAccessToken = jwt.sign({ userId: userId }, process.env.secretKey, {
+    expiresIn: process.env.jwtExpiration
   });
 
   return {
-    user: user,
-    token: jsonToken
+    accessToken: newAccessToken,
+    refreshToken: refreshToken.token,
   }
 }
+
+const getAllUsers = async () => {
+  const users = await models.User.findAll({
+    attributes: { exclude: ["password"] },
+  });
+  if (!users) {
+    throw new Error('Not Found');
+  }
+  return users;
+}
+
+const logoutUser = async (requestToken) => {
+  let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
+  if (!refreshToken) return;
+  models.RefreshToken.destroy({ where: { token: refreshToken.token } });
+  return;
+
+}
+
 
 module.exports = {
   // Login
   loginUser,
-  loginUser1: async (data, callback) => {
-    try {
-      const { email, password } = data;
-
-      const userWithEmail = await models.User.findOne({
-        where: {
-          email: email
-        }
-      });
-      if (!userWithEmail) {
-        return callback(401, { message: `Credentials are invalid!` });
-      }
-
-      // check for correct password
-      const match = await bcrypt.compareSync(password, userWithEmail.password);
-      if (!match) {
-        return callback(401, { message: `Wrong email or password` });
-      }
-
-
-      if (userWithEmail.dataValues.is_firsttime) {
-        let tokenData = {
-          email: email,
-          expirationtime: Date.now()
-        }
-
-        let userToken = jwt.sign(JSON.stringify(tokenData), process.env.secretKey);
-        let token = `http://localhost:3004/resetUserPassword?token=${userToken}`;
-
-
-        await models.User.update(
-          {
-            token_expiration: (Date.now() + (60 * 1000 * 20)),
-            token: userToken
-          },
-          { where: { email: email } }
-        );
-        return callback(200, { data: { password_reset_link: token } });
-      }
-
-      // jwt token assignment
-      const jsonToken = jwt.sign({ email: email }, process.env.secretKey, {
-        expiresIn: "1h",
-      });
-      const expirationTime = Date.now() + (1 * 60 * 60 * 1000);
-      await models.User.update(
-        { token: jsonToken, token_expiration: expirationTime },
-        {
-          where: {
-            id: userWithEmail.id,
-          },
-        }
-      );
-      return callback(200, { data: { token: jsonToken } });
-    } catch (error) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
+  getAllUsers,
+  refreshToken,
+  logoutUser,
   // User creation API
   createUser: async (data, callback) => {
     const trans = await sequelize.transaction();
@@ -323,17 +335,7 @@ module.exports = {
     }
   },
 
-  getAllUsers: async (callback) => {
-    try {
-      const user = await models.User.findAll({
-        attributes: { exclude: ["password", "token", "token_expiration"] },
-      });
 
-      return callback(200, { data: user });
-    } catch (err) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
   resetUserPassword: async (query, data, callback) => {
     try {
       const reset_Token = query.token;
@@ -592,18 +594,6 @@ module.exports = {
     }
   },
 
-  getAllUsers: async (callback) => {
-    try {
-      const user = await models.User.findAll({
-        attributes: { exclude: ['password', 'token', 'token_expiration', 'updated_at', 'deleted_at'] },
-      });
-
-      return callback(200, { data: user });
-
-    } catch (err) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  }
 
 };
 

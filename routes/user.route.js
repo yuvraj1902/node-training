@@ -15,6 +15,16 @@ router.post(
     genericResponse.sendResponse
 );
 router.post(
+    '/refresh-token',
+    controllers.User.refreshToken,
+    genericResponse.sendResponse
+);
+router.delete(
+    '/logout',
+    controllers.User.logoutUser,
+    genericResponse.sendResponse
+)
+router.post(
     '/create-user',
     checkToken,
     verifyUser,

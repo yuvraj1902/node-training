@@ -57,14 +57,6 @@ module.exports = {
         type: DataTypes.BOOLEAN,
         allowNull: false
       },
-      // token: {
-      //   type: DataTypes.TEXT,
-      //   allowNull: true,
-      // },
-      // token_expiration: {
-      //   type: DataTypes.BIGINT,
-      //   allowNull: true,
-      // },
       created_at: {
         allowNull: false,
         type: DataTypes.DATE,
