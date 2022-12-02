@@ -47,7 +47,6 @@ const loginUser = async (payload) => {
   return {
     id: user.id,
     email: user.email,
-    roles: authorities,
     accessToken: accessToken,
     refreshToken: refreshToken,
   };
