@@ -7,12 +7,12 @@ module.exports = {
       {
         role_key:"ADM",
         role_code:"1001",
-        role_title:"Admin"
+        role_title:"ADMIN"
       },
       {
         role_key:"USR",
         role_code:"1002",
-        role_title:"User"
+        role_title:"USER"
       }
     ]
     )
