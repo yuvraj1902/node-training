@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('roles', {
+    await queryInterface.createTable('role', {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.literal('uuid_generate_v4()'),
@@ -42,6 +42,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('roles');
+    await queryInterface.dropTable('role');
   }
 };
