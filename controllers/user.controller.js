@@ -1,4 +1,17 @@
+<<<<<<< HEAD
 const { commonErrorHandler } = require("../helper/errorHandeler");
+=======
+const { createUser,
+    deactivateUser,
+    userInfo,
+    resetUserPassword,
+    forgetPassword,
+    enableUser,
+    userDetail } = require('../services/user.service');
+
+const { commonErrorHandler } = require('../helper/errorHandler')
+const userService = require('../services/user.service');
+>>>>>>> 05818d1 (Refactor userAddReportee and adminAddReportee API)
 
 const userService = require("../services/user.service");
 
