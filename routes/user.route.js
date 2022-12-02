@@ -58,11 +58,30 @@ router.get(
     controllers.User.getUserInfo,
     genericResponse.sendResponse
 );
+
+
+
 router.post(
-    '/reset-user-password',
-    validator.userValidator.resetPasswordQuerySchema,
-    validator.userValidator.resetUserPasswordSchema,
+    '/reset-password',
+    checkToken,
+    validator.userValidator.resetPasswordSchema,
     controllers.User.resetPassword,
+    genericResponse.sendResponse
+);
+
+router.post(
+    '/reset-password/:token',
+    controllers.User.resetPasswordByLink,
+    genericResponse.sendResponse
+);
+
+
+router.post(
+    '/admin-reset-password',
+    checkToken,
+    verifyUser,
+    validator.userValidator.adminResetPasswordSchema,
+    controllers.User.adminResetPassword,
     genericResponse.sendResponse
 );
 router.delete(

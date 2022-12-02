@@ -65,13 +65,11 @@ module.exports = {
       updated_at: {
         allowNull: false,
         type: DataTypes.DATE,
-
         defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
       },
       deleted_at: {
         allowNull: true,
         type: DataTypes.DATE,
-
         defaultValue: null
       },
     });

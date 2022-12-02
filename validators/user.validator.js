@@ -36,38 +36,20 @@ module.exports = {
 
         validateRequest(req, res, next, schema, 'body');
     },
-    resetUserPasswordSchema: async (req, res, next) => {
-        try {
-            const checkresetPasswordSchema = Joi.object({
+    resetPasswordSchema: async (req, res, next) => {
+            const schema = Joi.object({
                 password: passwordComplexity(complexityOptions).required(),
             });
-            const result = checkresetPasswordSchema.validate(req.body, req.query);
-            if (result.error) {
-                return res.status(400).json({ message: result.error.details[0].message });
-            } else {
-                next();
-            }
-        } catch (error) {
-            return res.status(500).json({ message: `Something went wrong` });
-        }
+        validateRequest(req, res, next, schema, 'body');
     },
-
-    resetPasswordQuerySchema: async (req, res, next) => {
-        try {
-            const checkresetPasswordSchema = Joi.object({
-                token: Joi.string().regex(/^.*$/).min(10).max(500).required(),
+    adminResetPasswordSchema: async (req, res, next) => {
+        const schema = Joi.object({
+                userEmail: Joi.string().email().lowercase().required(),
+                password: passwordComplexity(complexityOptions).required(),
             });
-
-            const result = checkUserSchema.validate(req.body);
-            if (result.error) {
-                return res.status(400).json({ message: result.error.details[0].message });
-            } else {
-                next();
-            }
-        } catch (error) {
-            return res.status(500).json({ message: `Something went wrong` });
-        }
+        validateRequest(req, res, next, schema, 'body');
     },
+
     forgetPassword: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({

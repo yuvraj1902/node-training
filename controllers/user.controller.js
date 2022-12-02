@@ -15,7 +15,9 @@ const userService = require('../services/user.service');
 const loginUser = async (req, res, next) => {
     try {
         const { body: payload } = req;
+        console.log("Inside Controller")
         const data = await userService.loginUser(payload);
+        console.log("Service done");
         res.data = data;
         next();
     } catch (error) {
@@ -65,10 +67,55 @@ const logoutUser = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
     try {
-        const { body, user } = req;
+        const { body, user,params } = req;
         const payload = {
-            userId: user.id,
-            newPassword: body.password
+            newPassword: body.password,
+            userEmail: user.email,
+            token:(Object.keys(params).length>0?params.token:null)
+
+        }
+        console.log(payload);
+        const data = await userService.resetUserPassword(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+
+const resetPasswordByLink = async (req, res, next) => {
+    try {
+        const { body,params } = req;
+        const payload = {
+            newPassword: body.password,
+            userEmail: null,
+            token:(Object.keys(params).length>0?params.token:null)
+        }
+        console.log(payload);
+        const data = await userService.resetUserPassword(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+
+
+
+const adminResetPassword = async (req, res, next) => {
+    try {
+        const { body,params} = req;
+        const payload = {
+            newPassword: body.password,
+            userEmail: body.userEmail,
+            token:(Object.keys(params).length>0?query.token:null)
+
         }
         console.log(payload);
         const data = await userService.resetUserPassword(payload);
@@ -106,6 +153,7 @@ module.exports = {
     getAllUsers,
     refreshToken,
     logoutUser,
+    resetPasswordByLink,
     // createUser API
     registration: async (req, res, next) => {
         createUser(req.body, (result, statusCode) => {
@@ -168,7 +216,8 @@ module.exports = {
             next();
         });
     },
-    resetPassword
+    resetPassword,
+    adminResetPassword
 
 };
 

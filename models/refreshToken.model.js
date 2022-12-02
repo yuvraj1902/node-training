@@ -32,16 +32,18 @@ module.exports = (sequelize, DataTypes) => {
   });
   RefreshToken.createToken = async function (user) {
     let expiredAt = new Date();
-
+    
     expiredAt.setSeconds(expiredAt.getSeconds() + process.env.jwtRefreshExpiration);
 
+    console.log(expiredAt.getTime());
     let _token = uuidv4();
+    console.log("here");
     let refreshToken = await this.create({
       token: _token,
       user_id: user.dataValues.id,
       expiry_date: expiredAt.getTime(),
     });
-
+    console.log("Not here");
     return refreshToken.token;
   };
 
