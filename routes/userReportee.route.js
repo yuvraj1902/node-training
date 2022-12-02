@@ -8,7 +8,7 @@ const validator = require("../validators");
 const genericResponse = require("../helper/generic-response");
 
 router.post(
-  "/userAddReportee",
+  "/user-add-reportee",
   checkToken,
   validator.reporteeValidator.userReporteeSchema,
   controllers.UserReportee.userAddReportee,
@@ -22,7 +22,7 @@ router.delete(
   genericResponse.sendResponse
 );
 router.post(
-  "/adminAddReportee",
+  "/admin-add-reportee",
   checkToken,
   verifyUser,
   validator.reporteeValidator.adminReporteeSchema,

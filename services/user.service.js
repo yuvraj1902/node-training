@@ -36,25 +36,9 @@ const loginUser = async (payload) => {
 
   let refreshToken = await models.RefreshToken.createToken(user);
 
-  let userRoles = await models.UserRoleMapping.findAll({
-    where: {
-      user_id: user.id
-    }
-  });
-  let authorities = [];
-  for (let i = 0; i < userRoles.length; i++) {
-    const role = await models.Role.findOne({
-      where: {
-        id: userRoles[i].role_id
-      }
-    });
-    authorities.push(role.role_title);
-  }
-
   return {
     id: user.id,
     email: user.email,
-    roles: authorities,
     accessToken: accessToken,
     refreshToken: refreshToken,
   }
@@ -239,7 +223,6 @@ const userDetail =  async (payload) => {
 
 
 module.exports = {
-  // Login
   loginUser,
   getAllUsers,
   refreshToken,

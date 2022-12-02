@@ -37,9 +37,16 @@ module.exports = {
         validateRequest(req, res, next, schema, 'body');
     },
     resetPasswordSchema: async (req, res, next) => {
-            const schema = Joi.object({
+        const schema = Joi.object({
                 password: passwordComplexity(complexityOptions).required(),
-            });
+        })
+            validateRequest(req, res, next, schema, 'body');
+    },
+
+    refreshTokenSchema: async (req, res, next) => {
+        const schema = Joi.object({
+            refreshToken: Joi.string().guid().required()
+        });
         validateRequest(req, res, next, schema, 'body');
     },
     adminResetPasswordSchema: async (req, res, next) => {
