@@ -5,6 +5,7 @@ const compression = require('compression');
 
 const routes = require('./routes');
 
+
 const app = express();
 app.use(express.json());
 
@@ -20,7 +21,7 @@ app.use(compression());
 // Disble x-powered-by header to hide server side technology
 app.disable('x-powered-by');
 
-app.use('/health', (_req, res) => {
+app.use('/health', (req, res) => {
   res.send({ message: 'Application runing successfully!' });
 });
 

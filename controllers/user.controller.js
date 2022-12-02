@@ -128,6 +128,21 @@ const adminResetPassword = async (req, res, next) => {
     }
 }
 
+const getUserInfo = async (req, res, next) => {
+    try {
+        const payload = {
+            userId: req.user.id,
+        }
+        const data = await userService.userInfo(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
 // admin level accell
 // admin pwd reset
 // const adminPwdReset = async (req, res, next) => {
@@ -154,6 +169,7 @@ module.exports = {
     refreshToken,
     logoutUser,
     resetPasswordByLink,
+    getUserInfo,
     // createUser API
     registration: async (req, res, next) => {
         createUser(req.body, (result, statusCode) => {
@@ -175,21 +191,8 @@ module.exports = {
             next();
         })
     },
-    getUserInfo: async (req, res, next) => {
-        userInfo(req.user.dataValues.email, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        })
-    },
-
-    // resetUserPassword: async (req, res, next) => {
-    //     resetUserPassword(req.query, req.body, (statusCode, result) => {
-    //         req.statusCode = statusCode;
-    //         req.result = result;
-    //         next();
-    //     })
-    // },
+    
+   
 
     forgetPassword: async (req, res, next) => {
         forgetPassword(req.body, (statusCode, result) => {

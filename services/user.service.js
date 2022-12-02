@@ -136,6 +136,64 @@ const resetUserPassword = async (payload) => {
   }
 }
 
+const userInfo = async (payload) => {
+     const userDetails = await models.User.findOne({
+        where: { id: payload.userId }, include: models.Role
+      });
+
+      // user Roles 
+      const userRolesArray = [];
+
+      console.log("here")
+      for (let i = 0; i < userDetails.Roles.length; ++i){
+        userRolesArray.push(userDetails.Roles[i].role_title);
+      }
+
+      const userDetailsDesignation = await models.User.findOne({
+        where: { id: payload.userId }, include: models.Designation
+      });
+      
+      const userDesignationArray = [];
+      for (let i = 0; i < userDetailsDesignation.Designations.length; ++i){
+        userDesignationArray.push(userDetailsDesignation.Designations[i].designation_title);
+      }
+
+      // user Manager
+      const userManagerDetails = await models.UserReportee.findAll({ where: { reportee_id: userDetails.dataValues.id } });
+      console.log(userManagerDetails);
+
+      const mangerDetailsArray = [];
+      for (let i = 0; i < userManagerDetails.length; ++i) {
+        const userDetails = await models.User.findOne(
+          { where: { id: userManagerDetails[i].dataValues.manager_id } });
+        
+        const mangerDetails = {
+          firstName: userDetails.dataValues.first_name,
+          lastName: userDetails.dataValues.last_name,
+          email: userDetails.dataValues.email
+        }
+
+        mangerDetailsArray.push(mangerDetails);
+      }
+
+
+      const userInfo = {
+        firstName: userDetails.dataValues.first_name,
+        lastName: userDetails.dataValues.last_name,
+        email: userDetails.dataValues.email,
+        organization: userDetails.dataValues.organization,
+        google_id: userDetails.dataValues.organization,
+        image_url: userDetails.dataValues.image_url,
+        source: userDetails.dataValues.source,
+        roles: userRolesArray,
+        designation:userDesignationArray,
+        managers: mangerDetailsArray
+      }
+
+      return userInfo;
+  }
+
+
 
 module.exports = {
   // Login
@@ -144,6 +202,7 @@ module.exports = {
   refreshToken,
   logoutUser,
   resetUserPassword,
+  userInfo,
   // User creation API
   createUser: async (data, callback) => {
     const trans = await sequelize.transaction();
@@ -260,48 +319,7 @@ module.exports = {
     }
   },
 
-  userInfo: async (userEmail, callback) => {
-    try {
-      const userDetails = await models.User.findOne({
-        where: { email: userEmail },
-      });
-
-      const userManagerDetails = await models.UserReportee.findAll({
-        where: { reportee_id: userDetails.dataValues.id },
-      });
-
-      const mangerDetailsArray = [];
-      for (let i = 0; i < userManagerDetails.length; ++i) {
-        const userDetails = await models.User.findOne({
-          where: { id: userManagerDetails[i].dataValues.manager_id },
-        });
-
-        const mangerDetails = {
-          firstName: userDetails.dataValues.first_name,
-          lastName: userDetails.dataValues.last_name,
-          email: userDetails.dataValues.email,
-        };
-
-        mangerDetailsArray.push(mangerDetails);
-      }
-
-      const userInfo = {
-        firstName: userDetails.dataValues.first_name,
-        lastName: userDetails.dataValues.last_name,
-        email: userDetails.dataValues.email,
-        organization: userDetails.dataValues.organization,
-        google_id: userDetails.dataValues.organization,
-        image_url: userDetails.dataValues.image_url,
-        source: userDetails.dataValues.source,
-        managers: mangerDetailsArray,
-      };
-
-      return callback(200, { response: userInfo });
-    } catch (err) {
-      return callback(500, `Something went wrong!`);
-    }
-  },
-
+  
   registration: async (data, callback) => {
     try {
       const existingUser = await models.User.findOne({
@@ -471,46 +489,7 @@ module.exports = {
     }
   },
 
-  userInfo: async (userEmail, callback) => {
-    try {
-      const userDetails = await models.User.findOne(
-        { where: { email: userEmail } });
-
-      const userManagerDetails = await models.UserReportee.findAll({ where: { reportee_id: userDetails.dataValues.id } });
-
-      const mangerDetailsArray = [];
-      for (let i = 0; i < userManagerDetails.length; ++i) {
-        const userDetails = await models.User.findOne(
-          { where: { id: userManagerDetails[i].dataValues.manager_id } });
-
-        const mangerDetails = {
-          firstName: userDetails.dataValues.first_name,
-          lastName: userDetails.dataValues.last_name,
-          email: userDetails.dataValues.email
-        }
-
-        mangerDetailsArray.push(mangerDetails);
-      }
-
-
-      const userInfo = {
-        firstName: userDetails.dataValues.first_name,
-        lastName: userDetails.dataValues.last_name,
-        email: userDetails.dataValues.email,
-        organization: userDetails.dataValues.organization,
-        google_id: userDetails.dataValues.organization,
-        image_url: userDetails.dataValues.image_url,
-        source: userDetails.dataValues.source,
-        managers: mangerDetailsArray
-      }
-
-
-      return callback(200, { message: userInfo });
-    } catch (err) {
-      return callback(500, `Something went wrong!`);
-    }
-  },
-  forgetPassword: async (data, callback) => {
+   forgetPassword: async (data, callback) => {
 
     let expirationTime = (Date.now() + (60 * 1000 * 20));
     let email = data.email;
