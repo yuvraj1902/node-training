@@ -121,103 +121,85 @@ const resetUserPassword = async (payload) => {
 }
 
 const userInfo = async (payload) => {
-     const userDetails = await models.User.findOne({
-        where: { id: payload.userId }, include: models.Role
+     const userInfo = await models.User.findOne({
+       where: { id: payload.userId },
+       include: [{
+         model: models.Role,
+         required:false,
+         attributes: ["role_title"]
+       }, {
+         model: models.Designation,
+         attributes: ["designation_title"]
+         }],
+       attributes: {exclude:["password","created_at","updated_at","deleted_at"]}
       });
-
-      // user Roles 
-      const userRolesArray = [];
-
-      console.log("here")
-      for (let i = 0; i < userDetails.Roles.length; ++i){
-        userRolesArray.push(userDetails.Roles[i].role_title);
-      }
-
-      const userDetailsDesignation = await models.User.findOne({
-        where: { id: payload.userId }, include: models.Designation
-      });
-      
-      const userDesignationArray = [];
-      for (let i = 0; i < userDetailsDesignation.Designations.length; ++i){
-        userDesignationArray.push(userDetailsDesignation.Designations[i].designation_title);
-      }
-
-      // user Manager
-      const userManagerDetails = await models.UserReportee.findAll({ where: { reportee_id: userDetails.dataValues.id } });
-      console.log(userManagerDetails);
-
-      const mangerDetailsArray = [];
-      for (let i = 0; i < userManagerDetails.length; ++i) {
-        const userDetails = await models.User.findOne(
-          { where: { id: userManagerDetails[i].dataValues.manager_id } });
-        
-        const mangerDetails = {
-          firstName: userDetails.dataValues.first_name,
-          lastName: userDetails.dataValues.last_name,
-          email: userDetails.dataValues.email
-        }
-
-        mangerDetailsArray.push(mangerDetails);
-      }
-
-
-      const userInfo = {
-        firstName: userDetails.dataValues.first_name,
-        lastName: userDetails.dataValues.last_name,
-        email: userDetails.dataValues.email,
-        organization: userDetails.dataValues.organization,
-        google_id: userDetails.dataValues.organization,
-        image_url: userDetails.dataValues.image_url,
-        source: userDetails.dataValues.source,
-        roles: userRolesArray,
-        designation:userDesignationArray,
-        managers: mangerDetailsArray
-      }
-
       return userInfo;
 }
   
-const userDetail =  async (payload) => {
-      let user_id = payload.userId;
-      const user = await models.User.findOne({
-        where: {
-          id: user_id
-        },
-        include: models.Designation
-      });
+const userDetail = async (payload) => {
+  const user_id = payload.userId;
+  const userDesignationData = await models.User.findOne({
+                where: {
+                    id: user_id
+                },
 
-      const userData = await models.User.findOne({
-        where: {
-          id: user_id
-        },
-        include: models.Role
-      })
+                include: models.Designation
+            })
+            const userRoleData = await models.User.findOne({
+                where: {
+                    id: user_id
+                },
+                include: models.Role
+            })
       
-      const reportee = await models.UserReportee.findAll({
+  const reportee = await models.UserReportee.findAll({
         where: {
           reportee_id: user_id
         },
       })
   
-  console.log(reportee);
   
-  
-  
-      // let userDetails = {
-      //   first_name: userDesignationDetail.first_name,
-      //   last_name: userDesignationDetail.last_name,
-      //   email: user.email,
-      //   google_id: user.google_id,
-      //   organization: user.organization,
-      //   source: user.source,
-      //   designation_title: designation_title,
-      //   role_title: role_title,
-      //   manager_details: managers,
-      //   created_at: user.created_at,
-      //   updated_at: user.updated_at,
-      //   deleted_at: user.deleted_at
-      // }
-  return userDetail;
+  const managerArray = [];
+  for (let i = 0; i < reportee.length; i++) {
+    manager = await models.User.findOne({
+      where: {
+        id: reportee[i].manager_id
+      },
+    });
+     let singleManager = {
+        manager_first_name: manager.first_name,
+        manager_last_name: manager.last_name,
+        manager_email: manager.email
+      }
+    managerArray.push(singleManager);
+  }
+
+  const designationArray = [];
+  for (let i = 0; i < userDesignationData.Designations.length; i++) {
+    designationArray.push(userDesignationData.Designations[i].designation_title);
+  }
+
+  const rolesArray = [];
+  for (let i = 0; i < userRoleData.Roles.length; i++) {
+    rolesArray.push(userRoleData.Roles[i].role_title);
+  }
+
+
+      let userDetails = {
+        first_name: userDesignationData.first_name,
+        last_name: userDesignationData.last_name,
+        email: userDesignationData.email,
+        google_id: userDesignationData.google_id,
+        organization: userDesignationData.organization,
+        source: userDesignationData.source,
+        designation_title: designationArray,
+        role_title: rolesArray,
+        manager_details: managerArray,
+        created_at: userDesignationData.created_at,
+        updated_at: userDesignationData.updated_at,
+        deleted_at: userDesignationData.deleted_at
+      }
+  return userDetails;
   }
 
 
