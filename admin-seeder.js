@@ -46,7 +46,7 @@ async function admin() {
       },
       {
         name: "role_title",
-        description: colors.magenta("Role should be admin or user"),
+        description: colors.magenta("Role should be ADMIN or USER"),
         required: true,
       },
       {

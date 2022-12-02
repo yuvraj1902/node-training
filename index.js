@@ -2,6 +2,7 @@ require("dotenv").config();
 const app = require("./app")
 const { sequelize } = require("./models")
 
+
 const startServer = async function () {
   try {
     await sequelize.authenticate();
