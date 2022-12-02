@@ -72,7 +72,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       paranoid: true,
-      tableName: "users",
+      tableName: "user",
       modelName: "User",
       attributes: {
         exclude: ["password", "token", "token_expiration", "created_at", "updated_at", "deleted_at"],
