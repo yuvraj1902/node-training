@@ -97,7 +97,7 @@ const forgetPassword = async (payload) => {
   })
 
    if (!user) {
-    throw new Error('Credentials are invalid!');
+    throw new Error('User Not Found!');
    }
     
   let tokenData = {
@@ -120,8 +120,26 @@ const forgetPassword = async (payload) => {
 }
 
 // deactiveate user service 
+const deactivateUsers = async (payload) => {
 
-const deactivateUser = async (payload) => {
+  let { userId } = payload;
+  const user = await models.User.findOne({
+    where: {
+      id: userId
+    }
+  });
+
+  if (!user) {
+    throw new Error("User Not Found")
+  }
+   
+  let destroyUser = await models.User.destroy({
+    where: {
+      id: userId
+    }
+  });
+  
+  return "User Deactiveted"
   
 }
 
@@ -211,6 +229,7 @@ module.exports = {
   userInfo,
   userDetail,
   forgetPassword,
+  deactivateUsers,
   // User creation API
   createUser: async (data, callback) => {
     const trans = await sequelize.transaction();
