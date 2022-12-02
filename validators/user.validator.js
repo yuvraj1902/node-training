@@ -75,7 +75,7 @@ module.exports = {
     enableUserSchema: async (req, res, next) => {
         try {
             const checkSchema = Joi.object({
-                user_id: Joi.string().guid().required()
+                userId: Joi.string().guid().required()
             });
             const result = checkSchema.validate(req.body);
             if (result.error) {

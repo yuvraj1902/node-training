@@ -90,7 +90,7 @@ router.delete(
     checkToken,
     verifyUser,
     validator.userValidator.deactivateUserSchema,
-    controllers.User.deactivateUsers,
+    controllers.User.deactivateUser,
     genericResponse.sendResponse
 );
 router.patch(
@@ -98,13 +98,11 @@ router.patch(
     checkToken,
     verifyUser,
     validator.userValidator.enableUserSchema,
-    controllers.User.enableUsers,
+    controllers.User.enableUser,
     genericResponse.sendResponse
 );
 router.get(
     '/user-details',
-    checkToken,
-    verifyUser,
     validator.userValidator.userDetailsSchema,
     controllers.User.getUserDetail,
     genericResponse.sendResponse

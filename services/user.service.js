@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const { hash } = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 
 const models = require('../models');
 const { sequelize } = require('../models');
@@ -120,7 +120,7 @@ const forgetPassword = async (payload) => {
 }
 
 // deactiveate user service 
-const deactivateUsers = async (payload) => {
+const deactivateUser = async (payload) => {
 
   let { userId } = payload;
   const user = await models.User.findOne({
@@ -138,10 +138,25 @@ const deactivateUsers = async (payload) => {
       id: userId
     }
   });
-  
   return "User Deactiveted"
-  
 }
+
+const enableUser = async (payload) => {
+  let { userId } = payload;
+  let restoreUser = await models.User.restore({
+    where: {
+      id: userId
+    }
+  });
+  if (restoreUser) {
+    return "User activated"
+  } else {
+    throw new Error("User not found");
+  }
+   
+}
+
+
 
 
 const resetUserPassword = async (payload) => {
@@ -229,7 +244,9 @@ module.exports = {
   userInfo,
   userDetail,
   forgetPassword,
-  deactivateUsers,
+  deactivateUser,
+  enableUser,
+  userDetail,
   // User creation API
   createUser: async (data, callback) => {
     const trans = await sequelize.transaction();
@@ -383,77 +400,7 @@ module.exports = {
     }
   },
 
-  
-  deactivateUser: async (data, callback) => {
-    try {
-      let user_id = data.user_id;
-      const existingUser = await models.User.findOne({ where: { id: user_id } });
-      if (!existingUser) return callback(404, { message: `User not found` })
-      const user = await models.User.destroy({
-        where: {
-          id: user_id
-        }
-      })
-      return callback(202, { message: `User deactivate successfully` });
-    } catch (error) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
-  enableUser: async (data, callback) => {
-    try {
-      let user_id = data.user_id;
-      const user = await models.User.restore({
-        where: {
-          id: user_id
-        }
-      })
-      if (!user) return callback(404, { message: `User not found` })
-      return callback(202, { message: `User activated again` });
-    } catch (error) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
-
-  
-
-   forgetPassword: async (data, callback) => {
-
-    let expirationTime = (Date.now() + (60 * 1000 * 20));
-    let email = data.email;
-
-    try {
-      const existingUser = await models.User.findOne({ where: { email: email } });
-      if (!existingUser) { return callback(404, { message: `User not found` }); }
-
-      let tokenData = {
-        email: email,
-        expirationtime: Date.now()
-      }
-
-      let userToken = jwt.sign(JSON.stringify(tokenData), process.env.secretKey);
-      let token = `http://localhost:3004/resetUserPassword?token=${userToken}`;
-
-
-      await models.User.update(
-        {
-          token_expiration: expirationTime,
-          token: userToken
-        },
-        { where: { email: email } }
-      );
-
-      let recipient = email;
-      let subject = "Reset Password Link"
-      let body = `Password reset link- ${token}`;
-
-      await mailer.sendMail(body, subject, recipient)
-      return callback(200, { message: `password reset link sent` });
-
-    }
-    catch (err) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
+ 
 };
 
 

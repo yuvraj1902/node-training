@@ -1,8 +1,7 @@
 const { createUser,
     userInfo,
     resetUserPassword,
-    enableUser,
-    userDetail } = require('../services/user.service');
+ } = require('../services/user.service');
 
 const { commonErrorHandler } = require('../helper/errorHandler')
 const userService = require('../services/user.service');
@@ -155,11 +154,39 @@ const forgetPassword = async (req, res, next) => {
 }
 
 // deactive user controller
-const deactivateUsers = async (req, res, next) => {
+const deactivateUser = async (req, res, next) => {
     try {
 
         const { body: payload } = req;
-        const data = await userService.deactivateUsers(payload);
+        const data = await userService.deactivateUser(payload);
+        res.data = data;
+        next()
+        
+    } catch (error) {
+         commonErrorHandler(req, res, error.message, 400, error);   
+    }
+}
+
+// activate user controller
+const enableUser = async (req, res, next) => {
+    try {
+
+        const { body: payload } = req;
+        const data = await userService.enableUser(payload);
+        res.data = data;
+        next()
+        
+    } catch (error) {
+         commonErrorHandler(req, res, error.message, 400, error);   
+    }
+}
+
+// user details controller 
+const userDetail = async (req, res, next) => {
+    try {
+
+        const { body: payload } = req;
+        const data = await userService.userDetail(payload);
         res.data = data;
         next()
         
@@ -189,7 +216,9 @@ module.exports = {
     getUserInfo,
     getUserDetail,
     forgetPassword,
-    deactivateUsers,
+    deactivateUser,
+    enableUser,
+    userDetail,
     // createUser API
     registration: async (req, res, next) => {
         createUser(req.body, (result, statusCode) => {
