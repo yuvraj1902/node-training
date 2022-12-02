@@ -86,6 +86,45 @@ const logoutUser = async (requestToken) => {
 
 }
 
+// foreget password service
+const forgetPassword = async (payload) => {
+
+  const { email } = payload;
+  const user = await models.User.findOne({
+    where: {
+      email: email
+    }
+  })
+
+   if (!user) {
+    throw new Error('Credentials are invalid!');
+   }
+    
+  let tokenData = {
+    userId: user.dataValues.id,
+    time: Date.now()
+  }
+  let signUserToken = jwt.sign(tokenData, process.env.secretKey, {
+    expiresIn: process.env.FPT_EXPIRES_IN
+  });
+  let baseUrl = process.env.BASE_URL;
+  let resetPassawordLink = `${baseUrl}/api/user/reset-password/${signUserToken}`;
+
+  let recipient = email;
+  let subject = "Reset Password Link";
+  let body = `Password Reset Link:- ${resetPassawordLink}`;
+
+   await mailer.sendMail(body, subject, recipient);
+  return "send reset password link successfully"; 
+  
+}
+
+// deactiveate user service 
+
+const deactivateUser = async (payload) => {
+  
+}
+
 
 const resetUserPassword = async (payload) => {
 
@@ -171,6 +210,7 @@ module.exports = {
   resetUserPassword,
   userInfo,
   userDetail,
+  forgetPassword,
   // User creation API
   createUser: async (data, callback) => {
     const trans = await sequelize.transaction();
@@ -323,43 +363,6 @@ module.exports = {
       return callback(500, { message: `Something went wrong!` });
     }
   },
-  forgetPassword: async (data, callback) => {
-
-    let expirationTime = (Date.now() + (60 * 1000 * 20));
-    let email = data.email;
-
-    try {
-      const existingUser = await models.User.findOne({ where: { email: email } });
-      if (!existingUser) { return callback(404, { message: "User not found " }); }
-
-      let tokenData = {
-        email: email,
-        expirationtime: Date.now()
-      }
-
-      let userToken = jwt.sign(JSON.stringify(tokenData), process.env.secretKey);
-      let token = `http://localhost:3004/resetUserPassword?token=${userToken}`;
-
-
-      const user = await models.User.update(
-        {
-          token_expiration: expirationTime,
-          token: userToken
-        },
-        { where: { email: email } }
-      );
-
-      let recipient = email;
-      let subject = "Reset Password Link"
-      let body = `Password reset link- ${token}`;
-
-      await mailer.sendMail(body, subject, recipient)
-      return callback(200, { message: "password reset link sent" });
-    } catch (err) {
-      return callback(500, { error: "Something went wrong!" });
-    }
-  },
-
 
   
   deactivateUser: async (data, callback) => {

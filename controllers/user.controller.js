@@ -1,3 +1,10 @@
+const { createUser,
+    deactivateUser,
+    userInfo,
+    resetUserPassword,
+    enableUser,
+    userDetail } = require('../services/user.service');
+
 const { commonErrorHandler } = require('../helper/errorHandler')
 const userService = require('../services/user.service');
 const { createUser } = require("../services/user.service");
@@ -134,6 +141,21 @@ const getUserInfo = async (req, res, next) => {
     }
 }
 
+// forget password controller
+const forgetPassword = async (req, res, next) => {
+    try {
+        const { body: payload } = req;
+        // console.log(payload);
+        const data = await userService.forgetPassword(payload);
+        res.data = data;
+        console.log("datadata", data);
+        next();
+        
+    } catch (error) {
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
 
 const getUserDetail = async (req, res, next) => {
     const { body } = req;
@@ -154,6 +176,7 @@ module.exports = {
     resetPasswordByLink,
     getUserInfo,
     getUserDetail,
+    forgetPassword,
     // createUser API
     registration: async (req, res, next) => {
         createUser(req.body, (result, statusCode) => {
@@ -177,16 +200,6 @@ module.exports = {
     },
     
    
-
-    forgetPassword: async (req, res, next) => {
-        forgetPassword(req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        })
-    },
-
-
 
     enableUsers: async (req, res, next) => {
         enableUser(req.body, (statusCode, result) => {

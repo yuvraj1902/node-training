@@ -43,7 +43,6 @@ router.post(
 
 router.post(
     '/forgetpassword',
-    validator.userValidator.forgetPassword,
     controllers.User.forgetPassword,
     genericResponse.sendResponse
 );
