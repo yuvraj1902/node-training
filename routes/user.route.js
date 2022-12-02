@@ -16,11 +16,13 @@ router.post(
 );
 router.post(
     '/refresh-token',
+    validator.userValidator.refreshTokenSchema,
     controllers.User.refreshToken,
     genericResponse.sendResponse
 );
 router.delete(
     '/logout',
+    validator.userValidator.refreshTokenSchema,
     controllers.User.logoutUser,
     genericResponse.sendResponse
 )

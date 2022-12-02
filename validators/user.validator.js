@@ -36,6 +36,13 @@ module.exports = {
 
         validateRequest(req, res, next, schema, 'body');
     },
+
+    refreshTokenSchema: async (req, res, next) => {
+        const schema = Joi.object({
+            refreshToken: Joi.string().guid().required()
+        });
+        validateRequest(req, res, next, schema, 'body');
+    },
     resetUserPasswordSchema: async (req, res, next) => {
         try {
             const checkresetPasswordSchema = Joi.object({
