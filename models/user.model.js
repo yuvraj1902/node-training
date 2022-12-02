@@ -6,14 +6,20 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.Designation, {
         through: "user_designation_mapping",
       });
-      this.belongsToMany(models.Role, { through: 'user_role_mapping' });
+      this.belongsToMany(models.Role, { through: "user_role_mapping" });
 
-      this.belongsToMany(models.User, { through: 'user_reportee', as: 'manager_id' });
-      this.belongsToMany(models.User, { through: 'user_reportee', as: 'reportee_id' });
+      this.belongsToMany(models.User, {
+        through: "user_reportee",
+        as: "manager_id",
+      });
+      this.belongsToMany(models.User, {
+        through: "user_reportee",
+        as: "reportee_id",
+      });
       this.hasOne(models.RefreshToken, {
-        foreignKey: 'user_id',
-        targetKey: 'id'
-      })
+        foreignKey: "user_id",
+        targetKey: "id",
+      });
     }
   }
 
@@ -51,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
         unique: true,
-        isAlphanumeric: true,
+        defaultValue: null,
       },
       image_url: {
         type: DataTypes.STRING,
@@ -60,12 +66,12 @@ module.exports = (sequelize, DataTypes) => {
       },
       source: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
         isAlphanumeric: true,
       },
       is_firsttime: {
         type: DataTypes.BOOLEAN,
-        allowNull: false
+        allowNull: false,
       },
     },
 
@@ -75,7 +81,14 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "user",
       modelName: "User",
       attributes: {
-        exclude: ["password", "token", "token_expiration", "created_at", "updated_at", "deleted_at"],
+        exclude: [
+          "password",
+          "token",
+          "token_expiration",
+          "created_at",
+          "updated_at",
+          "deleted_at",
+        ],
       },
     }
   );

@@ -1,9 +1,5 @@
-const userValidator = require('./user.validator');
-const roleValidator = require('./role.validator');
-const reporteeValidator = require('./userReportee.validator');
+const userValidator = require("./user.validator");
 
 module.exports = {
-    userValidator,
-    roleValidator,
-    reporteeValidator
-}
+  userValidator,
+};

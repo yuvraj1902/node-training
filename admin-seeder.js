@@ -23,7 +23,6 @@ async function admin() {
       },
       {
         name: "password",
-        // hidden: true,
         conform: function (value) {
           return true;
         },
@@ -34,7 +33,6 @@ async function admin() {
       },
       {
         name: "google_id",
-        required: true,
       },
       {
         name: "source",
@@ -42,7 +40,7 @@ async function admin() {
       },
       {
         name: "is_firsttime",
-        required: true
+        required: true,
       },
       {
         name: "role_title",
@@ -51,10 +49,15 @@ async function admin() {
       },
       {
         name: "designation_title",
+        description: colors.magenta("DESIGNATION:"),
         required: true,
       },
     ],
     async function (err, result) {
+      result.role_title = result.role_title.toUpperCase();
+      result.designation_title = result.designation_title.toUpperCase();
+
+      console.log(result.role_title);
       const t = await sequelize.transaction();
       try {
         const data = await models.User.create(
@@ -66,7 +69,7 @@ async function admin() {
             google_id: result.google_id,
             source: result.source,
             password: await hash(result.password, 10),
-            is_firsttime: result.is_firsttime
+            is_firsttime: result.is_firsttime,
           },
           { transaction: t }
         );
@@ -109,7 +112,7 @@ async function admin() {
         console.log(colors.cyan("You are good to go."));
         await t.commit();
       } catch (error) {
-        console.log(error);
+        console.log(colors.cyan(error));
         await t.rollback();
       }
     }

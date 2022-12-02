@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('user', {
+    await queryInterface.createTable("user", {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -12,20 +12,20 @@ module.exports = {
       first_name: {
         type: DataTypes.STRING,
         allowNull: false,
-        isAlpha: true
+        isAlpha: true,
       },
       last_name: {
         type: DataTypes.STRING,
         allowNull: false,
-        isAlpha: true
+        isAlpha: true,
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
-          isEmail: true
-        }
+          isEmail: true,
+        },
       },
       password: {
         type: DataTypes.STRING,
@@ -41,7 +41,7 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: true,
         unique: true,
-        isAlphanumeric: true,
+        defaultValue: null,
       },
       image_url: {
         type: DataTypes.STRING,
@@ -50,12 +50,12 @@ module.exports = {
       },
       source: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
         isAlphanumeric: true,
       },
       is_firsttime: {
         type: DataTypes.BOOLEAN,
-        allowNull: false
+        allowNull: false,
       },
       created_at: {
         allowNull: false,
@@ -72,11 +72,11 @@ module.exports = {
         allowNull: true,
         type: DataTypes.DATE,
 
-        defaultValue: null
+        defaultValue: null,
       },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('user');
-  }
+    await queryInterface.dropTable("user");
+  },
 };

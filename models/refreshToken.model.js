@@ -46,7 +46,6 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   RefreshToken.verifyExpiration = (expiryDate) => {
-    console.log(expiryDate);
     return expiryDate < new Date().getTime();
   };
   return RefreshToken;
