@@ -6,7 +6,7 @@ const { createUser,
     enableUser,
     userDetail } = require('../services/user.service');
 
-const { commonErrorHandler } = require('../helper/errorHandler')
+const { commonErrorHandler } = require('../helper/errorHandler');
 const userService = require('../services/user.service');
 
 
