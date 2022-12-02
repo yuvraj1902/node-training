@@ -85,6 +85,123 @@ const logoutUser = async (requestToken) => {
 }
 
 
+const resetUserPassword = async (payload) => {
+
+  if (payload.userEmail) {
+    const userExist = await models.User.findOne({ where: { email: payload.userEmail } });
+    if (!userExist) {
+      throw new Error('User Not Found');
+    }
+    console.log(payload);
+    await models.User.update({ password: await hash(payload.newPassword, 10) }, { where: { email: payload.userEmail } });
+    const email_body = `Password reset successfull`;
+    const email_subject = `Password reset`;
+    await mailer.sendMail(email_body, email_subject, payload.userEmail);
+    return "Password reset successfully";
+  }
+  else if (payload.token) {
+    const decode_token = jwt.verify(payload.token, process.env.secretKey);
+    if (!decode_token) {
+      throw new Error('Invalid reset link');
+    }
+    const userExist = await models.User.findOne({ where: { id: decode_token.userId } });
+    if (!userExist) {
+      throw new Error('User Not Found');
+    }
+    console.log(payload.newPassword);
+    console.log(userExist.id);
+    await models.User.update({ password: await hash(payload.newPassword, 10) }, { where: { id: userExist.id } });
+    const email_body = `Password reset successfull`;
+    const email_subject = `Password reset`;
+    await mailer.sendMail(email_body, email_subject, userExist.email);
+    return "Password reset successfully";
+  }
+}
+
+const userInfo = async (payload) => {
+  const userInfo = await models.User.findOne({
+    where: { id: payload.userId },
+    include: [{
+      model: models.Role,
+      required: false,
+      attributes: ["role_title"]
+    }, {
+      model: models.Designation,
+      attributes: ["designation_title"]
+    }],
+    attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
+  });
+  return userInfo;
+}
+
+const userDetail = async (payload) => {
+  const user_id = payload.userId;
+  const userDesignationData = await models.User.findOne({
+    where: {
+      id: user_id
+    },
+
+    include: models.Designation
+  })
+  const userRoleData = await models.User.findOne({
+    where: {
+      id: user_id
+    },
+    include: models.Role
+  })
+
+  const reportee = await models.UserReportee.findAll({
+    where: {
+      reportee_id: user_id
+    },
+  })
+
+
+  const managerArray = [];
+  for (let i = 0; i < reportee.length; i++) {
+    manager = await models.User.findOne({
+      where: {
+        id: reportee[i].manager_id
+      },
+    });
+    let singleManager = {
+      manager_first_name: manager.first_name,
+      manager_last_name: manager.last_name,
+      manager_email: manager.email
+    }
+    managerArray.push(singleManager);
+  }
+
+  const designationArray = [];
+  for (let i = 0; i < userDesignationData.Designations.length; i++) {
+    designationArray.push(userDesignationData.Designations[i].designation_title);
+  }
+
+  const rolesArray = [];
+  for (let i = 0; i < userRoleData.Roles.length; i++) {
+    rolesArray.push(userRoleData.Roles[i].role_title);
+  }
+
+
+  let userDetails = {
+    first_name: userDesignationData.first_name,
+    last_name: userDesignationData.last_name,
+    email: userDesignationData.email,
+    google_id: userDesignationData.google_id,
+    organization: userDesignationData.organization,
+    source: userDesignationData.source,
+    designation_title: designationArray,
+    role_title: rolesArray,
+    manager_details: managerArray,
+    created_at: userDesignationData.created_at,
+    updated_at: userDesignationData.updated_at,
+    deleted_at: userDesignationData.deleted_at
+  }
+  return userDetails;
+}
+
+
+
 module.exports = {
   loginUser,
   getAllUsers,
