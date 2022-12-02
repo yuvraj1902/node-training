@@ -143,6 +143,18 @@ const getUserInfo = async (req, res, next) => {
     }
 }
 
+
+const getUserDetail = async (req, res, next) => {
+    const { body } = req;
+    const payload = {
+        userId: body.userId
+    };
+
+    const data = await userService.userDetail(payload);
+    res.data = data;
+    next();
+}
+
 // admin level accell
 // admin pwd reset
 // const adminPwdReset = async (req, res, next) => {
@@ -170,6 +182,7 @@ module.exports = {
     logoutUser,
     resetPasswordByLink,
     getUserInfo,
+    getUserDetail,
     // createUser API
     registration: async (req, res, next) => {
         createUser(req.body, (result, statusCode) => {
@@ -212,13 +225,7 @@ module.exports = {
         });
     },
 
-    userDetails: async (req, res, next) => {
-        userDetail(req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        });
-    },
+   
     resetPassword,
     adminResetPassword
 

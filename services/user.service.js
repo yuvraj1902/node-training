@@ -191,6 +191,49 @@ const userInfo = async (payload) => {
       }
 
       return userInfo;
+}
+  
+const userDetail =  async (payload) => {
+      let user_id = payload.userId;
+      const user = await models.User.findOne({
+        where: {
+          id: user_id
+        },
+        include: models.Designation
+      });
+
+      const userData = await models.User.findOne({
+        where: {
+          id: user_id
+        },
+        include: models.Role
+      })
+      
+      const reportee = await models.UserReportee.findAll({
+        where: {
+          reportee_id: user_id
+        },
+      })
+  
+  console.log(reportee);
+  
+  
+  
+      // let userDetails = {
+      //   first_name: userDesignationDetail.first_name,
+      //   last_name: userDesignationDetail.last_name,
+      //   email: user.email,
+      //   google_id: user.google_id,
+      //   organization: user.organization,
+      //   source: user.source,
+      //   designation_title: designation_title,
+      //   role_title: role_title,
+      //   manager_details: managers,
+      //   created_at: user.created_at,
+      //   updated_at: user.updated_at,
+      //   deleted_at: user.deleted_at
+      // }
+  return userDetail;
   }
 
 
@@ -203,6 +246,7 @@ module.exports = {
   logoutUser,
   resetUserPassword,
   userInfo,
+  userDetail,
   // User creation API
   createUser: async (data, callback) => {
     const trans = await sequelize.transaction();
@@ -422,72 +466,7 @@ module.exports = {
     }
   },
 
-  userDetail: async (data, callback) => {
-    try {
-      let user_id = data.user_id;
-      const user = await models.User.findOne({
-        where: {
-          id: user_id
-        },
-        include: models.Designation
-      });
-
-      const user2 = await models.User.findOne({
-        where: {
-          id: user_id
-        },
-        include: models.Role
-      })
-      if (!user) return callback(400, { message: `User not found` });
-      const reportee = await models.UserReportee.findAll({
-        where: {
-          reportee_id: user_id
-        },
-      })
-      let manager;
-      let managers = [];
-      if (reportee[0]) {
-        for (let i = 0; i < reportee.length; i++) {
-          manager = await models.User.findOne({
-            where: {
-              id: reportee[i].manager_id
-            },
-          })
-          let singleManager = {
-            manager_first_name: manager.first_name,
-            manager_last_name: manager.last_name,
-            manager_email: manager.email
-          }
-          managers.push(singleManager);
-        }
-      }
-      let designation_title = {};
-      let role_title = {};
-      if (!user.Designations && !user.Roles) {
-        designation_title = { destignation_title: user.Designations[0].dataValues.designation_title };
-        role_title = { role_title: user2.Roles[0].dataValues.role_title };
-      }
-      let obj = {
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        google_id: user.google_id,
-        organization: user.organization,
-        source: user.source,
-        designation_title: designation_title,
-        role_title: role_title,
-        manager_details: managers,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-        deleted_at: user.deleted_at
-      }
-      return callback(202, {
-        data: obj
-      });
-    } catch (error) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
+  
 
    forgetPassword: async (data, callback) => {
 

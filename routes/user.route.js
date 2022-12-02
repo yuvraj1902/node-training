@@ -105,7 +105,7 @@ router.get(
     checkToken,
     verifyUser,
     validator.userValidator.userDetailsSchema,
-    controllers.User.userDetails,
+    controllers.User.getUserDetail,
     genericResponse.sendResponse
 );
 module.exports = router;
