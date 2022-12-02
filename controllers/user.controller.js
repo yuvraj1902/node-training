@@ -63,16 +63,15 @@ const logoutUser = async (req, res, next) => {
     }
 }
 
-// user level accell
-// self pwd reset
-const resetpPwd = async (req, res, next) => {
+const resetPassword = async (req, res, next) => {
     try {
         const { body, user } = req;
         const payload = {
             userId: user.id,
             newPassword: body.password
         }
-        const data = await userService.loginUser(payload);
+        console.log(payload);
+        const data = await userService.resetUserPassword(payload);
         res.data = data;
         next();
     } catch (error) {
@@ -84,22 +83,22 @@ const resetpPwd = async (req, res, next) => {
 
 // admin level accell
 // admin pwd reset
-const adminPwdReset = async (req, res, next) => {
-    try {
-        const { body } = req;
-        const payload = {
-            userId: body.id,
-            newPassword: body.password
-        }
-        const data = await userService.loginUser(payload);
-        res.data = data;
-        next();
-    } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
-        commonErrorHandler(req, res, error.message, 400, error);
-    }
-}
+// const adminPwdReset = async (req, res, next) => {
+//     try {
+//         const { body } = req;
+//         const payload = {
+//             userId: body.id,
+//             newPassword: body.password
+//         }
+//         const data = await userService.loginUser(payload);
+//         res.data = data;
+//         next();
+//     } catch (error) {
+//         console.log('-----', error);
+//         console.log('getModalFieldData error:', error);
+//         commonErrorHandler(req, res, error.message, 400, error);
+//     }
+// }
 
 
 module.exports = {
@@ -136,13 +135,13 @@ module.exports = {
         })
     },
 
-    resetUserPassword: async (req, res, next) => {
-        resetUserPassword(req.query, req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        })
-    },
+    // resetUserPassword: async (req, res, next) => {
+    //     resetUserPassword(req.query, req.body, (statusCode, result) => {
+    //         req.statusCode = statusCode;
+    //         req.result = result;
+    //         next();
+    //     })
+    // },
 
     forgetPassword: async (req, res, next) => {
         forgetPassword(req.body, (statusCode, result) => {
@@ -169,6 +168,7 @@ module.exports = {
             next();
         });
     },
+    resetPassword
 
 };
 

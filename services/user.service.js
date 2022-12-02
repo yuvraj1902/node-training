@@ -101,6 +101,12 @@ const logoutUser = async (requestToken) => {
 }
 
 
+const resetUserPassword = async (payload) => {
+  await models.User.update({ password: payload.newPassword }, { where: { id: payload.userId } });
+  return ""
+}
+
+
 module.exports = {
   // Login
   loginUser,

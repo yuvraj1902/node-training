@@ -62,7 +62,7 @@ router.post(
     '/reset-user-password',
     validator.userValidator.resetPasswordQuerySchema,
     validator.userValidator.resetUserPasswordSchema,
-    controllers.User.resetUserPassword,
+    controllers.User.resetPassword,
     genericResponse.sendResponse
 );
 router.delete(
