@@ -1,11 +1,3 @@
-const { createUser,
-    deactivateUser,
-    userInfo,
-    resetUserPassword,
-    forgetPassword,
-    enableUser,
-    userDetail } = require('../services/user.service');
-
 const { commonErrorHandler } = require('../helper/errorHandler')
 const userService = require('../services/user.service');
 
