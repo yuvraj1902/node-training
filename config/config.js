@@ -1,10 +1,13 @@
-require('dotenv').config({ path: __dirname + '/../.env' });
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+console.log(path.resolve(__dirname, '../.env'));
 module.exports = {
   "development": {
-    "username": process.env.DB_USERNAME,
+    "username": process.env.DB_USER,
     "password": process.env.DB_PASSWORD,
-    "database": process.env.DB_DATABASE,
+    "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
+    "port":process.env.DB_PORT,
     "dialect": "postgres",
     "define": {
       "underscored": true,
@@ -27,4 +30,4 @@ module.exports = {
     "host": "127.0.0.1",
     "dialect": "mysql"
   }
-};
+}

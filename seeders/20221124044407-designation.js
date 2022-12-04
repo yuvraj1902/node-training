@@ -7,18 +7,26 @@ module.exports = {
       {
         designation_code: "101",
         designation_title: "CEO",
+        created_at: new Date(),
+        updated_at: new Date()
       },
       {
         designation_code: "102",
         designation_title: "LEAD",
+         created_at: new Date(),
+        updated_at: new Date()
       },
       {
         designation_code: "103",
         designation_title: "EMPLOYEE",
+         created_at: new Date(),
+        updated_at: new Date()
       },
       {
         designation_code: "104",
         designation_title: "INTERN",
+         created_at: new Date(),
+        updated_at: new Date()
       },
     ]);
   },

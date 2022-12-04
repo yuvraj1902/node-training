@@ -139,67 +139,27 @@ const userInfo = async (payload) => {
 const userDetail = async (payload) => {
   const user_id = payload.userId;
   const userDesignationData = await models.User.findOne({
-                where: {
-                    id: user_id
-                },
-
-                include: models.Designation
-            })
-            const userRoleData = await models.User.findOne({
-                where: {
-                    id: user_id
-                },
-                include: models.Role
-            })
-      
-  const reportee = await models.UserReportee.findAll({
-        where: {
-          reportee_id: user_id
-        },
-      })
-  
-  
-  const managerArray = [];
-  for (let i = 0; i < reportee.length; i++) {
-    manager = await models.User.findOne({
-      where: {
-        id: reportee[i].manager_id
-      },
-    });
-     let singleManager = {
-        manager_first_name: manager.first_name,
-        manager_last_name: manager.last_name,
-        manager_email: manager.email
-      }
-    managerArray.push(singleManager);
-  }
-
-  const designationArray = [];
-  for (let i = 0; i < userDesignationData.Designations.length; i++) {
-    designationArray.push(userDesignationData.Designations[i].designation_title);
-  }
-
-  const rolesArray = [];
-  for (let i = 0; i < userRoleData.Roles.length; i++) {
-    rolesArray.push(userRoleData.Roles[i].role_title);
-  }
-
-
-      let userDetails = {
-        first_name: userDesignationData.first_name,
-        last_name: userDesignationData.last_name,
-        email: userDesignationData.email,
-        google_id: userDesignationData.google_id,
-        organization: userDesignationData.organization,
-        source: userDesignationData.source,
-        designation_title: designationArray,
-        role_title: rolesArray,
-        manager_details: managerArray,
-        created_at: userDesignationData.created_at,
-        updated_at: userDesignationData.updated_at,
-        deleted_at: userDesignationData.deleted_at
-      }
-  return userDetails;
+    where: {
+      id: user_id
+    },
+    include: [{
+      model: models.Designation,
+      attributes:["designation_title"]
+    },
+      {
+      model: models.Role,
+      attributes:["role_title"]
+    },
+    {
+        model: models.User,
+        as: 'reportee_of',
+        attributes: {exclude:["password","created_at","updated_at","deleted_at","UserReporteeMapping"]}
+      }],
+        attributes: {exclude:["password","created_at","updated_at","deleted_at"]}
+    
+  });
+  // const userDetails = { ...userDesignationData, ...userManagerDetails };
+  return userDesignationData;
   }
 
 
@@ -357,6 +317,8 @@ module.exports = {
         source: data.source,
         is_firsttime: false
       });
+
+      console.log(user);
       return callback(201, { data: value });
     } catch (error) {
       return callback(500, { message: `Something went wrong!` });

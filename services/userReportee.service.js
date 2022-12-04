@@ -13,7 +13,7 @@ const addReportee = async (manager_id, reportee_id) => {
         existingManager.Designations[0].designation_code <
         existingReportee.Designations[0].designation_code
     ) {
-        const existingField = await models.UserReportee.findOne({
+        const existingField = await models.UserReporteeMapping.findOne({
             where: {
                 manager_id: manager_id,
                 reportee_id: reportee_id,
@@ -21,7 +21,7 @@ const addReportee = async (manager_id, reportee_id) => {
         });
         if (existingField)
             throw new Error('Already existing relation');
-        const reporteeAdded = await models.UserReportee.create({
+        const reporteeAdded = await models.UserReporteeMapping.create({
             manager_id: manager_id,
             reportee_id: reportee_id,
         });
