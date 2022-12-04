@@ -79,7 +79,8 @@ const createUser = async (payload) => {
       await trans.rollback();
       throw new Error("Something went wrong");
     }
-    const userId = user.payloadValues.id;
+    const userId = user.dataValues.id;
+    console.log("hiiii",userId);
     if (payload.designation_title) {
       const designation = await models.Designation.findOne(
         {
@@ -93,6 +94,7 @@ const createUser = async (payload) => {
         await trans.rollback();
         throw new Error("Invalid Designation");
       }
+      console.log("innnnnnnnnn",userId);
       const designation_user_mapping_designationID =
         await models.UserDesignationMapping.create(
           {
@@ -120,10 +122,11 @@ const createUser = async (payload) => {
         await trans.rollback();
       throw new Error("Invalid Role");
       }
+      console.log("jiiiiiiiiiiiiiii",userId);
       const user_role_mapping = await models.UserRoleMapping.create(
         {
-          role_id: role.id,
           user_id: userId,
+          role_id: role.id
         },
         { transaction: trans }
       );
@@ -134,9 +137,9 @@ const createUser = async (payload) => {
       }
     }
     await trans.commit();
-    if (data.reportee_id) {
+    if (payload.reportee_id) {
       return adminAddReportee(
-        { manager_id: userId, reportee_id: data.reportee_id },
+        { manager_id: userId, reportee_id: payload.reportee_id },
       );
     } else {
       return {
@@ -152,12 +155,50 @@ const createUser = async (payload) => {
       }
     }
   } catch (error) {
+    console.log(error);
     await trans.rollback();
    throw new Error("Something went wrong");
   }
 };
 
+const registration = async (payload) => {
+  try {
+      const existingUser = await models.User.findOne({
+        where: { email: payload.email },
+      });
+      if (existingUser) {
+        throw new Error("User already exists");
+      }
+     const user = await models.User.create(
+      {
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        email: payload.email,
+        password: await hash(payload.password, 10),
+        organization: payload.organization,
+        google_id: payload.google_id,
+        source: payload.source,
+        is_firsttime: true,
+      });
+   return {
+        first_name: payload.first_name,
+        last_name:payload.last_name,
+        email: payload.email,
+        organization: payload.organization,
+        google_id: payload.google_id,
+        source: payload.source,
+        role: payload.role_title,
+        designation:payload.designation_title
+        
+      }
+    } catch (error) {
+      throw new Error("Something went wrong");
+    }
+  }
+
+
 module.exports = {
   loginUser,
   createUser,
+  registration
 };

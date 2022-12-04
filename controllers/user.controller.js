@@ -3,12 +3,12 @@ const { commonErrorHandler } = require("../helper/errorHandeler");
 const userService = require("../services/user.service");
 
 const loginUser = async (req, res, next) => {
-    try {
+  try {
     const { body: payload } = req;
     const data = await userService.loginUser(payload);
     res.data = data;
     next();
-    } catch (error) {
+  } catch (error) {
     commonErrorHandler(req, res, error.message, 400);
   }
 };
@@ -16,17 +16,27 @@ const loginUser = async (req, res, next) => {
 const createUser = async (req, res, next) => {
   try {
     const { body: payload } = req;
-    const data = await createUser.createUser(payload);
+    const data = await userService.createUser(payload);
     res.data = data;
     next();
-
-  } catch (error)
-  {
+  } catch (error) {
     commonErrorHandler(req, res, error.message, 400);
   }
-}
+};
+
+const registration = async (req, res, next) => {
+  try {
+    const { body: payload } = req;
+    const data = await userService.registration(payload);
+    res.data = data;
+    next();
+  } catch (error) {
+    commonErrorHandler(req, res, error.message, 400);
+  }
+};
 
 module.exports = {
   loginUser,
-  createUser
-}
+  createUser,
+  registration,
+};
