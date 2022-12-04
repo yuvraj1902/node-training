@@ -158,7 +158,6 @@ const userDetail = async (payload) => {
         attributes: {exclude:["password","created_at","updated_at","deleted_at"]}
     
   });
-  // const userDetails = { ...userDesignationData, ...userManagerDetails };
   return userDesignationData;
   }
 
