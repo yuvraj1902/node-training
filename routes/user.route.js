@@ -10,8 +10,16 @@ const router = Router();
 
 router.post(
   "/login",
-validator.userValidator.loginSchema,
+  validator.userValidator.loginSchema,
   controllers.User.loginUser,
   genericResponse.sendResponse
 );
+router.post(
+    "/createUser",
+    
+  validator.userValidator.createUserSchema,
+  controllers.User.createUser,
+  genericResponse.sendResponse
+);
+
 module.exports = router;

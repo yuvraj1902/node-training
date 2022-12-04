@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 const models = require("../models");
 const { sequelize } = require("../models");
 const mailer = require("../helper/sendmail");
-
+const {addReportee}= require("./userReportee.service")
 const loginUser = async (payload) => {
   const { email, password } = payload;
 
