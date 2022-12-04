@@ -18,6 +18,37 @@ const loginSchema = async (req, res, next) => {
   });
   validateSchema(req, res, next, schema, "body");
 };
+const createUserSchema = async (req, res, next) => {
+  const schema = Joi.object({
+    first_name: Joi.string().min(1).required(),
+    last_name: Joi.string().min(1).required(),
+    email: Joi.string().email().lowercase().required(),
+    password: passwordComplexity(complexityOptions).required(),
+    organization: Joi.string().min(1).required(),
+    google_id: Joi.string().min(1).required(),
+    source: Joi.string().min(1).required(),
+    role_title: Joi.string().min(1).required(),
+    designation_title: Joi.string().min(1).required(),
+    reportee_id: Joi.string().guid(),
+  });
+
+  validateSchema(req, res, next, schema, "body");
+};
+
+const registrationSchema = async (req, res, next) => {
+  const schema = Joi.object({
+    first_name: Joi.string().min(1).required(),
+    last_name: Joi.string().min(1).required(),
+    email: Joi.string().email().lowercase().required(),
+    password: passwordComplexity(complexityOptions).required(),
+    organization: Joi.string().min(1).required(),
+    google_id: Joi.string().min(1).required(),
+    source: Joi.string().min(1).required(),
+  });
+  validateSchema(req, res, next, schema, "body");
+};
 module.exports = {
   loginSchema,
+  createUserSchema,
+  registrationSchema,
 };

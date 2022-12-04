@@ -2,7 +2,6 @@ const fs = require("fs");
 const { resolve } = require("path");
 const routesFolder = resolve("./routes");
 
-
 function camelCaseToDash(myStr) {
   return myStr.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 }
@@ -24,15 +23,13 @@ const getAllRoutesPath = function () {
 };
 
 // MAIN FUNCTION TO REGISTER ALL ROUTES
-const registerRoutes = function (expressInstance) {
-
+const registerRoutes = function (app) {
   const allRoutesPath = getAllRoutesPath();
-
   // LOAD ALL NESTED ROUTES FILE
-   
-    for (const routeFile of allRoutesPath) {
-      const router = require(routeFile.fullPath);
-    expressInstance.use(`/api/${camelCaseToDash(routeFile.fileName)}`, router);
+
+  for (const routeFile of allRoutesPath) {
+    const router = require(routeFile.fullPath);
+    app.use(`/${camelCaseToDash(routeFile.fileName)}`, router);
   }
 };
 

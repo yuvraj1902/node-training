@@ -13,7 +13,20 @@ const loginUser = async (req, res, next) => {
   }
 };
 
+const createUser = async (req, res, next) => {
+  try {
+    const { body: payload } = req;
+    const data = await createUser.createUser(payload);
+    res.data = data;
+    next();
+
+  } catch (error)
+  {
+    commonErrorHandler(req, res, error.message, 400);
+  }
+}
 
 module.exports = {
-    loginUser
+  loginUser,
+  createUser
 }
