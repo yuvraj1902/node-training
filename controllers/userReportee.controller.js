@@ -3,7 +3,7 @@ const {
     adminDeleteReportee
 } = require('../services/userReportee.service');
 
-const { commonErrorHandler } = require('../helper/errorHandler')
+const { commonErrorHandler } = require('../helper/errorHandeler')
 const userReporteeService = require('../services/userReportee.service');
 
 

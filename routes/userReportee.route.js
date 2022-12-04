@@ -10,7 +10,7 @@ const genericResponse = require("../helper/genericResponse");
 router.post(
   "/user-add-reportee",
   checkToken,
-  validator.UserReportee.userReporteeSchema,
+  validator.reporteeValidator.userReporteeSchema,
   controllers.UserReportee.userAddReportee,
   genericResponse.sendResponse
 );
