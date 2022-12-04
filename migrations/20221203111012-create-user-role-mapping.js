@@ -35,7 +35,11 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue:Sequelize.NOW
       },
+<<<<<<< HEAD
       deleted_at:{
+=======
+      delete_at:{
+>>>>>>> 3b79d83 (refactor database  models, associations, migrations)
          allowNull: true,
         type: Sequelize.DATE,
         defaultValue:null

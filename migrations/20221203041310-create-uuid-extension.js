@@ -1,5 +1,5 @@
 module.exports = {
-  async up(queryInterface) {
+   async up(queryInterface) {
     return queryInterface.sequelize.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
   },
 

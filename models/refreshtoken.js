@@ -2,7 +2,7 @@
 const { v4: uuidv4 } = require("uuid");
 
 const {
-  Model
+  Model,Sequelize
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class RefreshToken extends Model {
@@ -16,14 +16,21 @@ module.exports = (sequelize, DataTypes) => {
   RefreshToken.init({
     user_id: {
       allowNull: true,
-      primaryKey: true,
-      type: DataTypes.UUID,
+      type: Sequelize.UUID,
+      references: {
+        model: 'user',
+        key:'id'
+      }
     },
     token: {
-      type: DataTypes.STRING,
+       type: Sequelize.UUID,
+        allowNull: true,
+        primaryKey: true,
+        defaultValue: Sequelize.literal("uuid_generate_v4()")
     },
     expiry_date: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
+      allowNull:false
     },
   }, {
     sequelize,
@@ -35,10 +42,11 @@ module.exports = (sequelize, DataTypes) => {
 
     expiredAt.setSeconds(expiredAt.getSeconds() + process.env.jwtRefreshExpiration);
 
-    let _token = uuidv4();
+    console.log(expiredAt.getTime());
+    // let _token = uuidv4();
+    console.log("here",user.id);
     let refreshToken = await this.create({
-      token: _token,
-      user_id: user.dataValues.id,
+      user_id: user.id,
       expiry_date: expiredAt.getTime(),
     });
 
