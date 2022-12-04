@@ -32,33 +32,8 @@ const createUserSchema = async (req, res, next) => {
     reportee_id: Joi.string().guid(),
   });
 
-<<<<<<< HEAD
   validateSchema(req, res, next, schema, "body");
 };
-=======
-        validateRequest(req, res, next, schema, 'body');
-    },
-    resetPasswordSchema: async (req, res, next) => {
-        const schema = Joi.object({
-                password: passwordComplexity(complexityOptions).required(),
-        })
-            validateRequest(req, res, next, schema, 'body');
-    },
-
-    refreshTokenSchema: async (req, res, next) => {
-        const schema = Joi.object({
-            refreshToken: Joi.string().guid().required()
-        });
-        validateRequest(req, res, next, schema, 'body');
-    },
-    adminResetPasswordSchema: async (req, res, next) => {
-        const schema = Joi.object({
-                userEmail: Joi.string().email().lowercase().required(),
-                password: passwordComplexity(complexityOptions).required(),
-            });
-        validateRequest(req, res, next, schema, 'body');
-    },
->>>>>>> 05818d1 (Refactor userAddReportee and adminAddReportee API)
 
 const registrationSchema = async (req, res, next) => {
   const schema = Joi.object({

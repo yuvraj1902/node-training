@@ -44,11 +44,7 @@ async function admin() {
       },
       {
         name: "role_title",
-<<<<<<< HEAD
         description: colors.magenta("Role should be ADMIN or USER"),
-=======
-        description: colors.magenta("Role should be Admin or User"),
->>>>>>> 05818d1 (Refactor userAddReportee and adminAddReportee API)
         required: true,
       },
       {
