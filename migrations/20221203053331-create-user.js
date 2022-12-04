@@ -1,15 +1,9 @@
-"use strict";
+'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-<<<<<<< HEAD:migrations/20221121111543-create-user.js
-  async up(queryInterface, DataTypes) {
-    await queryInterface.createTable("user", {
-      id: {
-=======
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('user', {
         id: {
->>>>>>> 3b79d83 (refactor database  models, associations, migrations):migrations/20221203053331-create-user.js
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
@@ -18,20 +12,20 @@ module.exports = {
       first_name: {
         type: Sequelize.STRING,
         allowNull: false,
-        isAlpha: true,
+        isAlpha: true
       },
       last_name: {
         type: Sequelize.STRING,
         allowNull: false,
-        isAlpha: true,
+        isAlpha: true
       },
       email: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
         validate: {
-          isEmail: true,
-        },
+          isEmail: true
+        }
       },
       password: {
         type: Sequelize.STRING,
@@ -47,7 +41,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
         unique: true,
-        defaultValue: null,
+        isAlphanumeric: true,
       },
       image_url: {
         type: Sequelize.STRING,
@@ -55,15 +49,6 @@ module.exports = {
         isAlphanumeric: true,
       },
       source: {
-<<<<<<< HEAD:migrations/20221121111543-create-user.js
-        type: DataTypes.STRING,
-        allowNull: false,
-        isAlphanumeric: true,
-      },
-      is_firsttime: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-=======
         type: Sequelize.STRING,
         allowNull: true,
         isAlphanumeric: true,
@@ -71,7 +56,6 @@ module.exports = {
       is_firsttime: {
         type: Sequelize.BOOLEAN,
         allowNull: false
->>>>>>> 3b79d83 (refactor database  models, associations, migrations):migrations/20221203053331-create-user.js
       },
       created_at: {
         allowNull: false,
@@ -80,17 +64,6 @@ module.exports = {
       },
       updated_at: {
         allowNull: false,
-<<<<<<< HEAD:migrations/20221121111543-create-user.js
-        type: DataTypes.DATE,
-
-        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
-      },
-      deleted_at: {
-        allowNull: true,
-        type: DataTypes.DATE,
-
-        defaultValue: null,
-=======
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
       },
@@ -98,11 +71,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.DATE,
         defaultValue: null
->>>>>>> 3b79d83 (refactor database  models, associations, migrations):migrations/20221203053331-create-user.js
       },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("user");
-  },
+    await queryInterface.dropTable('user');
+  }
 };

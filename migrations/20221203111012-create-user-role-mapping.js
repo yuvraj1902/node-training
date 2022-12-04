@@ -36,7 +36,11 @@ module.exports = {
         defaultValue:Sequelize.NOW
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       deleted_at:{
+=======
+      delete_at:{
+>>>>>>> 3b79d83 (refactor database  models, associations, migrations)
 =======
       delete_at:{
 >>>>>>> 3b79d83 (refactor database  models, associations, migrations)

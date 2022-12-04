@@ -22,12 +22,15 @@ if (config.use_env_variable) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 fs.readdirSync(__dirname)
   .filter((file) => {
     return (
       file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
     );
 =======
+=======
+>>>>>>> 3b79d83 (refactor database  models, associations, migrations)
 fs
   .readdirSync(__dirname)
   .filter(file => {
