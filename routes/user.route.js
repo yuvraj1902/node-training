@@ -36,7 +36,7 @@ router.post(
 );
 router.post(
     '/registration',
-    validator.userValidator.createUserSchema,
+    validator.userValidator.registrationSchema,
     controllers.User.registration,
     genericResponse.sendResponse
 );

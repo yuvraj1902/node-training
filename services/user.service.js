@@ -20,7 +20,7 @@ const loginUser = async (payload) => {
     }
   });
   if (!user) {
-    throw new Error('Credentials are invalid!');
+    throw new Error('User Not Found!');
   }
 
   const match = await bcrypt.compareSync(password, user.password);
@@ -311,6 +311,7 @@ const createUser = async (payload) => {
 
 const registration = async (payload) => {
   payload.is_firsttime = false;
+  payload.role_key = 'USR';
   payload.password = await hash(payload.password, 10);
   const existingUser = await models.User.findOne({
     where: { email: payload.email },
@@ -319,10 +320,18 @@ const registration = async (payload) => {
     throw new Error("User already exists");
   }
   const user = await models.User.create(payload);
+  const userId = user.dataValues.id;
+  const role = await models.Role.findOne({
+    where: {
+      role_key: payload.role_key,
+    },
+  });
+  await models.UserRoleMapping.create({
+    user_id: userId,
+    role_id: role.id
+  });
   return user;
 }
-
-
 
 
 module.exports = {
