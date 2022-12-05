@@ -9,6 +9,21 @@ const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
 
 
+const resetPassword = async (newPassword, id, userEmail) => {
+  
+  if (id) {
+    await models.User.update({ password: await hash(newPassword,10) }, { where: { id: id } });
+    
+  }
+  else {
+    await models.User.update({ password: await hash(newPassword,10) }, { where: { email: userEmail } });
+  }
+    const email_body = `Password reset successfull`;
+    const email_subject = `Password reset`;
+    await mailer.sendMail(email_body, email_subject, userEmail);
+    return "Password reset successfully";
+}
+
 
 
 const loginUser = async (payload) => {
@@ -92,11 +107,7 @@ const resetUserPassword = async (payload) => {
       throw new Error('User Not Found');
     }
     console.log(payload);
-    await models.User.update({ password: await hash(payload.newPassword, 10) }, { where: { email: payload.userEmail } });
-    const email_body = `Password reset successfull`;
-    const email_subject = `Password reset`;
-    await mailer.sendMail(email_body, email_subject, payload.userEmail);
-    return "Password reset successfully";
+    return resetPassword(payload.newPassword,null,payload.userEmail);
   }
   else if (payload.token) {
     const decode_token = jwt.verify(payload.token, process.env.secretKey);
@@ -109,11 +120,7 @@ const resetUserPassword = async (payload) => {
     }
     console.log(payload.newPassword);
     console.log(userExist.id);
-    await models.User.update({ password: await hash(payload.newPassword, 10) }, { where: { id: userExist.id } });
-    const email_body = `Password reset successfull`;
-    const email_subject = `Password reset`;
-    await mailer.sendMail(email_body, email_subject, userExist.email);
-    return "Password reset successfully";
+    return resetPassword(payload.newPassword,userExist.id, userExist.email);
   }
 }
 
