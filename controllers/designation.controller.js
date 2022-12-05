@@ -1,4 +1,3 @@
-
 const { commonErrorHandler } = require('../helper/errorHandler');
 const designationService = require('../services/designation.service');
 
