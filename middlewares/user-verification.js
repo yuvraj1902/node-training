@@ -1,7 +1,7 @@
-module.exports = {
-    verifyUser: async (req, res, next) => {
+ const verifyUser= (req, res, next) => {
         try {
-            if (req.user.role.role_code == 1001) {
+            if (req.user.Roles[0].role_code == 1001) {
+                console.log("here222");
                 next();
             } else {
                 return res.status(403).json({ message: 'Access denied' });
@@ -9,6 +9,10 @@ module.exports = {
         } catch (err) {
             return res.status(500).json({ message: `Something went wrong!` });
         }
-
     }
+
+
+
+module.exports = {
+   verifyUser
 }

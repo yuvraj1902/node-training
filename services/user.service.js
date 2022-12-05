@@ -7,16 +7,16 @@ const models = require('../models');
 const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
-
+const { commonErrorHandler } = require('../helper/errorHandler');
+const { set, get, del } = require("../utility/redis");
 
 const resetPassword = async (newPassword, id, userEmail) => {
   
   if (id) {
     await models.User.update({ password: await hash(newPassword,10) }, { where: { id: id } });
-    
   }
   else {
-    await models.User.update({ password: await hash(newPassword,10) }, { where: { email: userEmail } });
+    await models.User.update({ password: await hash(newPassword, 10) }, { where: { email: userEmail } });
   }
     const email_body = `Password reset successfull`;
     const email_subject = `Password reset`;
@@ -110,6 +110,9 @@ const resetUserPassword = async (payload) => {
     return resetPassword(payload.newPassword,null,payload.userEmail);
   }
   else if (payload.token) {
+    if (!await get(payload.token)) {
+      throw new Error("reset link expired");
+    }
     const decode_token = jwt.verify(payload.token, process.env.secretKey);
     if (!decode_token) {
       throw new Error('Invalid reset link');
@@ -118,14 +121,20 @@ const resetUserPassword = async (payload) => {
     if (!userExist) {
       throw new Error('User Not Found');
     }
-    console.log(payload.newPassword);
-    console.log(userExist.id);
+    await del(payload.token);
     return resetPassword(payload.newPassword,userExist.id, userExist.email);
   }
 }
 
 const userInfo = async (payload) => {
-  const userInfo = await models.User.findOne({
+  let key_name = payload.userId;
+  let is_data = await get(key_name);
+
+  if (is_data) {
+    return JSON.parse(is_data);
+  }
+  else {
+    const userInfo = await models.User.findOne({
     where: { id: payload.userId },
     include: [{
       model: models.Role,
@@ -136,33 +145,44 @@ const userInfo = async (payload) => {
       attributes: ["designation_title"]
     }],
     attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
-  });
-  return userInfo;
+    });
+    set(key_name, JSON.stringify(userInfo));
+    is_data = await get(key_name);
+    return userInfo;
+  }
 }
 
 const userDetail = async (payload) => {
   const user_id = payload.user_id;
-  const userDesignationData = await models.User.findOne({
-    where: {
-      id: user_id
-    },
-    include: [{
-      model: models.Designation,
-      attributes: ["designation_title"]
-    },
-    {
-      model: models.Role,
-      attributes: ["role_title"]
-    },
-    {
-      model: models.User,
-      as: 'reportee_of',
-      attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at", "UserReporteeMapping"] }
-    }],
-    attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
+  let key_name = user_id;
+  const is_data = await get(key_name);
 
-  });
-  return userDesignationData;
+  if (is_data) {
+    return JSON.parse(is_data);
+  }
+  else {
+    const userDesignationData = await models.User.findOne({
+      where: {
+        id: user_id
+      },
+      include: [{
+        model: models.Designation,
+        attributes: ["designation_title"]
+      },
+      {
+        model: models.Role,
+        attributes: ["role_title"]
+      },
+      {
+        model: models.User,
+        as: 'reportee_of',
+        attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at", "UserReporteeMapping"] }
+      }],
+      attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
+    });
+    await set(key_name, JSON.stringify(userDesignationData));
+    return userDesignationData;
+  }
 }
 
 const forgetPassword = async (payload) => {
@@ -188,9 +208,11 @@ const forgetPassword = async (payload) => {
   let baseUrl = process.env.BASE_URL;
   let resetPassawordLink = `${baseUrl}/api/user/reset-password/${signUserToken}`;
 
+  await set(signUserToken, resetPassawordLink);
   let recipient = email;
   let subject = "Reset Password Link";
   let body = `Password Reset Link:- ${resetPassawordLink}`;
+
 
   await mailer.sendMail(body, subject, recipient);
   return "send reset password link successfully";
@@ -303,16 +325,15 @@ const createUser = async (payload) => {
     }
     if (payload.reportee_id) {
       await trans.commit();
-      return adminAddReportee(
-        { manager_id: userId, reportee_id: payload.reportee_id },
-      );
+      return { data: adminAddReportee({ manager_id: userId, reportee_id: payload.reportee_id }),error:null};
     } else {
       await trans.commit();
-      return user;
+    return { data: user,error:null};
+
     }
   } catch (error) {
     await trans.rollback();
-    throw new Error("Something went wrong");
+    return { data: null,error:error};
   }
 };
 
