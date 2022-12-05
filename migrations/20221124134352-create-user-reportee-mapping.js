@@ -2,20 +2,28 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("designation", {
+    await queryInterface.createTable('user_reportee_mapping', {
       id: {
-        type: Sequelize.UUID,
         allowNull: true,
         primaryKey: true,
+        type: Sequelize.UUID,
         defaultValue: Sequelize.literal("uuid_generate_v4()"),
       },
-      designation_title: {
-        type: Sequelize.STRING,
+      manager_id: {
+        type: Sequelize.UUID,
         allowNull: false,
+        references: {
+          model: 'user',
+          key: 'id',
+        }
       },
-      designation_code: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+      reportee_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'user',
+          key: 'id',
+        }
       },
       created_at: {
         type: Sequelize.DATE,
@@ -35,6 +43,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('designation');
+    await queryInterface.dropTable('user_reportee_mapping');
   }
 };

@@ -13,7 +13,7 @@ const addReportee = async (manager_id, reportee_id) => {
         existingManager.Designations[0].designation_code <
         existingReportee.Designations[0].designation_code
     ) {
-        const existingField = await models.UserReportee.findOne({
+        const existingField = await models.UserReporteeMapping.findOne({
             where: {
                 manager_id: manager_id,
                 reportee_id: reportee_id,
@@ -21,7 +21,7 @@ const addReportee = async (manager_id, reportee_id) => {
         });
         if (existingField)
             throw new Error('Already existing relation');
-        const reporteeAdded = await models.UserReportee.create({
+        const reporteeAdded = await models.UserReporteeMapping.create({
             manager_id: manager_id,
             reportee_id: reportee_id,
         });
@@ -37,37 +37,33 @@ const addReportee = async (manager_id, reportee_id) => {
 } 
 
 const deleteReportee = async (manager_id, reportee_id, callback) => {
-    try {
         // check for valid request
-        const existingManager = await models.User.findOne({ where: { id: manager_id }, include: models.Designation });
-        if (!existingManager) return callback(404, { response: `User not found` });
+    const existingManager = await models.User.findOne({ where: { id: manager_id }, include: models.Designation });
+    if (!existingManager) throw new Error('User not found');
 
-        const existingReportee = await models.User.findOne({ where: { id: reportee_id }, include: models.Designation });
-        if (!existingReportee) return callback(404, { response: `User not found` });
+    const existingReportee = await models.User.findOne({ where: { id: reportee_id }, include: models.Designation });
+    if (!existingReportee) throw new Error('User not found');
 
-        if (existingManager.Designations[0].designation_code < existingReportee.Designations[0].designation_code) {
-            const existingField = await models.UserReportee.findOne({
-                where: {
-                    manager_id: manager_id,
-                    reportee_id: reportee_id
-                }
-            })
-            if (!existingField) return callback(404, { response: `Not Found` });
-            const reporteeDeleted = await models.UserReportee.destroy({
-                where: {
-                    manager_id: manager_id,
-                    reportee_id: reportee_id
-                }
-            })
-            return callback(200, { response: `Relation successfully deleted` });
-        } else {
-            return callback(422, { message: `Unprocessable` });
+    if (existingManager.Designations[0].designation_code < existingReportee.Designations[0].designation_code) {
+        const existingField = await models.UserReporteeMapping.findOne({
+            where: {
+                manager_id: manager_id,
+                reportee_id: reportee_id
+            }
+        })
+        if (!existingField) throw new Error(`Not Found`);
+        const reporteeDeleted = await models.UserReporteeMapping.destroy({
+            where: {
+                manager_id: manager_id,
+                reportee_id: reportee_id
+            }
+        })
+        return {
+            message: `Relation successfully deleted`
         }
-
-    } catch (err) {
-        return callback(500, { error: `Something went wrong!` });
+    } else {
+        throw new Error(`Unprocessable`);
     }
-
 }
 
 
@@ -86,16 +82,16 @@ const adminAddReportee = async (payload) => {
     return addReportee(manager_id, reportee_id);
 }
 
-const userDeleteReportee = async (body, user, callback) => {
+const userDeleteReportee = async (payload, user) => {
     const manager_id = user.dataValues.id;
-    const reportee_id = body.reportee_id;
+    const { reportee_id } = payload;
 
-    return deleteReportee(manager_id, reportee_id, callback);
+    return deleteReportee(manager_id, reportee_id);
 }
-const adminDeleteReportee = async (body, callback) => {
-    const { manager_id, reportee_id } = body;
+const adminDeleteReportee = async (payload) => {
+    const { manager_id, reportee_id } = payload;
 
-    return deleteReportee(manager_id, reportee_id, callback);
+    return deleteReportee(manager_id, reportee_id);
 }
 
 module.exports = {

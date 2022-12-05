@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const {
   Model
 } = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize, Sequelize) => {
   class RefreshToken extends Model {
     static associate(models) {
       this.belongsTo(models.User, {
@@ -16,14 +16,20 @@ module.exports = (sequelize, DataTypes) => {
   RefreshToken.init({
     user_id: {
       allowNull: true,
-      primaryKey: true,
-      type: DataTypes.UUID,
+      type: Sequelize.UUID,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
     },
     token: {
-      type: DataTypes.STRING,
+      type: Sequelize.UUID,
+      allowNull: false,
+      primaryKey: true,
     },
     expiry_date: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
+      allowNull: false
     },
   }, {
     sequelize,
@@ -46,7 +52,6 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   RefreshToken.verifyExpiration = (expiryDate) => {
-    console.log(expiryDate);
     return expiryDate < new Date().getTime();
   };
   return RefreshToken;

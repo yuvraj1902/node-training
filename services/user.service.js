@@ -84,7 +84,6 @@ const logoutUser = async (requestToken) => {
 
 }
 
-
 const resetUserPassword = async (payload) => {
 
   if (payload.userEmail) {
@@ -135,70 +134,194 @@ const userInfo = async (payload) => {
 }
 
 const userDetail = async (payload) => {
-  const user_id = payload.userId;
+  const user_id = payload.user_id;
   const userDesignationData = await models.User.findOne({
     where: {
       id: user_id
     },
-
-    include: models.Designation
-  })
-  const userRoleData = await models.User.findOne({
-    where: {
-      id: user_id
+    include: [{
+      model: models.Designation,
+      attributes: ["designation_title"]
     },
-    include: models.Role
-  })
-
-  const reportee = await models.UserReportee.findAll({
-    where: {
-      reportee_id: user_id
+    {
+      model: models.Role,
+      attributes: ["role_title"]
     },
-  })
+    {
+      model: models.User,
+      as: 'reportee_of',
+      attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at", "UserReporteeMapping"] }
+    }],
+    attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
 
-
-  const managerArray = [];
-  for (let i = 0; i < reportee.length; i++) {
-    manager = await models.User.findOne({
-      where: {
-        id: reportee[i].manager_id
-      },
-    });
-    let singleManager = {
-      manager_first_name: manager.first_name,
-      manager_last_name: manager.last_name,
-      manager_email: manager.email
-    }
-    managerArray.push(singleManager);
-  }
-
-  const designationArray = [];
-  for (let i = 0; i < userDesignationData.Designations.length; i++) {
-    designationArray.push(userDesignationData.Designations[i].designation_title);
-  }
-
-  const rolesArray = [];
-  for (let i = 0; i < userRoleData.Roles.length; i++) {
-    rolesArray.push(userRoleData.Roles[i].role_title);
-  }
-
-
-  let userDetails = {
-    first_name: userDesignationData.first_name,
-    last_name: userDesignationData.last_name,
-    email: userDesignationData.email,
-    google_id: userDesignationData.google_id,
-    organization: userDesignationData.organization,
-    source: userDesignationData.source,
-    designation_title: designationArray,
-    role_title: rolesArray,
-    manager_details: managerArray,
-    created_at: userDesignationData.created_at,
-    updated_at: userDesignationData.updated_at,
-    deleted_at: userDesignationData.deleted_at
-  }
-  return userDetails;
+  });
+  return userDesignationData;
 }
+
+const forgetPassword = async (payload) => {
+
+  const { email } = payload;
+  const user = await models.User.findOne({
+    where: {
+      email: email
+    }
+  })
+
+  if (!user) {
+    throw new Error('User Not Found!');
+  }
+
+  let tokenData = {
+    userId: user.dataValues.id,
+    time: Date.now()
+  }
+  let signUserToken = jwt.sign(tokenData, process.env.secretKey, {
+    expiresIn: process.env.FPT_EXPIRES_IN
+  });
+  let baseUrl = process.env.BASE_URL;
+  let resetPassawordLink = `${baseUrl}/api/user/reset-password/${signUserToken}`;
+
+  let recipient = email;
+  let subject = "Reset Password Link";
+  let body = `Password Reset Link:- ${resetPassawordLink}`;
+
+  await mailer.sendMail(body, subject, recipient);
+  return "send reset password link successfully";
+
+}
+
+const deactivateUser = async (payload) => {
+
+  let { userId } = payload;
+  const user = await models.User.findOne({
+    where: {
+      id: userId
+    }
+  });
+
+  if (!user) {
+    throw new Error("User Not Found")
+  }
+
+  let destroyUser = await models.User.destroy({
+    where: {
+      id: userId
+    }
+  });
+  return "User Deactiveted"
+}
+
+const enableUser = async (payload) => {
+  let { userId } = payload;
+  let restoreUser = await models.User.restore({
+    where: {
+      id: userId
+    }
+  });
+  if (restoreUser) {
+    return "User activated"
+  } else {
+    throw new Error("User not found");
+  }
+
+}
+
+const createUser = async (payload) => {
+  payload.is_firsttime = true;
+  payload.password = await hash(payload.password, 10)
+  const trans = await sequelize.transaction();
+  try {
+    const existingUser = await models.User.findOne({
+      where: { email: payload.email },
+    });
+    if (existingUser) {
+      throw new Error("User already exists");
+    }
+    const user = await models.User.create(payload,
+      { transaction: trans }
+    );
+
+    if (!user) {
+      throw new Error("Something went wrong");
+    }
+    const userId = user.dataValues.id;
+    if (payload.designation_code) {
+      const designation = await models.Designation.findOne({
+        where: {
+          designation_code: payload.designation_code,
+        },
+      },
+        { transaction: trans }
+      );
+      if (!designation) {
+
+        throw new Error("Invalid Designation");
+      }
+      const designation_user_mapping_designationID =
+        await models.UserDesignationMapping.create({
+          designation_id: designation.id,
+          user_id: userId,
+        },
+          { transaction: trans }
+        );
+      if (!designation_user_mapping_designationID) {
+
+        throw new Error("Something went wrong");
+      }
+    }
+    if (payload.role_key) {
+      const role = await models.Role.findOne({
+        where: {
+          role_key: payload.role_key,
+        },
+      },
+        { transaction: trans }
+      );
+
+      if (!role) {
+
+        throw new Error("Invalid Role");
+      }
+      const user_role_mapping = await models.UserRoleMapping.create({
+        user_id: userId,
+        role_id: role.id
+      },
+        { transaction: trans }
+      );
+
+      if (!user_role_mapping) {
+
+        throw new Error("Something went wrong");
+      }
+    }
+    if (payload.reportee_id) {
+      await trans.commit();
+      return adminAddReportee(
+        { manager_id: userId, reportee_id: payload.reportee_id },
+      );
+    } else {
+      await trans.commit();
+      return user;
+    }
+  } catch (error) {
+    await trans.rollback();
+    throw new Error("Something went wrong");
+  }
+};
+
+const registration = async (payload) => {
+  payload.is_firsttime = false;
+  payload.password = await hash(payload.password, 10);
+  const existingUser = await models.User.findOne({
+    where: { email: payload.email },
+  });
+  if (existingUser) {
+    throw new Error("User already exists");
+  }
+  const user = await models.User.create(payload);
+  return user;
+}
+
 
 
 
@@ -207,494 +330,14 @@ module.exports = {
   getAllUsers,
   refreshToken,
   logoutUser,
-  // User creation API
-  createUser: async (data, callback) => {
-    const trans = await sequelize.transaction();
-    try {
-      const existingUser = await models.User.findOne({
-        where: { email: data.email },
-      });
-      //  checking existing User
-      if (existingUser) {
-        return callback(409, { message: `User already exists` },);
-      }
-      const value = {
-        first_name,
-        last_name,
-        email,
-        organization,
-        google_id,
-        source,
-      } = data;
-      // user creation
-
-      const user = await models.User.create(
-        {
-          first_name: data.first_name,
-          last_name: data.last_name,
-          email: data.email,
-          password: await hash(data.password, 10),
-          organization: data.organization,
-          google_id: data.google_id,
-          source: data.source,
-          is_firsttime: true
-        },
-        { transaction: trans }
-      );
-
-      if (!user) {
-        await trans.rollback();
-        return callback(500, { message: `Something went wrong` });
-      }
-      // finding userId
-      const userId = user.dataValues.id;
-
-      // checking is designation_title from req.body
-      if (data.designation_title) {
-        const designation = await models.Designation.findOne(
-          {
-            where: {
-              designation_title: data.designation_title,
-            },
-          },
-          { transaction: trans }
-        );
-        if (!designation) {
-          await trans.rollback();
-          return callback(400, { message: `Invalid Designation` });
-        }
-        // entry in user-designation-mapping
-        const designation_user_mapping_designationID =
-          await models.UserDesignationMapping.create(
-            {
-              designation_id: designation.id,
-              user_id: userId,
-            },
-            { transaction: trans }
-          );
-        if (!designation_user_mapping_designationID) {
-          await trans.rollback();
-          return callback(500, { message: `Something went wrong` })
-        }
-
-      }
-      // checking is role_title from req.body
-      if (data.role_title) {
-        const role = await models.Role.findOne(
-          {
-            where: {
-              role_title: data.role_title,
-            },
-          },
-          { transaction: trans }
-        );
-
-
-        if (!role) {
-          await trans.rollback();
-          return callback(400, { message: `Invalid Role` });
-
-        }
-        // entry in user-role-mapping
-        const user_role_mapping = await models.UserRoleMapping.create(
-          {
-            role_id: role.id,
-            user_id: userId,
-          },
-          { transaction: trans }
-        );
-
-        if (!user_role_mapping) {
-          await trans.rollback();
-          return callback(500, { message: `Something went wrong` });
-        }
-      }
-      // transaction commit successfully
-      await trans.commit();
-      if (data.reportee_id) {
-        return adminAddReportee({ manager_id: userId, reportee_id: data.reportee_id }, callback);
-      } else {
-        return callback(201, { data: value });
-      }
-    } catch (error) {
-      // rollback transaction if any error
-      await trans.rollback();
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
-
-  userInfo: async (userEmail, callback) => {
-    try {
-      const userDetails = await models.User.findOne({
-        where: { email: userEmail },
-      });
-
-      const userManagerDetails = await models.UserReportee.findAll({
-        where: { reportee_id: userDetails.dataValues.id },
-      });
-
-      const mangerDetailsArray = [];
-      for (let i = 0; i < userManagerDetails.length; ++i) {
-        const userDetails = await models.User.findOne({
-          where: { id: userManagerDetails[i].dataValues.manager_id },
-        });
-
-        const mangerDetails = {
-          firstName: userDetails.dataValues.first_name,
-          lastName: userDetails.dataValues.last_name,
-          email: userDetails.dataValues.email,
-        };
-
-        mangerDetailsArray.push(mangerDetails);
-      }
-
-      const userInfo = {
-        firstName: userDetails.dataValues.first_name,
-        lastName: userDetails.dataValues.last_name,
-        email: userDetails.dataValues.email,
-        organization: userDetails.dataValues.organization,
-        google_id: userDetails.dataValues.organization,
-        image_url: userDetails.dataValues.image_url,
-        source: userDetails.dataValues.source,
-        managers: mangerDetailsArray,
-      };
-
-      return callback(200, { response: userInfo });
-    } catch (err) {
-      return callback(500, `Something went wrong!`);
-    }
-  },
-
-  registration: async (data, callback) => {
-    try {
-      const existingUser = await models.User.findOne({
-        where: { email: data.email },
-      });
-      //  checking existing User
-      if (existingUser) {
-        return callback(409, { message: `User already exists` });
-      }
-
-      const value = ({
-        first_name,
-        last_name,
-        email,
-        organization,
-        google_id,
-        source,
-      } = data);
-      const user = await models.User.create({
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
-        password: await hash(data.password, 10),
-        organization: data.organization,
-        google_id: data.google_id,
-        source: data.source,
-        is_firsttime: false
-      });
-      return callback(201, { data: value });
-    } catch (error) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
-  forgetPassword: async (data, callback) => {
-
-    let expirationTime = (Date.now() + (60 * 1000 * 20));
-    let email = data.email;
-
-    try {
-      const existingUser = await models.User.findOne({ where: { email: email } });
-      if (!existingUser) { return callback(404, { message: "User not found " }); }
-
-      let tokenData = {
-        email: email,
-        expirationtime: Date.now()
-      }
-
-      let userToken = jwt.sign(JSON.stringify(tokenData), process.env.secretKey);
-      let token = `http://localhost:3004/resetUserPassword?token=${userToken}`;
-
-
-      const user = await models.User.update(
-        {
-          token_expiration: expirationTime,
-          token: userToken
-        },
-        { where: { email: email } }
-      );
-
-      let recipient = email;
-      let subject = "Reset Password Link"
-      let body = `Password reset link- ${token}`;
-
-      await mailer.sendMail(body, subject, recipient)
-      return callback(200, { message: "password reset link sent" });
-    } catch (err) {
-      return callback(500, { error: "Something went wrong!" });
-    }
-  },
-
-
-  resetUserPassword: async (query, data, callback) => {
-    try {
-      const reset_Token = query.token;
-      const password = data.password;
-
-      const currentTime = Date.now();
-
-      const isUserExist = await models.User.findOne({
-        where: {
-          token: reset_Token,
-          token_expiration: { [Op.gt]: currentTime },
-        },
-      });
-
-      if (!isUserExist) {
-        return callback(400, { error: "Invalid reset token" });
-      }
-
-      const userEmail = isUserExist.dataValues.email;
-
-      await models.User.update(
-        {
-          password: await hash(password, 10),
-          token_expiration: Date.now(),
-        },
-        {
-          where: {
-            email: userEmail,
-          },
-        }
-      );
-
-      const emailBody = `Your password has been reset successfully`;
-      const emailSubject = `Password reset`;
-
-      await mailer.sendMail(emailBody, emailSubject, userEmail);
-      return callback(200, { message: "Password reset success" });
-    } catch (err) {
-      return callback(500, { error: `something went wrong` });
-    }
-  },
-
-  deactivateUser: async (data, callback) => {
-    try {
-      let user_id = data.user_id;
-      const existingUser = await models.User.findOne({ where: { id: user_id } });
-      if (!existingUser) return callback(404, { message: `User not found` })
-      const user = await models.User.destroy({
-        where: {
-          id: user_id
-        }
-      })
-      return callback(202, { message: `User deactivate successfully` });
-    } catch (error) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
-  enableUser: async (data, callback) => {
-    try {
-      let user_id = data.user_id;
-      const user = await models.User.restore({
-        where: {
-          id: user_id
-        }
-      })
-      if (!user) return callback(404, { message: `User not found` })
-      return callback(202, { message: `User activated again` });
-    } catch (error) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
-
-  userDetail: async (data, callback) => {
-    try {
-      let user_id = data.user_id;
-      const user = await models.User.findOne({
-        where: {
-          id: user_id
-        },
-        include: models.Designation
-      });
-
-      const user2 = await models.User.findOne({
-        where: {
-          id: user_id
-        },
-        include: models.Role
-      })
-      if (!user) return callback(400, { message: `User not found` });
-      const reportee = await models.UserReportee.findAll({
-        where: {
-          reportee_id: user_id
-        },
-      })
-      let manager;
-      let managers = [];
-      if (reportee[0]) {
-        for (let i = 0; i < reportee.length; i++) {
-          manager = await models.User.findOne({
-            where: {
-              id: reportee[i].manager_id
-            },
-          })
-          let singleManager = {
-            manager_first_name: manager.first_name,
-            manager_last_name: manager.last_name,
-            manager_email: manager.email
-          }
-          managers.push(singleManager);
-        }
-      }
-      let designation_title = {};
-      let role_title = {};
-      if (!user.Designations && !user.Roles) {
-        designation_title = { destignation_title: user.Designations[0].dataValues.designation_title };
-        role_title = { role_title: user2.Roles[0].dataValues.role_title };
-      }
-      let obj = {
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        google_id: user.google_id,
-        organization: user.organization,
-        source: user.source,
-        designation_title: designation_title,
-        role_title: role_title,
-        manager_details: managers,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-        deleted_at: user.deleted_at
-      }
-      return callback(202, {
-        data: obj
-      });
-    } catch (error) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
-
-  userInfo: async (userEmail, callback) => {
-    try {
-      const userDetails = await models.User.findOne(
-        { where: { email: userEmail } });
-
-      const userManagerDetails = await models.UserReportee.findAll({ where: { reportee_id: userDetails.dataValues.id } });
-
-      const mangerDetailsArray = [];
-      for (let i = 0; i < userManagerDetails.length; ++i) {
-        const userDetails = await models.User.findOne(
-          { where: { id: userManagerDetails[i].dataValues.manager_id } });
-
-        const mangerDetails = {
-          firstName: userDetails.dataValues.first_name,
-          lastName: userDetails.dataValues.last_name,
-          email: userDetails.dataValues.email
-        }
-
-        mangerDetailsArray.push(mangerDetails);
-      }
-
-
-      const userInfo = {
-        firstName: userDetails.dataValues.first_name,
-        lastName: userDetails.dataValues.last_name,
-        email: userDetails.dataValues.email,
-        organization: userDetails.dataValues.organization,
-        google_id: userDetails.dataValues.organization,
-        image_url: userDetails.dataValues.image_url,
-        source: userDetails.dataValues.source,
-        managers: mangerDetailsArray
-      }
-
-
-      return callback(200, { message: userInfo });
-    } catch (err) {
-      return callback(500, `Something went wrong!`);
-    }
-  },
-  forgetPassword: async (data, callback) => {
-
-    let expirationTime = (Date.now() + (60 * 1000 * 20));
-    let email = data.email;
-
-    try {
-      const existingUser = await models.User.findOne({ where: { email: email } });
-      if (!existingUser) { return callback(404, { message: `User not found` }); }
-
-      let tokenData = {
-        email: email,
-        expirationtime: Date.now()
-      }
-
-      let userToken = jwt.sign(JSON.stringify(tokenData), process.env.secretKey);
-      let token = `http://localhost:3004/resetUserPassword?token=${userToken}`;
-
-
-      await models.User.update(
-        {
-          token_expiration: expirationTime,
-          token: userToken
-        },
-        { where: { email: email } }
-      );
-
-      let recipient = email;
-      let subject = "Reset Password Link"
-      let body = `Password reset link- ${token}`;
-
-      await mailer.sendMail(body, subject, recipient)
-      return callback(200, { message: `password reset link sent` });
-
-    }
-    catch (err) {
-      return callback(500, { message: `Something went wrong!` });
-    }
-  },
-  resetUserPassword: async (query, data, callback) => {
-    try {
-      const reset_Token = query.token;
-      const password = data.password;
-
-      const currentTime = Date.now();
-      const isUserExist = await models.User.findOne({
-        where: {
-          token: reset_Token,
-          token_expiration: { [Op.gt]: currentTime }
-        }
-      });
-
-
-      if (!isUserExist) {
-        return callback(400, { message: `Invalid reset token` });
-      }
-
-      const userEmail = isUserExist.dataValues.email;
-
-      await models.User.update({
-        password: await hash(password, 10),
-        token_expiration: Date.now()
-      }, {
-        where: {
-          email: userEmail
-        }
-      });
-
-
-      const emailBody = `Your password has been reset successfully`;
-      const emailSubject = `Password reset`
-
-
-      await mailer.sendMail(emailBody, emailSubject, userEmail);
-      return callback(200, { message: `Password reset success` });
-
-    } catch (err) {
-      return callback(500, { message: `something went wrong` });
-    }
-  },
-
-
+  resetUserPassword,
+  userInfo,
+  userDetail,
+  forgetPassword,
+  deactivateUser,
+  enableUser,
+  createUser,
+  registration
 };
 
 

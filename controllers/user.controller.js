@@ -1,11 +1,3 @@
-const { createUser,
-    deactivateUser,
-    userInfo,
-    resetUserPassword,
-    forgetPassword,
-    enableUser,
-    userDetail } = require('../services/user.service');
-
 const { commonErrorHandler } = require('../helper/errorHandler');
 const userService = require('../services/user.service');
 
@@ -61,16 +53,17 @@ const logoutUser = async (req, res, next) => {
     }
 }
 
-// user level accell
-// self pwd reset
-const resetpPwd = async (req, res, next) => {
+const resetPassword = async (req, res, next) => {
     try {
-        const { body, user } = req;
+        const { body, user, params } = req;
         const payload = {
-            userId: user.id,
-            newPassword: body.password
+            newPassword: body.password,
+            userEmail: user.email,
+            token: (Object.keys(params).length > 0 ? params.token : null)
+
         }
-        const data = await userService.loginUser(payload);
+        console.log(payload);
+        const data = await userService.resetUserPassword(payload);
         res.data = data;
         next();
     } catch (error) {
@@ -80,16 +73,17 @@ const resetpPwd = async (req, res, next) => {
     }
 }
 
-// admin level accell
-// admin pwd reset
-const adminPwdReset = async (req, res, next) => {
+
+const resetPasswordByLink = async (req, res, next) => {
     try {
-        const { body } = req;
+        const { body, params } = req;
         const payload = {
-            userId: body.id,
-            newPassword: body.password
+            newPassword: body.password,
+            userEmail: null,
+            token: (Object.keys(params).length > 0 ? params.token : null)
         }
-        const data = await userService.loginUser(payload);
+        console.log(payload);
+        const data = await userService.resetUserPassword(payload);
         res.data = data;
         next();
     } catch (error) {
@@ -99,75 +93,134 @@ const adminPwdReset = async (req, res, next) => {
     }
 }
 
+
+
+
+const adminResetPassword = async (req, res, next) => {
+    try {
+        const { body, params } = req;
+        const payload = {
+            newPassword: body.password,
+            userEmail: body.userEmail,
+            token: (Object.keys(params).length > 0 ? query.token : null)
+
+        }
+        console.log(payload);
+        const data = await userService.resetUserPassword(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+const getUserInfo = async (req, res, next) => {
+    try {
+        const payload = {
+            userId: req.user.id,
+        }
+        const data = await userService.userInfo(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+
+const getUserDetail = async (req, res, next) => {
+    const { body } = req;
+    const payload = {
+        user_id: body.user_id
+    };
+
+    const data = await userService.userDetail(payload);
+    res.data = data;
+    next();
+}
+
+const forgetPassword = async (req, res, next) => {
+    try {
+        const { body: payload } = req;
+        // console.log(payload);
+        const data = await userService.forgetPassword(payload);
+        res.data = data;
+        console.log("datadata", data);
+        next();
+
+    } catch (error) {
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+const deactivateUsers = async (req, res, next) => {
+    try {
+
+        const { body: payload } = req;
+        const data = await userService.deactivateUsers(payload);
+        res.data = data;
+        next()
+
+    } catch (error) {
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+const enableUser = async (req, res, next) => {
+    try {
+
+        const { body: payload } = req;
+        const data = await userService.enableUser(payload);
+        res.data = data;
+        next()
+
+    } catch (error) {
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+}
+
+const createUser = async (req, res, next) => {
+    try {
+        const { body: payload } = req;
+        const data = await userService.createUser(payload);
+        res.data = data;
+        console.log(data);
+        next();
+    } catch (error) {
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+};
+
+const registration = async (req, res, next) => {
+    try {
+        const { body: payload } = req;
+        const data = await userService.registration(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
+};
 
 module.exports = {
     loginUser,
     getAllUsers,
     refreshToken,
     logoutUser,
-    // createUser API
-    registration: async (req, res, next) => {
-        createUser(req.body, (result, statusCode) => {
-            (req.result = result), (req.statusCode = statusCode);
-            next();
-        });
-    },
-
-    createUser: async (req, res, next) => {
-        createUser(req.body, (data, result) => {
-            (req.body = data), (req.statusCode = result);
-            next();
-        });
-    },
-    deactivateUsers: async (req, res, next) => {
-        deactivateUser(req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        })
-    },
-    getUserInfo: async (req, res, next) => {
-        userInfo(req.user.dataValues.email, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        })
-    },
-
-    resetUserPassword: async (req, res, next) => {
-        resetUserPassword(req.query, req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        })
-    },
-
-    forgetPassword: async (req, res, next) => {
-        forgetPassword(req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        })
-    },
-
-
-
-    enableUsers: async (req, res, next) => {
-        enableUser(req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        });
-    },
-
-    userDetails: async (req, res, next) => {
-        userDetail(req.body, (statusCode, result) => {
-            req.statusCode = statusCode;
-            req.result = result;
-            next();
-        });
-    },
-
+    resetPasswordByLink,
+    getUserInfo,
+    getUserDetail,
+    resetPassword,
+    adminResetPassword,
+    forgetPassword,
+    deactivateUsers,
+    enableUser,
+    createUser,
+    registration
 };
 
 

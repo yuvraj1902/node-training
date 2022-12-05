@@ -20,7 +20,7 @@ router.post(
     controllers.User.refreshToken,
     genericResponse.sendResponse
 );
-router.delete(
+router.post(
     '/logout',
     validator.userValidator.refreshTokenSchema,
     controllers.User.logoutUser,
@@ -42,7 +42,7 @@ router.post(
 );
 
 router.post(
-    '/forgetpassword',
+    '/forget-password',
     validator.userValidator.forgetPassword,
     controllers.User.forgetPassword,
     genericResponse.sendResponse
@@ -61,10 +61,26 @@ router.get(
     genericResponse.sendResponse
 );
 router.post(
-    '/reset-user-password',
-    validator.userValidator.resetPasswordQuerySchema,
-    validator.userValidator.resetUserPasswordSchema,
-    controllers.User.resetUserPassword,
+    '/reset-password',
+    checkToken,
+    validator.userValidator.resetPasswordSchema,
+    controllers.User.resetPassword,
+    genericResponse.sendResponse
+);
+
+router.post(
+    '/reset-password/:token',
+    validator.userValidator.resetPasswordSchema,
+    controllers.User.resetPasswordByLink,
+    genericResponse.sendResponse
+);
+
+router.post(
+    '/admin-reset-password',
+    checkToken,
+    verifyUser,
+    validator.userValidator.adminResetPasswordSchema,
+    controllers.User.adminResetPassword,
     genericResponse.sendResponse
 );
 router.delete(
@@ -80,7 +96,7 @@ router.patch(
     checkToken,
     verifyUser,
     validator.userValidator.enableUserSchema,
-    controllers.User.enableUsers,
+    controllers.User.enableUser,
     genericResponse.sendResponse
 );
 router.get(
@@ -88,7 +104,7 @@ router.get(
     checkToken,
     verifyUser,
     validator.userValidator.userDetailsSchema,
-    controllers.User.userDetails,
+    controllers.User.getUserDetail,
     genericResponse.sendResponse
 );
 module.exports = router;

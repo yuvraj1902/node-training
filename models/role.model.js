@@ -1,24 +1,27 @@
 "use strict";
 const { Model } = require("sequelize");
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize, Sequelize) => {
   class Role extends Model {
     static associate(models) {
-      this.belongsToMany(models.User, { through: 'user_role_mapping' })
+      this.belongsToMany(models.User, {
+        through: models.UserRoleMapping,
+        foreignKey: 'role_id',
+      })
     }
   }
   Role.init({
     role_key: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       unique: true
     },
     role_code: {
-      type: DataTypes.INTEGER,
+      type: Sequelize.INTEGER,
       allowNull: false,
       unique: true
     },
     role_title: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       unique: true
     }

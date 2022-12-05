@@ -15,7 +15,7 @@ router.post(
   genericResponse.sendResponse
 );
 router.delete(
-  "/userDeleteReportee",
+  "/user-delete-reportee",
   checkToken,
   validator.reporteeValidator.userReporteeSchema,
   controllers.UserReportee.userDeleteReportee,
@@ -30,7 +30,7 @@ router.post(
   genericResponse.sendResponse
 );
 router.delete(
-  "/adminDeleteReportee",
+  "/admin-delete-reportee",
   checkToken,
   verifyUser,
   validator.reporteeValidator.adminReporteeSchema,

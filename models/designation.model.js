@@ -1,21 +1,22 @@
 "use strict";
 const { Model } = require("sequelize");
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize, Sequelize) => {
   class Designation extends Model {
     static associate(models) {
       this.belongsToMany(models.User, {
-        through: "user_designation_mapping",
+        through: models.UserDesignationMapping,
+        foreignKey: 'designation_id',
       });
     }
   }
   Designation.init(
     {
       designation_title: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       designation_code: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
     },

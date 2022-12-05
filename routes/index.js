@@ -19,7 +19,6 @@ const getAllRoutesPath = function () {
             });
         }
     });
-
     return allRoutesPath;
 };
 

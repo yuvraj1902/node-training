@@ -23,7 +23,7 @@ async function admin() {
       },
       {
         name: "password",
-        // hidden: true,
+        hidden: true,
         conform: function (value) {
           return true;
         },
@@ -34,7 +34,6 @@ async function admin() {
       },
       {
         name: "google_id",
-        required: true,
       },
       {
         name: "source",
@@ -45,16 +44,18 @@ async function admin() {
         required: true
       },
       {
-        name: "role_title",
-        description: colors.magenta("Role should be Admin or User"),
+        name: "role_key",
+        description: colors.magenta("Role should be ADM or USR"),
         required: true,
       },
       {
-        name: "designation_title",
+        name: "designation_code",
+        description: colors.magenta("Designation 101 - 4"),
         required: true,
       },
     ],
     async function (err, result) {
+      result.role_key = result.role_key.toUpperCase();
       const t = await sequelize.transaction();
       try {
         const data = await models.User.create(
@@ -73,7 +74,7 @@ async function admin() {
         const designation = await models.Designation.findOne(
           {
             where: {
-              designation_title: result.designation_title,
+              designation_code: result.designation_code,
             },
           },
           { transaction: t }
@@ -92,7 +93,7 @@ async function admin() {
         const role = await models.Role.findOne(
           {
             where: {
-              role_title: result.role_title,
+              role_key: result.role_key,
             },
           },
           { transaction: t }
@@ -109,7 +110,6 @@ async function admin() {
         console.log(colors.cyan("You are good to go."));
         await t.commit();
       } catch (error) {
-        console.log(error);
         await t.rollback();
       }
     }
