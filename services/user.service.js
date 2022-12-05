@@ -328,11 +328,6 @@ const registration = async (payload) => {
   const user = await models.User.create(payload);
   return user;
 }
-
-
-const { Op } = require("sequelize");
-const { sequelize } = require("../models");
-const { adminAddReportee } = require("./userReportee.service");
 module.exports = {
   loginUser,
   getAllUsers,
