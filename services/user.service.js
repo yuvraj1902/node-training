@@ -351,6 +351,7 @@ const createUser = async (payload) => {
 
     }
   } catch (error) {
+    console.log("In service", error);
     await trans.rollback();
     return { data: null, error: error };
   }
