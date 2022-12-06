@@ -3,11 +3,9 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const routes = require('./routes');
-const redis = require("./utility/redis");
+const ReqResLoggerMiddleware = require("./middlewares/req-res-logger");
 
 
-
-redis.connect();
 const app = express();
 app.use(express.json());
 
@@ -22,6 +20,8 @@ app.use(compression());
 
 // Disble x-powered-by header to hide server side technology
 app.disable('x-powered-by');
+
+app.use(ReqResLoggerMiddleware);
 
 app.use('/health', (_req, res) => {
   res.send({ message: 'Application runing successfully!' });

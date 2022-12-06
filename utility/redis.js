@@ -9,10 +9,6 @@ let client = getClient();
 
 const connect = () => {
     client.connect();
-    client.on("connect", (err) => {
-        if (!err)
-            console.log("redis connected");
-    })
 };
 
 const get = async (key) => {
