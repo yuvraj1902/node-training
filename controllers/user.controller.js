@@ -166,7 +166,6 @@ const createUser = async (req, res, next) => {
         res.data = response.data;
         next();
     } catch (error) {
-        console.log("in helper" ,error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 };

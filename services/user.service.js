@@ -67,6 +67,13 @@ const loginUser = async (payload) => {
   // await redisClient.set(user.id, JSON.stringify(user));
   // await redisClient.set(refreshToken, JSON.stringify("true"),24*60);
 
+  const data = {
+    refresh_token: refreshToken,
+    user_id: user.id,
+    email: user.email
+  };
+  await redisClient.set("refresh_token_detail", JSON.stringify(data));
+
   return {
     id: user.id,
     email: user.email,
@@ -351,7 +358,6 @@ const createUser = async (payload) => {
 
     }
   } catch (error) {
-    console.log("In service", error);
     await trans.rollback();
     return { data: null, error: error };
   }
@@ -359,13 +365,8 @@ const createUser = async (payload) => {
 
 const registration = async (payload) => {
   payload.is_firsttime = false;
-<<<<<<< HEAD
   payload.role_key = "USR";
   payload.password = await bcrypt.hash(payload.password, 10);
-=======
-  payload.role_key = 'USR';
-  payload.password = await hash(payload.password, 10);
->>>>>>> d3e8175 (Refactor refresh token association and create assign designation API)
   const existingUser = await models.User.findOne({
     where: { email: payload.email },
   });
@@ -381,7 +382,6 @@ const registration = async (payload) => {
   });
   await models.UserRoleMapping.create({
     user_id: userId,
-<<<<<<< HEAD
     role_id: role.id,
   });
 
@@ -393,14 +393,6 @@ const registration = async (payload) => {
 };
 
 
-=======
-    role_id: role.id
-  });
-  return user;
-}
-
-
->>>>>>> d3e8175 (Refactor refresh token association and create assign designation API)
 module.exports = {
   loginUser,
   getAllUsers,
