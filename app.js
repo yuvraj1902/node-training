@@ -4,6 +4,8 @@ const helmet = require('helmet');
 const compression = require('compression');
 
 const routes = require('./routes');
+const ReqResLoggerMiddleware = require('./middlewares/req-res-logger');
+const { commonErrorHandler } = require('./helper/commonFunctions.helper');
 
 const app = express();
 app.use(express.json());
@@ -20,6 +22,10 @@ app.use(compression());
 // Disble x-powered-by header to hide server side technology
 app.disable('x-powered-by');
 
+// Request Response logging
+app.use(ReqResLoggerMiddleware);
+
+
 app.use('/health', (_req, res) => {
   res.send({ message: 'Application runing successfully!' });
 });
@@ -30,7 +36,7 @@ routes.registerRoutes(app);
 // 404 Error Handling
 app.use((req, res) => {
     const message = 'Invalid endpoint';
-    res.status(404).json({message});
+    commonErrorHandler(req, res, message, 404);
 });
 
 module.exports = app;

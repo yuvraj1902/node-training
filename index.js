@@ -2,15 +2,16 @@ require('dotenv').config();
 
 const app = require('./app');
 const { sequelize } = require('./models');
-const { connect } = require('./utility/redis');
+const redis = require('./utility/redis');
+const logger = require('./helper/logger');
 
 const startServer = async function () {
   try {
+    logger.init();
     await sequelize.authenticate();
     console.log('... Microservice db ✔');
-
-
-    await connect();
+    await redis.connect();
+    console.log('... Redis db ✔');
     app.listen(process.env.SERVER_PORT);
     console.log(`--- Server started on ${process.env.SERVER_PORT} ---\n\n`);
   } catch (err) {

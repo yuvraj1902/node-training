@@ -8,6 +8,7 @@ const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
 const redisClient = require('../utility/redis');
+const { use } = require('../app');
 
 
 
@@ -17,14 +18,22 @@ const loginUser = async (payload) => {
   const user = await models.User.findOne({
     where: {
       email: email
-    }
+    },
+    include: [{
+      model: models.Role,
+      required: false,
+      attributes: ["role_title"]
+    }, {
+      model: models.Designation,
+      attributes: ["designation_title"]
+    }],
+    attributes: { exclude: ["created_at", "updated_at", "deleted_at"] }
   });
   if (!user) {
     throw new Error('User Not Found!');
   }
 
-
-  const match = await bcrypt.compareSync(password, user.password);
+  const match = await bcrypt.compareSync(password, user.dataValues.password);
   if (!match) {
     throw new Error('Wrong email or password');
   }
@@ -40,7 +49,9 @@ const loginUser = async (payload) => {
     user_id: user.id,
     email: user.email
   };
-  await redisClient.set("refresh_token_detail", JSON.stringify(data));
+  delete user.dataValues.password;
+  await redisClient.set("user", JSON.stringify(user));
+  await redisClient.set("refresh_token", JSON.stringify(refreshToken));
 
   return {
     id: user.id,
@@ -87,7 +98,8 @@ const getAllUsers = async () => {
 }
 
 const logoutUser = async (requestToken) => {
-  await redisClient.del("refresh_token_detail");
+  await redisClient.del("refresh_token");
+  await redisClient.del("user");
   // let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
   // if (!refreshToken) return;
   // models.RefreshToken.destroy({ where: { token: refreshToken.token } });

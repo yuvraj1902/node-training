@@ -12,8 +12,8 @@ const connect = () => {
     //     client = getClient();
     client.connect();
     client.on("connect", (err) => {
-        if (!err)
-            console.log("redis connected");
+        // if (!err)
+        //     console.log("redis connected");
     })
 };
 
