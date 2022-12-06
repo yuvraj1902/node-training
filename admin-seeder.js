@@ -23,7 +23,6 @@ async function admin() {
       },
       {
         name: "password",
-        hidden: true,
         conform: function (value) {
           return true;
         },

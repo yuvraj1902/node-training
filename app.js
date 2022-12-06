@@ -8,12 +8,6 @@ const { connect, getClient ,set,get} = require("./utility/redis");
 
 
 connect();
-
-
-set("arvind", "yadav");
-let data = get("arvind");
-console.log(data);
-
 const app = express();
 app.use(express.json());
 

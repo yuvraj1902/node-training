@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon index.js",
     "migrate": "npx sequelize db:migrate",
-    "seed": "npx sequelize db:seed:all"
+    "seed": "npx sequelize db:seed:all",
+    "undo":"npx sequelize db:migrate:undo:all"
   },
   "repository": {
     "type": "git",

@@ -95,6 +95,7 @@ const logoutUser = async (requestToken) => {
   let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
   if (!refreshToken) return;
   models.RefreshToken.destroy({ where: { token: refreshToken.token } });
+  
   return;
 
 }
