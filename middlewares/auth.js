@@ -1,36 +1,30 @@
-const jwt = require('jsonwebtoken');
-
-const models = require('../models');
-
-module.exports = {
-  checkToken: async (req, res, next) => {
+const jwt = require('jsonwebtoken')
+const models = require('../models')
+const checkToken= async (req, res, next) => {
     try {
-      let token = req.get('authorization');
-
-      if (!token) return res.status(401).json({ message: `Access denied` });
-
-      token = token.slice(7);
-
-      if (!token) return res.status(401).json({ message: `Access denied` });
-
-      jwt.verify(token, process.env.secretKey, async function (err, decoded) {
-        if (err) {
-          return res.status(401).json({ message: `You are not authorized` });
-        }
-        const user = await models.User.findOne({
-          where: {
-            id: decoded.userId
-          },
-          include: models.Role
-        });
-        if (!user) return res.status(404).json({
-          message: `User not found`
-        })
-        req.user = user;
-        next();
+      console.log("here");
+      const header = req.headers["authorization"];
+      const token = (header ? header.split(' ')[1] : null);
+      if (!token) {
+        throw new Error('Access denied');
+      }
+      const decoded_jwt = jwt.verify(token, process.env.secretKey);
+      const user = await models.User.findOne({
+        where: {
+                id: decoded_jwt.userId
+              },
+              include: models.Role
       });
+      if(!user) {
+        throw new Error('User Not found');
+      }
+      req.user = user;
+      console.log(user);
+      next();
     } catch (error) {
-      return res.status(500).json({ message: `Something went wrong!` });
+      return res.status(500).json({ error: error.message });
     }
-  },
+  }
+module.exports = {
+  checkToken
 };
