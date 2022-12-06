@@ -9,7 +9,19 @@ const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
 const redisClient = require('../utility/redis');
 
-
+const resetPassword = async (newPassword, id, userEmail) => {
+  
+  if (id) {
+    await models.User.update({ password: await hash(newPassword,10) }, { where: { id: id } });
+  }
+  else {
+    await models.User.update({ password: await hash(newPassword, 10) }, { where: { email: userEmail } });
+  }
+    const email_body = `Password reset successfull`;
+    const email_subject = `Password reset`;
+    await mailer.sendMail(email_body, email_subject, userEmail);
+    return "Password reset successfully";
+}
 
 const loginUser = async (payload) => {
   const { email, password } = payload;
@@ -60,10 +72,6 @@ const refreshToken = async (requestToken) => {
     throw new Error('Refresh token is not in database!');
   }
   if (refreshToken.refresh_token === requestToken) console.log("hello");
-  // if (models.RefreshToken.verifyExpiration(refreshToken.expiry_date)) {
-  //   models.RefreshToken.destroy({ where: { token: refreshToken.token } });
-  //   throw new Error('Refresh token was expired. Please make a new signin request');
-  // }
 
   const userId = refreshToken.user_id;
   let newAccessToken = jwt.sign({ userId: userId }, process.env.secretKey, {
@@ -88,9 +96,7 @@ const getAllUsers = async () => {
 
 const logoutUser = async (requestToken) => {
   await redisClient.del("refresh_token_detail");
-  // let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
-  // if (!refreshToken) return;
-  // models.RefreshToken.destroy({ where: { token: refreshToken.token } });
+  
   return;
 
 }

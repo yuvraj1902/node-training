@@ -8,8 +8,6 @@ const getClient = () => {
 let client = getClient();
 
 const connect = () => {
-    // if (!client)
-    //     client = getClient();
     client.connect();
     client.on("connect", (err) => {
         if (!err)
