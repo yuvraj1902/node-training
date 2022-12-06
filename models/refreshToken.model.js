@@ -42,14 +42,14 @@ module.exports = (sequelize, Sequelize) => {
 
     expiredAt.setSeconds(expiredAt.getSeconds() + process.env.jwtRefreshExpiration);
 
-    let _token = uuidv4();
-    let refreshToken = await this.create({
-      token: _token,
-      user_id: user.dataValues.id,
-      expiry_date: expiredAt.getTime(),
-    });
+    let token = uuidv4();
+    // let refreshToken = await this.create({
+    //   token: _token,
+    //   user_id: user.dataValues.id,
+    //   expiry_date: expiredAt.getTime(),
+    // });
 
-    return refreshToken.token;
+    return token;
   };
 
   RefreshToken.verifyExpiration = (expiryDate) => {

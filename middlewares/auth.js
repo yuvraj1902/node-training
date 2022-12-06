@@ -15,7 +15,7 @@ module.exports = {
 
       jwt.verify(token, process.env.secretKey, async function (err, decoded) {
         if (err) {
-          return res.status(401).json({message: `You are not authorized`});
+          return res.status(401).json({ message: `You are not authorized` });
         }
         const user = await models.User.findOne({
           where: {
@@ -29,7 +29,7 @@ module.exports = {
         req.user = user;
         next();
       });
-    }  catch (error) {
+    } catch (error) {
       return res.status(500).json({ message: `Something went wrong!` });
     }
   },

@@ -146,10 +146,8 @@ const getUserDetail = async (req, res, next) => {
 const forgetPassword = async (req, res, next) => {
     try {
         const { body: payload } = req;
-        // console.log(payload);
         const data = await userService.forgetPassword(payload);
         res.data = data;
-        console.log("datadata", data);
         next();
 
     } catch (error) {
@@ -186,12 +184,13 @@ const enableUser = async (req, res, next) => {
 const createUser = async (req, res, next) => {
     try {
         const { body: payload } = req;
-        const data = await userService.createUser(payload);
-        res.data = data;
-        console.log(data);
+        const response = await userService.createUser(payload);
+        if (response.error) {
+            throw new Error(response.error.message);
+        }
+        res.data = response.data;
         next();
     } catch (error) {
-        console.log("in helper" ,error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 };
