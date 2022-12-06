@@ -2,17 +2,18 @@ const redis = require("redis");
 require("dotenv").config();
 
 const getClient = () => {
-    return redis.createClient(process.env.REDIS_HOST,process.env.REDIS_PORT);
+    return redis.createClient(process.env.REDIS_HOST, process.env.REDIS_PORT);
 }
 
 let client = getClient();
 
 const connect = () => {
-    
+    // if (!client)
+    //     client = getClient();
     client.connect();
     client.on("connect", (err) => {
-        if(!err)
-        console.log("redis connected");
+        if (!err)
+            console.log("redis connected");
     })
 };
 

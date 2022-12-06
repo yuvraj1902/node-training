@@ -181,7 +181,6 @@ const enableUser = async (req, res, next) => {
 const createUser = async (req, res, next) => {
     try {
         const { body: payload } = req;
-        console.log(payload);
         const response = await userService.createUser(payload);
         if (response.error) {
             throw new Error(response.error.message);

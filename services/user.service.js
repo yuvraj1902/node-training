@@ -7,22 +7,7 @@ const models = require('../models');
 const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
-const { commonErrorHandler } = require('../helper/errorHandler');
-const redis = require("../utility/redis");
-
-const resetPassword = async (newPassword, id, userEmail) => {
-  
-  if (id) {
-    await models.User.update({ password: await hash(newPassword,10) }, { where: { id: id } });
-  }
-  else {
-    await models.User.update({ password: await hash(newPassword, 10) }, { where: { email: userEmail } });
-  }
-    const email_body = `Password reset successfull`;
-    const email_subject = `Password reset`;
-    await mailer.sendMail(email_body, email_subject, userEmail);
-    return "Password reset successfully";
-}
+const redisClient = require('../utility/redis');
 
 
 
@@ -38,6 +23,7 @@ const loginUser = async (payload) => {
     throw new Error('Credentials are invalid!');
   }
 
+
   const match = await bcrypt.compareSync(password, user.password);
   if (!match) {
     throw new Error('Wrong email or password');
@@ -48,6 +34,13 @@ const loginUser = async (payload) => {
     expiresIn: process.env.jwtExpiration
   });
   let refreshToken = await models.RefreshToken.createToken(user);
+
+  const data = {
+    refresh_token: refreshToken,
+    user_id: user.id,
+    email: user.email
+  };
+  await redisClient.set("refresh_token_detail", JSON.stringify(data));
 
   return {
     id: user.id,
@@ -60,15 +53,17 @@ const loginUser = async (payload) => {
 const refreshToken = async (requestToken) => {
   if (!requestToken) throw new Error('Refresh Token is required!');
 
-  let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
+  let refreshToken = await redisClient.get("refresh_token_detail");
+  refreshToken = JSON.parse(refreshToken);
+
   if (!refreshToken) {
     throw new Error('Refresh token is not in database!');
   }
-
-  if (models.RefreshToken.verifyExpiration(refreshToken.expiry_date)) {
-    models.RefreshToken.destroy({ where: { token: refreshToken.token } });
-    throw new Error('Refresh token was expired. Please make a new signin request');
-  }
+  if (refreshToken.refresh_token === requestToken) console.log("hello");
+  // if (models.RefreshToken.verifyExpiration(refreshToken.expiry_date)) {
+  //   models.RefreshToken.destroy({ where: { token: refreshToken.token } });
+  //   throw new Error('Refresh token was expired. Please make a new signin request');
+  // }
 
   const userId = refreshToken.user_id;
   let newAccessToken = jwt.sign({ userId: userId }, process.env.secretKey, {
@@ -77,7 +72,7 @@ const refreshToken = async (requestToken) => {
 
   return {
     accessToken: newAccessToken,
-    refreshToken: refreshToken.token,
+    refreshToken: refreshToken.refresh_token,
   }
 }
 
@@ -92,10 +87,10 @@ const getAllUsers = async () => {
 }
 
 const logoutUser = async (requestToken) => {
-  let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
-  if (!refreshToken) return;
-  models.RefreshToken.destroy({ where: { token: refreshToken.token } });
-
+  await redisClient.del("refresh_token_detail");
+  // let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
+  // if (!refreshToken) return;
+  // models.RefreshToken.destroy({ where: { token: refreshToken.token } });
   return;
 
 }
@@ -333,7 +328,7 @@ const createUser = async (payload) => {
     }
   } catch (error) {
     await trans.rollback();
-    return { data: null,error:error};
+    return { data: null, error: error };
   }
 };
 
