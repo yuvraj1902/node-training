@@ -16,7 +16,7 @@ module.exports = {
     loginSchema: async (req, res, next) => {
         const schema = Joi.object({
             email: Joi.string().email().lowercase().required(),
-            password: Joi.string().min(4).max(16).required(),
+            password:passwordComplexity(complexityOptions).required()
         });
 
         validateRequest(req, res, next, schema, 'body');

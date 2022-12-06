@@ -1,9 +1,11 @@
 const fs = require('fs');
 
 const commonErrorHandler = async (req, res, message, statusCode = 500, error = null) => {
+
   if (req.files) {
     Object.keys(req.files).forEach(function (file) {
       if (req.files[file].path) {
+        console.log("here");
         fs.unlink(req.files[file].path, function (err) {
           console.log(err);
         });

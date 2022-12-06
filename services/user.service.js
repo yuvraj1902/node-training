@@ -8,7 +8,7 @@ const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
 const { commonErrorHandler } = require('../helper/errorHandler');
-const { set, get, del } = require("../utility/redis");
+const redis = require("../utility/redis");
 
 const resetPassword = async (newPassword, id, userEmail) => {
   
@@ -95,7 +95,7 @@ const logoutUser = async (requestToken) => {
   let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
   if (!refreshToken) return;
   models.RefreshToken.destroy({ where: { token: refreshToken.token } });
-  
+
   return;
 
 }
@@ -122,14 +122,14 @@ const resetUserPassword = async (payload) => {
     if (!userExist) {
       throw new Error('User Not Found');
     }
-    await del(payload.token);
+    await redis.del(payload.token);
     return resetPassword(payload.newPassword,userExist.id, userExist.email);
   }
 }
 
 const userInfo = async (payload) => {
   let key_name = payload.userId;
-  let is_data = await get(key_name);
+  let is_data = await redis.get(key_name);
 
   if (is_data) {
     return JSON.parse(is_data);
@@ -147,8 +147,7 @@ const userInfo = async (payload) => {
     }],
     attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
     });
-    set(key_name, JSON.stringify(userInfo));
-    is_data = await get(key_name);
+    await redis.set(key_name, JSON.stringify(userInfo));
     return userInfo;
   }
 }
@@ -156,7 +155,7 @@ const userInfo = async (payload) => {
 const userDetail = async (payload) => {
   const user_id = payload.user_id;
   let key_name = user_id;
-  const is_data = await get(key_name);
+  const is_data = await redis.get(key_name);
 
   if (is_data) {
     return JSON.parse(is_data);
@@ -181,7 +180,7 @@ const userDetail = async (payload) => {
       }],
       attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
     });
-    await set(key_name, JSON.stringify(userDesignationData));
+    await redis.set(key_name, JSON.stringify(userDesignationData));
     return userDesignationData;
   }
 }
@@ -209,7 +208,7 @@ const forgetPassword = async (payload) => {
   let baseUrl = process.env.BASE_URL;
   let resetPassawordLink = `${baseUrl}/api/user/reset-password/${signUserToken}`;
 
-  await set(signUserToken, resetPassawordLink);
+  await redis.set(signUserToken, resetPassawordLink);
   let recipient = email;
   let subject = "Reset Password Link";
   let body = `Password Reset Link:- ${resetPassawordLink}`;

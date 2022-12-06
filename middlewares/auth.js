@@ -1,8 +1,5 @@
 const jwt = require('jsonwebtoken')
-
 const models = require('../models')
-
-
 const checkToken= async (req, res, next) => {
     try {
       console.log("here");

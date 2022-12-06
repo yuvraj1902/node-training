@@ -1,4 +1,3 @@
-const moment = require('moment');
 const { commonErrorHandler } = require('./errorHandler');
 
 
@@ -28,12 +27,12 @@ const validateRequest = (req, res, next, schema, requestParamterType) => {
     } else {
       req.params = value;
     }
+    console.log(value);
     return next();
   }
 
   const { details } = error;
   const message = details.map(i => i.message).join(',');
-
   return commonErrorHandler(req, res, message, 422);
 };
 
