@@ -7,6 +7,7 @@ const models = require('../models');
 const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
+const {set, get} = require("../redis");
 
 
 
@@ -73,8 +74,20 @@ const getAllUsers = async () => {
   if (!users) {
     throw new Error('Not Found');
   }
-  return users;
+//  await redisClient.set("allUsersData", users);
+  let getCacheData = await get("allUsersData");
+  let  userData = JSON.parse(getCacheData)
+  if (getCacheData) {
+    return userData;
+  }
+  else {
+    await set("allUsersData", JSON.stringify(users));
+     return users
+  } 
 }
+
+
+
 
 const logoutUser = async (requestToken) => {
   let refreshToken = await models.RefreshToken.findOne({ where: { token: requestToken } });
@@ -180,6 +193,8 @@ const forgetPassword = async (payload) => {
   });
   let baseUrl = process.env.BASE_URL;
   let resetPassawordLink = `${baseUrl}/api/user/reset-password/${signUserToken}`;
+
+  await set(signUserToken, resetPassawordLink);
 
   let recipient = email;
   let subject = "Reset Password Link";
@@ -296,17 +311,15 @@ const createUser = async (payload) => {
     }
     if (payload.reportee_id) {
       await trans.commit();
-      return adminAddReportee(
-        { manager_id: userId, reportee_id: payload.reportee_id },
-      );
+      return { data: adminAddReportee({ manager_id: userId, reportee_id: payload.reportee_id }), error: null };
     } else {
       await trans.commit();
-      return user;
+      return { data: user, error: null };
+
     }
   } catch (error) {
-    console.log(error);
     await trans.rollback();
-    throw new Error("Something went wrong");
+    return { data: null, error: error };
   }
 };
 
