@@ -8,8 +8,20 @@ const { sequelize } = require('../models');
 const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
 const redisClient = require('../utility/redis');
+const UniqueStringGenerator = require('unique-string-generator');
 
-
+const resetPassword = async (newPassword, id, userEmail) => {  
+  if (id) {
+    await models.User.update({ password: await hash(newPassword,10) }, { where: { id: id } });
+  }
+  else {
+    await models.User.update({ password: await hash(newPassword, 10) }, { where: { email: userEmail } });
+  }
+    const email_body = `Password reset successfull`;
+    const email_subject = `Password reset`;
+    await mailer.sendMail(email_body, email_subject, userEmail);
+    return "Password reset successfully";
+}
 
 const loginUser = async (payload) => {
   const { email, password } = payload;
@@ -19,12 +31,17 @@ const loginUser = async (payload) => {
       email: email
     },
     include: [{
-      model: models.Role,
-      required: false,
-      attributes: ["role_title"]
-    }, {
       model: models.Designation,
       attributes: ["designation_title"]
+    },
+    {
+      model: models.Role,
+      attributes: ["role_title"]
+    },
+    {
+      model: models.User,
+      as: 'reportee_of',
+      attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at", "UserReporteeMapping"] }
     }],
     attributes: { exclude: ["created_at", "updated_at", "deleted_at"] }
   });
@@ -37,20 +54,16 @@ const loginUser = async (payload) => {
     throw new Error('Wrong email or password');
   }
 
-  // jwt token assignment
   const accessToken = jwt.sign({ userId: user.id }, process.env.secretKey, {
     expiresIn: process.env.jwtExpiration
   });
-  let refreshToken = await models.RefreshToken.createToken(user);
+  const refreshToken = jwt.sign({ userId: user.id }, process.env.secretKey, {
+    expiresIn: process.env.jwtRefreshExpiration
+  });
 
-  const data = {
-    refresh_token: refreshToken,
-    user_id: user.id,
-    email: user.email
-  };
   delete user.dataValues.password;
-  await redisClient.set("user", JSON.stringify(user));
-  await redisClient.set("refresh_token", JSON.stringify(refreshToken));
+  await redisClient.set(user.id, JSON.stringify(user));
+  await redisClient.set(refreshToken, JSON.stringify("true"));
 
   return {
     id: user.id,
@@ -61,28 +74,22 @@ const loginUser = async (payload) => {
 }
 
 const refreshToken = async (requestToken) => {
-  if (!requestToken) throw new Error('Refresh Token is required!');
 
-  let refreshToken = await redisClient.get("refresh_token_detail");
-  refreshToken = JSON.parse(refreshToken);
+  let refreshToken = await redisClient.get(requestToken);
 
   if (!refreshToken) {
-    throw new Error('Refresh token is not in database!');
+    throw new Error('Login required!');
   }
-  if (refreshToken.refresh_token === requestToken) console.log("hello");
-  // if (models.RefreshToken.verifyExpiration(refreshToken.expiry_date)) {
-  //   models.RefreshToken.destroy({ where: { token: refreshToken.token } });
-  //   throw new Error('Refresh token was expired. Please make a new signin request');
-  // }
 
-  const userId = refreshToken.user_id;
-  let newAccessToken = jwt.sign({ userId: userId }, process.env.secretKey, {
+  const decoded_jwt = jwt.verify(requestToken, process.env.secretKey);
+  
+  let newAccessToken = jwt.sign({ userId: decoded_jwt.userId }, process.env.secretKey, {
     expiresIn: process.env.jwtExpiration
   });
 
   return {
     accessToken: newAccessToken,
-    refreshToken: refreshToken.refresh_token,
+    refreshToken: requestToken,
   }
 }
 
@@ -126,70 +133,57 @@ const resetUserPassword = async (payload) => {
       throw new Error('User Not Found');
     }
     console.log(payload);
-    await models.User.update({ password: await hash(payload.newPassword, 10) }, { where: { email: payload.userEmail } });
-    const email_body = `Password reset successfull`;
-    const email_subject = `Password reset`;
-    await mailer.sendMail(email_body, email_subject, payload.userEmail);
-    return "Password reset successfully";
+    return resetPassword(payload.newPassword,null,payload.userEmail);
   }
-  else if (payload.token) {
-    const decode_token = jwt.verify(payload.token, process.env.secretKey);
-    if (!decode_token) {
-      throw new Error('Invalid reset link');
+  else if (payload.token) { 
+    const is_data = await redisClient.get(payload.token);
+    if (!is_data) {
+      throw new Error("reset link expired");
     }
-    const userExist = await models.User.findOne({ where: { id: decode_token.userId } });
+    const userExist = await models.User.findOne({ where: { id:is_data } });
     if (!userExist) {
       throw new Error('User Not Found');
     }
-    console.log(payload.newPassword);
-    console.log(userExist.id);
-    await models.User.update({ password: await hash(payload.newPassword, 10) }, { where: { id: userExist.id } });
-    const email_body = `Password reset successfull`;
-    const email_subject = `Password reset`;
-    await mailer.sendMail(email_body, email_subject, userExist.email);
-    return "Password reset successfully";
+    await redisClient.del(payload.token);
+    return resetPassword(payload.newPassword,userExist.id, userExist.email);
   }
 }
 
-const userInfo = async (payload) => {
-  const userInfo = await models.User.findOne({
-    where: { id: payload.userId },
-    include: [{
-      model: models.Role,
-      required: false,
-      attributes: ["role_title"]
-    }, {
-      model: models.Designation,
-      attributes: ["designation_title"]
-    }],
-    attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
-  });
-  return userInfo;
-}
 
 const userDetail = async (payload) => {
-  const user_id = payload.user_id;
-  const userDesignationData = await models.User.findOne({
-    where: {
-      id: user_id
-    },
-    include: [{
-      model: models.Designation,
-      attributes: ["designation_title"]
-    },
-    {
-      model: models.Role,
-      attributes: ["role_title"]
-    },
-    {
-      model: models.User,
-      as: 'reportee_of',
-      attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at", "UserReporteeMapping"] }
-    }],
-    attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
+  let key_name = payload.userId;
+  const is_data = await redisClient.get(key_name);
 
-  });
-  return userDesignationData;
+  if (is_data) {
+    return JSON.parse(is_data);
+  }
+  else {
+    const userData = await models.User.findOne({
+      where: {
+        id: payload.userId
+      },
+      include: [{
+        model: models.Designation,
+        attributes: ["designation_title"]
+      },
+      {
+        model: models.Role,
+        attributes: ["role_title"]
+      },
+      {
+        model: models.User,
+        as: 'reportee_of',
+        attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at", "UserReporteeMapping"] }
+      }],
+      attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
+    });
+
+    if (!userData) {
+      throw new Error("User Not Found");
+    }
+    await redisClient.set(key_name, JSON.stringify(userData));
+    return userDesignationData;
+  }
 }
 
 const forgetPassword = async (payload) => {
@@ -205,17 +199,16 @@ const forgetPassword = async (payload) => {
     throw new Error('User Not Found!');
   }
 
-  let tokenData = {
-    userId: user.dataValues.id,
-    time: Date.now()
-  }
-  let signUserToken = jwt.sign(tokenData, process.env.secretKey, {
-    expiresIn: process.env.FPT_EXPIRES_IN
-  });
-  let baseUrl = process.env.BASE_URL;
-  let resetPassawordLink = `${baseUrl}/api/user/reset-password/${signUserToken}`;
+  
+     
+  let randomToken = UniqueStringGenerator.UniqueString();
+  let userId = user.dataValues.id;
 
-  await set(signUserToken, resetPassawordLink);
+  
+  let baseUrl = process.env.BASE_URL;
+  let resetPassawordLink = `${baseUrl}/api/user/reset-password/${randomToken}`;
+
+  await redisClient.set(randomToken, userId);
 
   let recipient = email;
   let subject = "Reset Password Link";
@@ -228,30 +221,43 @@ const forgetPassword = async (payload) => {
 
 const deactivateUser = async (payload) => {
 
-  let { userId } = payload;
+  let { user_id } = payload;
   const user = await models.User.findOne({
     where: {
-      id: userId
-    }
+      id: user_id
+    },
+    include: [{
+      model: models.Role,
+      attributes: ["role_code"]
+    }],
+
   });
+
 
   if (!user) {
     throw new Error("User Not Found")
   }
 
+   if (user.Roles[0].role_code == 1001) {
+     throw new Error("Access denied")
+  }
+
   let destroyUser = await models.User.destroy({
     where: {
-      id: userId
+      id: user_id
     }
   });
-  return "User Deactiveted"
+  return "User deactivate";
+ 
+ 
+
 }
 
 const enableUser = async (payload) => {
-  let { userId } = payload;
+  let { user_id } = payload;
   let restoreUser = await models.User.restore({
     where: {
-      id: userId
+      id: user_id
     }
   });
   if (restoreUser) {
@@ -264,7 +270,7 @@ const enableUser = async (payload) => {
 
 const createUser = async (payload) => {
   payload.is_firsttime = true;
-  payload.password = await hash(payload.password, 10)
+  payload.password = await hash(payload.password, 10);
   const trans = await sequelize.transaction();
   try {
     const existingUser = await models.User.findOne({
@@ -273,70 +279,77 @@ const createUser = async (payload) => {
     if (existingUser) {
       throw new Error("User already exists");
     }
-    const user = await models.User.create(payload,
-      { transaction: trans }
-    );
+    const user = await models.User.create(payload, { transaction: trans });
+    delete user.dataValues.password;
+    delete user.dataValues.created_at;
+    delete user.dataValues.updated_at;
+    delete user.dataValues.deleted_at;
 
     if (!user) {
       throw new Error("Something went wrong");
     }
     const userId = user.dataValues.id;
     if (payload.designation_code) {
-      const designation = await models.Designation.findOne({
-        where: {
-          designation_code: payload.designation_code,
+      const designation = await models.Designation.findOne(
+        {
+          where: {
+            designation_code: payload.designation_code,
+          },
         },
-      },
         { transaction: trans }
       );
       if (!designation) {
-
         throw new Error("Invalid Designation");
       }
       const designation_user_mapping_designationID =
-        await models.UserDesignationMapping.create({
-          designation_id: designation.id,
-          user_id: userId,
-        },
+        await models.UserDesignationMapping.create(
+          {
+            designation_id: designation.id,
+            user_id: userId,
+          },
           { transaction: trans }
         );
       if (!designation_user_mapping_designationID) {
-
         throw new Error("Something went wrong");
       }
     }
     if (payload.role_key) {
-      const role = await models.Role.findOne({
-        where: {
-          role_key: payload.role_key,
+      const role = await models.Role.findOne(
+        {
+          where: {
+            role_key: payload.role_key,
+          },
         },
-      },
         { transaction: trans }
       );
 
       if (!role) {
-
         throw new Error("Invalid Role");
       }
-      const user_role_mapping = await models.UserRoleMapping.create({
-        user_id: userId,
-        role_id: role.id
-      },
+      const user_role_mapping = await models.UserRoleMapping.create(
+        {
+          user_id: userId,
+          role_id: role.id,
+        },
         { transaction: trans }
       );
 
       if (!user_role_mapping) {
-
         throw new Error("Something went wrong");
       }
     }
     if (payload.reportee_id) {
       await trans.commit();
-      return { data: adminAddReportee({ manager_id: userId, reportee_id: payload.reportee_id }), error: null };
+      return {
+        data: adminAddReportee({
+          manager_id: userId,
+          reportee_id: payload.reportee_id,
+        }),
+        error: null,
+      };
     } else {
       await trans.commit();
       return { data: user, error: null };
-
     }
   } catch (error) {
     await trans.rollback();
@@ -346,7 +359,7 @@ const createUser = async (payload) => {
 
 const registration = async (payload) => {
   payload.is_firsttime = false;
-  payload.role_key = 'USR';
+  payload.role_key = "USR";
   payload.password = await hash(payload.password, 10);
   const existingUser = await models.User.findOne({
     where: { email: payload.email },
@@ -363,10 +376,15 @@ const registration = async (payload) => {
   });
   await models.UserRoleMapping.create({
     user_id: userId,
-    role_id: role.id
+    role_id: role.id,
   });
+
+  delete user.dataValues.password;
+  delete user.dataValues.created_at;
+  delete user.dataValues.updated_at;
+  delete user.dataValues.deleted_at;
   return user;
-}
+};
 
 
 module.exports = {
@@ -375,7 +393,6 @@ module.exports = {
   refreshToken,
   logoutUser,
   resetUserPassword,
-  userInfo,
   userDetail,
   forgetPassword,
   deactivateUser,

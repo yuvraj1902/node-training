@@ -55,7 +55,8 @@ module.exports = {
 
     refreshTokenSchema: async (req, res, next) => {
         const schema = Joi.object({
-            refreshToken: Joi.string().guid().required()
+            refreshToken: Joi.string().min(3).max(200).required()
+            
         });
         validateRequest(req, res, next, schema, 'body');
     },

@@ -8,7 +8,7 @@ const addReportee = async (manager_id, reportee_id) => {
 
     const existingReportee = await models.User.findOne({ where: { id: reportee_id }, include: models.Designation });
     if (!existingReportee) throw new Error('User not found');
-
+    console.log(existingManager.Designations[0].designation_code, "-----------------------", existingReportee.Designations[0].designation_code);
     if (
         existingManager.Designations[0].designation_code <
         existingReportee.Designations[0].designation_code
@@ -52,6 +52,7 @@ const deleteReportee = async (manager_id, reportee_id, callback) => {
             }
         })
         if (!existingField) throw new Error(`Not Found`);
+
         const reporteeDeleted = await models.UserReporteeMapping.destroy({
             where: {
                 manager_id: manager_id,

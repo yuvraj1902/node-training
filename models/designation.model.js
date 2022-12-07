@@ -25,7 +25,6 @@ module.exports = (sequelize, Sequelize) => {
       tableName: "designation",
       modelName: "Designation",
       paranoid: true,
-      timestamps: true,
     }
   );
   return Designation;

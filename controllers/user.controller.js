@@ -121,12 +121,10 @@ const getUserInfo = async (req, res, next) => {
         const payload = {
             userId: req.user.id,
         }
-        const data = await userService.userInfo(payload);
+         const data = await userService.userDetail(payload);
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -155,11 +153,11 @@ const forgetPassword = async (req, res, next) => {
     }
 }
 
-const deactivateUsers = async (req, res, next) => {
+const deactivateUser = async (req, res, next) => {
     try {
 
         const { body: payload } = req;
-        const data = await userService.deactivateUsers(payload);
+        const data = await userService.deactivateUser(payload);
         res.data = data;
         next()
 
@@ -217,7 +215,7 @@ module.exports = {
     resetPassword,
     adminResetPassword,
     forgetPassword,
-    deactivateUsers,
+    deactivateUser,
     enableUser,
     createUser,
     registration

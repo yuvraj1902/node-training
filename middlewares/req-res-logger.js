@@ -6,6 +6,9 @@ function logRequest(req) {
         logType: 'REQUEST',
         req
     };
+    
+    console.log("arvind", meta);
+
     req.logger.info.call(req.logger, meta, `${req.method} ${req.originalUrl}`);
     if (process.env.STDOUT_LOG === 'true') {
         console.log(`\n`);
