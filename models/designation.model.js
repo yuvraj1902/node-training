@@ -25,12 +25,6 @@ module.exports = (sequelize, Sequelize) => {
       tableName: "designation",
       modelName: "Designation",
       paranoid: true,
-      timestamps: true,
-      defaultScope: {
-        attributes: {
-          exclude: ["created_at", "updated_at", "deleted_at"],
-        },
-      },
     }
   );
   return Designation;

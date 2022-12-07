@@ -10,8 +10,6 @@ const userAddReportee = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -23,8 +21,6 @@ const adminAddReportee = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -37,8 +33,6 @@ const userDeleteReportee = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -50,8 +44,6 @@ const adminDeleteReportee = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }

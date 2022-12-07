@@ -2,6 +2,8 @@ const { commonErrorHandler } = require('./errorHandler');
 
 
 const validateRequest = (req, res, next, schema, requestParamterType) => {
+
+  console.log(requestParamterType);
   const options = {
     abortEarly: true, // include all errors
     allowUnknown: false, // ignore unknown props

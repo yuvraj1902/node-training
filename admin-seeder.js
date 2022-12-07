@@ -1,8 +1,9 @@
-const models = require("./models");
 const { sequelize } = require("./models");
+const models = require("./models");
 const prompt = require("prompt");
 const colors = require("@colors/colors/safe");
 const { hash } = require("bcrypt");
+const { req } = require("./utility/serializers");
 
 async function admin() {
   await prompt.start();
@@ -23,6 +24,7 @@ async function admin() {
       },
       {
         name: "password",
+        hidden: true,
         conform: function (value) {
           return true;
         },
@@ -109,7 +111,6 @@ async function admin() {
         console.log(colors.cyan("You are good to go."));
         await t.commit();
       } catch (error) {
-        console.log(error);
         await t.rollback();
       }
     }

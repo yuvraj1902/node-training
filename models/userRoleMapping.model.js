@@ -34,6 +34,7 @@ module.exports = (sequelize, Sequelize) => {
       sequelize,
       tableName: "user_role_mapping",
       modelName: "UserRoleMapping",
+      paranoid:true
     }
   );
   return UserRoleMapping;

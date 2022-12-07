@@ -8,10 +8,10 @@ const checkToken= async (req, res, next) => {
       if (!token) {
         throw new Error('Access denied');
       }
-      const decoded_jwt = jwt.verify(token, process.env.secretKey);
+      const decodedJwt = jwt.verify(token, process.env.secretKey);
       const user = await models.User.findOne({
         where: {
-                id: decoded_jwt.userId
+                id: decodedJwt.userId
               },
               include: models.Role
       });

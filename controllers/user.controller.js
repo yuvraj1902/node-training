@@ -20,8 +20,6 @@ const refreshToken = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -32,8 +30,7 @@ const getAllUsers = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
+       
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -45,22 +42,19 @@ const logoutUser = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
+       
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
 
 const resetPassword = async (req, res, next) => {
     try {
-        const { body, user, params } = req;
+        const { body, user } = req;
         const payload = {
             newPassword: body.password,
             userEmail: user.email,
-            token: (Object.keys(params).length > 0 ? params.token : null)
-
+            roleCode:user.Roles[0].role_code
         }
-        console.log(payload);
         const data = await userService.resetUserPassword(payload);
         res.data = data;
         next();
@@ -75,10 +69,8 @@ const resetPasswordByLink = async (req, res, next) => {
         const { body, params } = req;
         const payload = {
             newPassword: body.password,
-            userEmail: null,
-            token: (Object.keys(params).length > 0 ? params.token : null)
+            token:  params.token
         }
-        console.log(payload);
         const data = await userService.resetUserPassword(payload);
         res.data = data;
         next();
@@ -89,18 +81,13 @@ const resetPasswordByLink = async (req, res, next) => {
 }
 
 
-
-
 const adminResetPassword = async (req, res, next) => {
     try {
-        const { body, params } = req;
+        const { body} = req;
         const payload = {
             newPassword: body.password,
-            userEmail: body.userEmail,
-            token: (Object.keys(params).length > 0 ? query.token : null)
-
+            userEmail: body.email,
         }
-        console.log(payload);
         const data = await userService.resetUserPassword(payload);
         res.data = data;
         next();
@@ -109,12 +96,12 @@ const adminResetPassword = async (req, res, next) => {
     }
 }
 
-const getUserInfo = async (req, res, next) => {
+const userDetail = async (req, res, next) => {
     try {
         const payload = {
             userId: req.user.id,
         }
-        const data = await userService.userInfo(payload);
+         const data = await userService.userDetail(payload);
         res.data = data;
         next();
     } catch (error) {
@@ -123,11 +110,11 @@ const getUserInfo = async (req, res, next) => {
 }
 
 
-const getUserDetail = async (req, res, next) => {
+const adminUserDetail = async (req, res, next) => {
     try {
         const { body } = req;
         const payload = {
-            user_id: body.user_id
+            userId: body.userId
         };
 
         const data = await userService.userDetail(payload);
@@ -141,22 +128,19 @@ const getUserDetail = async (req, res, next) => {
 const forgetPassword = async (req, res, next) => {
     try {
         const { body: payload } = req;
-        // console.log(payload);
         const data = await userService.forgetPassword(payload);
         res.data = data;
-        console.log("datadata", data);
         next();
 
     } catch (error) {
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
-
-const deactivateUsers = async (req, res, next) => {
+const deactivateUser = async (req, res, next) => {
     try {
 
         const { body: payload } = req;
-        const data = await userService.deactivateUsers(payload);
+        const data = await userService.deactivateUser(payload);
         res.data = data;
         next()
 
@@ -209,12 +193,12 @@ module.exports = {
     refreshToken,
     logoutUser,
     resetPasswordByLink,
-    getUserInfo,
-    getUserDetail,
+    userDetail,
+    adminUserDetail,
     resetPassword,
     adminResetPassword,
     forgetPassword,
-    deactivateUsers,
+    deactivateUser,
     enableUser,
     createUser,
     registration

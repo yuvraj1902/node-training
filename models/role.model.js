@@ -30,7 +30,6 @@ module.exports = (sequelize, Sequelize) => {
     tableName: 'role',
     modelName: 'Role',
     paranoid: true,
-    timestamps: true
   });
   return Role;
 };

@@ -35,7 +35,6 @@ module.exports = {
             designation_code: Joi.number().min(1).required(),
             reportee_id: Joi.string().guid()
         });
-
         validateRequest(req, res, next, schema, 'body');
     },
 
@@ -49,13 +48,12 @@ module.exports = {
             google_id: Joi.string().min(1).required(),
             source: Joi.string().min(1).required()
         });
-
         validateRequest(req, res, next, schema, 'body');
     },
 
     refreshTokenSchema: async (req, res, next) => {
         const schema = Joi.object({
-            refreshToken: Joi.string().guid().required()
+            refreshToken: Joi.string().min(3).max(200).required()
         });
         validateRequest(req, res, next, schema, 'body');
     },
@@ -67,11 +65,16 @@ module.exports = {
         validateRequest(req, res, next, schema, 'body');
     },
 
-    
+    resetPasswordSchemaToken:  async (req, res, next) => {
+        const schema = Joi.object({
+            token: Joi.string().alphanum().min(5).required()
+        })
+        validateRequest(req, res, next, schema, 'params');
+    },
 
     adminResetPasswordSchema: async (req, res, next) => {
         const schema = Joi.object({
-            userEmail: Joi.string().email().lowercase().required(),
+            email: Joi.string().email().lowercase().required(),
             password: passwordComplexity(complexityOptions).required(),
         });
         validateRequest(req, res, next, schema, 'body');
@@ -81,27 +84,26 @@ module.exports = {
        const schema = Joi.object({
             email: Joi.string().email().lowercase().required(),
         });
-        
         validateRequest(req, res, next, schema, 'body');
     },
 
     enableUserSchema: async (req, res, next) => {
         const schema = Joi.object({
-            user_id: Joi.string().guid().required()
+            userId: Joi.string().guid().required()
         });
         validateRequest(req, res, next, schema, 'body');   
     },
 
     deactivateUserSchema: async (req, res, next) => {
         const schema = Joi.object({
-            user_id: Joi.string().guid().required()
+            userId: Joi.string().guid().required()
         });
         validateRequest(req, res, next, schema, 'body');
     },
 
     userDetailsSchema: async (req, res, next) => {
         const schema = Joi.object({
-            user_id: Joi.string().guid().required()
+            userId: Joi.string().guid().required()
         });
         validateRequest(req, res, next, schema, 'body');
     },

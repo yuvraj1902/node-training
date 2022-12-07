@@ -1,23 +1,20 @@
 const bunyan = require('bunyan');
-// const Elasticsearch = require('bunyan-elasticsearch');
 const { v4 } = require('uuid');
 const serializers = require('./serializers');
 
 let logger;
-const init = (name = 'logger',loggerLevel = 'info') => {
- 
-
+const init = (name = 'logger') => {
   logger = bunyan.createLogger({
     name: name,
     serializers: serializers
   });
 
-
   logger.getContext = function () {
     return {
       'x-request-id': this.fields['x-request-id']
     };
-  };
+  }
+
 };
 
 const getInstance = (props = {}) => {
@@ -28,6 +25,7 @@ const getInstance = (props = {}) => {
     'x-request-id': v4(),
     ...props
   };
+
   return logger.child(properties);
 };
 

@@ -6,6 +6,8 @@ function logRequest(req) {
     logType: 'REQUEST',
     req
   };
+
+
   req.logger.info.call(req.logger, meta, `${req.method} ${req.originalUrl}`);
   if (process.env.STDOUT_LOG === 'true') {
     console.log(`\n`);
@@ -56,11 +58,14 @@ module.exports = (req, res, next) => {
 
   req.logger = logger.getInstance(props);
 
+
   if (req.originalUrl === '/health') {
     return next();
   }
 
+  
   logRequest(req);
+
   res.on('finish', logResponse.bind(null, req, res));
 
   return next();
