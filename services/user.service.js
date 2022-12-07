@@ -94,13 +94,13 @@ const getAllUsers = async () => {
     throw new Error('Not Found');
   }
 //  await redisClient.set("allUsersData", users);
-  let getCacheData = await get("allUsersData");
+  let getCacheData = await redisClient.get("allUsersData");
   let  userData = JSON.parse(getCacheData)
   if (getCacheData) {
     return userData;
   }
   else {
-    await set("allUsersData", JSON.stringify(users));
+    await redisClient.set("allUsersData", JSON.stringify(users));
      return users
   } 
 }

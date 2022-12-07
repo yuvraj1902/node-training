@@ -37,7 +37,7 @@ module.exports = {
         let body = maskSensitiveData(req.body);
         let query = maskSensitiveData(req.query);
 
-        return {
+        let serialzeData = {
             method: req.method,
             originalUrl: req.originalUrl,
             url: req.url,
@@ -47,7 +47,11 @@ module.exports = {
             httpVersion: req.httpVersion,
             remoteAddress: req.socket.remoteAddress,
             remotePort: req.socket.remotePort
-        };
+        }
+           
+        // console.log("arvindyadav", serialzeData);
+
+        return serialzeData
     },
     res: function resSerializer(res) {
         if (!res) {

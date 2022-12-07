@@ -11,12 +11,18 @@ const init = (name = 'logger', loggerLevel = 'info') => {
         serializers: serializers
     });
 
+    
+
     logger.getContext = function () {
         return {
             'x-request-id': this.fields['x-request-id']
         };
     };
+
 };
+
+
+
 
 const getInstance = (props = {}) => {
     if (typeof props === 'string') {
@@ -26,9 +32,11 @@ const getInstance = (props = {}) => {
         'x-request-id': v4(),
         ...props
     };
-    console.log(logger.child(properties));
-    return logger.child(properties);
+    // console.log("arvind", logger.child(properties));  
+    return logger.child(properties);       
 };
+
+
 
 module.exports = {
     init,
