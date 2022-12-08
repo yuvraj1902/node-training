@@ -11,23 +11,24 @@ module.exports = (sequelize, Sequelize) => {
       });
     }
   }
-  UserDesignationMapping.init({
-    user_id: {
-      allowNull: false,
-      type: Sequelize.UUID,
-      references: {
-        model: "user",
-        key: 'id'
-      }
-    },
-    designation_id: {
-      type: Sequelize.UUID,
-      allowNull: false,
-      references: {
-        model: "designation",
-        key: 'id'
-      }
-    },
+  UserDesignationMapping.init(
+    {
+      user_id: {
+        allowNull: false,
+        type: Sequelize.UUID,
+        references: {
+          model: "user",
+          key: "id",
+        },
+      },
+      designation_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: "designation",
+          key: "id",
+        },
+      },
     },
     {
       sequelize,

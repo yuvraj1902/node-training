@@ -1,6 +1,5 @@
-const { commonErrorHandler } = require('../helper/errorHandler');
-const userService = require('../services/user.service');
-
+const { commonErrorHandler } = require("../helper/errorHandler");
+const userService = require("../services/user.service");
 
 const loginUser = async (req, res, next) => {
     try {
@@ -144,41 +143,39 @@ const deactivateUser = async (req, res, next) => {
 }
 
 const enableUser = async (req, res, next) => {
-    try {
-
-        const { body: payload } = req;
-        const data = await userService.enableUser(payload);
-        res.data = data;
-        next()
-
-    } catch (error) {
-        commonErrorHandler(req, res, error.message, 400, error);
-    }
-}
+  try {
+    const { body: payload } = req;
+    const data = await userService.enableUser(payload);
+    res.data = data;
+    next();
+  } catch (error) {
+    commonErrorHandler(req, res, error.message, 400, error);
+  }
+};
 
 const createUser = async (req, res, next) => {
-    try {
-        const { body: payload } = req;
-        const response = await userService.createUser(payload);
-        if (response.error) {
-            throw new Error(response.error.message);
-        }
-        res.data = response.data;
-        next();
-    } catch (error) {
-        commonErrorHandler(req, res, error.message, 400, error);
+  try {
+    const { body: payload } = req;
+    const response = await userService.createUser(payload);
+    if (response.error) {
+      throw new Error(response.error.message);
     }
+    res.data = response.data;
+    next();
+  } catch (error) {
+    commonErrorHandler(req, res, error.message, 400, error);
+  }
 };
 
 const registration = async (req, res, next) => {
-    try {
-        const { body: payload } = req;
-        const data = await userService.registration(payload);
-        res.data = data;
-        next();
-    } catch (error) {
-        commonErrorHandler(req, res, error.message, 400, error);
-    }
+  try {
+    const { body: payload } = req;
+    const data = await userService.registration(payload);
+    res.data = data;
+    next();
+  } catch (error) {
+    commonErrorHandler(req, res, error.message, 400, error);
+  }
 };
 
 module.exports = {

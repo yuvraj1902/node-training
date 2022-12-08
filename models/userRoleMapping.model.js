@@ -18,20 +18,21 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.UUID,
         references: {
           model: "user",
-          key: 'id'
-        }
+          key: "id",
+        },
       },
       role_id: {
         allowNull: false,
         type: Sequelize.UUID,
         references: {
           model: "role",
-          key: 'id'
-        }
+          key: "id",
+        },
       },
     },
     {
       sequelize,
+      paranoid: true,
       tableName: "user_role_mapping",
       modelName: "UserRoleMapping",
       paranoid:true

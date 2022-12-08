@@ -5,23 +5,23 @@ module.exports = (sequelize, Sequelize) => {
     static associate(models) {
       this.belongsToMany(models.Designation, {
         through: models.UserDesignationMapping,
-        foreignKey: 'user_id',
+        foreignKey: "user_id",
       });
 
       this.belongsToMany(models.Role, {
         through: models.UserRoleMapping,
-        foreignKey: 'user_id',
+        foreignKey: "user_id",
       });
 
       this.belongsToMany(models.User, {
         through: models.UserReporteeMapping,
-        as: 'manager_of',
+        as: "manager_of",
         foreignKey: "manager_id",
       });
 
       this.belongsToMany(models.User, {
         through: models.UserReporteeMapping,
-        as: 'reportee_of',
+        as: "reportee_of",
         foreignKey: "reportee_id",
       });
     }
@@ -75,7 +75,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       is_firsttime: {
         type: Sequelize.BOOLEAN,
-        allowNull: false
+        allowNull: false,
       },
     },
 

@@ -1,5 +1,6 @@
 module.exports = {
   sendResponse: async (req, res) => {
+    console.log(res.data);
     const response = {
       statusCode: 200,
       data: res.data || {},

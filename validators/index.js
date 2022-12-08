@@ -4,7 +4,6 @@ const designationValidator = require('./designation.validator');
 
 module.exports = {
     userValidator,
-    roleValidator,
     reporteeValidator,
     designationValidator
 }

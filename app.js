@@ -21,7 +21,6 @@ app.use(compression());
 // Disble x-powered-by header to hide server side technology
 app.disable('x-powered-by');
 
-
 app.use(ReqResLoggerMiddleware);
 
 app.use('/health', (_req, res) => {

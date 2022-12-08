@@ -13,24 +13,25 @@ module.exports = (sequelize, Sequelize) => {
       });
     }
   }
-  UserReporteeMapping.init({
-    manager_id: {
-      type: Sequelize.UUID,
-      allowNull: false,
-      references: {
-        model: "user",
-        key: "id",
-      }
+  UserReporteeMapping.init(
+    {
+      manager_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: "user",
+          key: "id",
+        },
+      },
+      reportee_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: "user",
+          key: "id",
+        },
+      },
     },
-    reportee_id: {
-      type: Sequelize.UUID,
-      allowNull: false,
-      references: {
-        model: "user",
-        key: "id",
-      }
-    },
-  },
     {
       sequelize,
       paranoid: true,

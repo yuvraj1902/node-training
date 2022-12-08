@@ -9,10 +9,10 @@ const router = Router();
 
 
 router.post(
-    '/login',
-    validator.userValidator.loginSchema,
-    controllers.User.loginUser,
-    genericResponse.sendResponse
+  "/login",
+  validator.userValidator.loginSchema,
+  controllers.User.loginUser,
+  genericResponse.sendResponse
 );
 router.get(
     '/refresh-token',
@@ -27,10 +27,10 @@ router.post(
 );
 
 router.post(
-    '/registration',
-    validator.userValidator.registrationSchema,
-    controllers.User.registration,
-    genericResponse.sendResponse
+  "/registration",
+  validator.userValidator.registrationSchema,
+  controllers.User.registration,
+  genericResponse.sendResponse
 );
 
 router.post(
