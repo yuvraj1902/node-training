@@ -83,24 +83,10 @@ const refreshToken = async (requestToken) => {
 
 const getAllUsers = async () => {
   const users = await models.User.findAll({
-    attributes: { exclude: ["password"] },
+    attributes: { exclude: ["password, deleted_at"] },
   });
-  if (!users) {
-    throw new Error('Not Found');
-  }
-  //  await redisClient.set("allUsersData", users);
-  let getCacheData = await redisClient.get("allUsersData");
-  let userData = JSON.parse(getCacheData)
-  if (getCacheData) {
-    return userData;
-  }
-  else {
-    await redisClient.set("allUsersData", JSON.stringify(users));
-    return users
-  }
+  return users;
 }
-
-
 
 
 const logoutUser = async (requestToken) => {
