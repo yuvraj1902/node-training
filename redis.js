@@ -1,52 +1,52 @@
-const redis = require("redis");
-require("dotenv").config();
+// const redis = require("redis");
+// require("dotenv").config();
 
-const getClient = () => {
-    return redis.createClient(process.env.REDIS_HOST,process.env.REDIS_PORT);
-}
+// const getClient = () => {
+//     return redis.createClient(process.env.REDIS_HOST,process.env.REDIS_PORT);
+// }
 
-let client = getClient();
+// let client = getClient();
 
-const connect = () => {
-    // if (!client)
-    //     client = getClient();
-    client.connect();
-    client.on("connect", (err) => {
-        if(!err)
-        console.log("redis connected");
-    })
-};
+// const connect = () => {
+//     // if (!client)
+//     //     client = getClient();
+//     client.connect();
+//     client.on("connect", (err) => {
+//         if(!err)
+//         console.log("redis connected");
+//     })
+// };
 
-const get = async (key) => {
-    // if (!client)
-    //     client = getClient();
-    const data = await client.get(key);
-    console.log(data);
-    return data;
-};
+// const get = async (key) => {
+//     // if (!client)
+//     //     client = getClient();
+//     const data = await client.get(key);
+//     console.log(data);
+//     return data;
+// };
 
-const set = async (key, value, timeout = { EX: process.env.REDIS_EXT }) => {
-    // if (!client)
-    //     client = getClient();
-  return await client.set(key, value, timeout );
-};
+// const set = async (key, value, timeout = { EX: process.env.REDIS_EXT }) => {
+//     // if (!client)
+//     //     client = getClient();
+//   return await client.set(key, value, timeout );
+// };
 
-const reset = async () => {
-    // if (!client)
-    //     client = getClient();
-  return await client.reset();
-};
+// const reset = async () => {
+//     // if (!client)
+//     //     client = getClient();
+//   return await client.reset();
+// };
 
-const del = async (key) => {
-    // if (!client)
-    //     client = getClient();
-  return await client.del(key);
-};
+// const del = async (key) => {
+//     // if (!client)
+//     //     client = getClient();
+//   return await client.del(key);
+// };
 
-module.exports = {
-  connect,
-  get,
-  set,
-  reset,
-  del
-};
+// module.exports = {
+//   connect,
+//   get,
+//   set,
+//   reset,
+//   del
+// };

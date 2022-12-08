@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+const redisClient = require("../utility/redis");
 module.exports = (sequelize, Sequelize) => {
   class User extends Model {
     static associate(models) {
@@ -79,8 +80,14 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false
       },
     },
-
+    
     {
+      hooks: {
+        afterCreate: async (user, options) => {
+          await redisClient.del("allUsersData");
+        },
+      },
+
       sequelize,
       paranoid: true,
       tableName: "user",

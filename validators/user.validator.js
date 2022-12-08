@@ -68,11 +68,17 @@ module.exports = {
         validateRequest(req, res, next, schema, 'body');
     },
 
-    
+     resetPasswordSchemaToken:  async (req, res, next) => {
+        const schema = Joi.object({
+            token: Joi.string().alphanum().min(5).required()
+        })
+        validateRequest(req, res, next, schema, 'params');
+    },
+
 
     adminResetPasswordSchema: async (req, res, next) => {
         const schema = Joi.object({
-            userEmail: Joi.string().email().lowercase().required(),
+            email: Joi.string().email().lowercase().required(),
             password: passwordComplexity(complexityOptions).required(),
         });
         validateRequest(req, res, next, schema, 'body');
@@ -88,21 +94,21 @@ module.exports = {
 
     enableUserSchema: async (req, res, next) => {
         const schema = Joi.object({
-            user_id: Joi.string().guid().required()
+            userId: Joi.string().guid().required()
         });
         validateRequest(req, res, next, schema, 'body');   
     },
 
     deactivateUserSchema: async (req, res, next) => {
         const schema = Joi.object({
-            user_id: Joi.string().guid().required()
+            userId: Joi.string().guid().required()
         });
         validateRequest(req, res, next, schema, 'body');
     },
 
     userDetailsSchema: async (req, res, next) => {
         const schema = Joi.object({
-            user_id: Joi.string().guid().required()
+         userId: Joi.string().guid().required()
         });
         validateRequest(req, res, next, schema, 'body');
     },

@@ -24,10 +24,10 @@ const get = async (key) => {
     return data;
 };
 
-const set = async (key, value, timeout = process.env.jwtRefreshExpiration) => {
+const set = async (key, value, timeout = { ttl: process.env.REDIS_EXT }) => {
     // if (!client)
     //     client = getClient();
-    return await client.set(key, value, { ttl: timeout });
+    return await client.set(key, value,  timeout);
 };
 
 const reset = async () => {

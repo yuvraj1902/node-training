@@ -57,6 +57,7 @@ router.post(
 router.post(
     '/reset-password/:token',
     validator.userValidator.resetPasswordSchema,
+    validator.userValidator.resetPasswordSchemaToken,
     controllers.User.resetPasswordByLink,
     genericResponse.sendResponse
 );

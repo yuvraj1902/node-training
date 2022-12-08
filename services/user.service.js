@@ -10,13 +10,8 @@ const { adminAddReportee } = require('./userReportee.service');
 const redisClient = require('../utility/redis');
 const UniqueStringGenerator = require('unique-string-generator');
 
-const resetPassword = async (newPassword, id, userEmail) => {  
-  if (id) {
-    await models.User.update({ password: await hash(newPassword,10) }, { where: { id: id } });
-  }
-  else {
-    await models.User.update({ password: await hash(newPassword, 10) }, { where: { email: userEmail } });
-  }
+const resetPassword = async (newPassword,userEmail) => {  
+    await models.User.update({ password: await bcrypt.hash(newPassword, 10) }, { where: { email: userEmail } });
     const email_body = `Password reset successfull`;
     const email_subject = `Password reset`;
     await mailer.sendMail(email_body, email_subject, userEmail);
@@ -100,7 +95,7 @@ const getAllUsers = async () => {
   if (!users) {
     throw new Error('Not Found');
   }
-//  await redisClient.set("allUsersData", users);
+
   let getCacheData = await redisClient.get("allUsersData");
   let  userData = JSON.parse(getCacheData)
   if (getCacheData) {
@@ -108,7 +103,7 @@ const getAllUsers = async () => {
   }
   else {
     await redisClient.set("allUsersData", JSON.stringify(users));
-     return users
+    return  users;
   } 
 }
 
@@ -126,36 +121,45 @@ const logoutUser = async (requestToken) => {
 }
 
 const resetUserPassword = async (payload) => {
-
   if (payload.userEmail) {
-    const userExist = await models.User.findOne({ where: { email: payload.userEmail } });
+    const userExist = await models.User.findOne({
+      where: { email: payload.userEmail },
+      include: { model: models.Role }
+    });
+    
     if (!userExist) {
       throw new Error('User Not Found');
     }
-    console.log(payload);
-    return resetPassword(payload.newPassword,null,payload.userEmail);
+
+    if (payload.roleCode || userExist.Roles[0].role_title=='User') {
+      return resetPassword(payload.newPassword, userExist.email);
+    }
+    else{
+      throw new Error('Access Denied');
+    }
+
   }
   else if (payload.token) { 
-    const is_data = await redisClient.get(payload.token);
-    if (!is_data) {
-      throw new Error("reset link expired");
+    const isData = await redisClient.get(payload.token);
+    if (!isData) {
+      throw new Error("Invalid Reset Link");
     }
-    const userExist = await models.User.findOne({ where: { id:is_data } });
+    const userExist = await models.User.findOne({ where: { id:isData } });
     if (!userExist) {
       throw new Error('User Not Found');
     }
     await redisClient.del(payload.token);
-    return resetPassword(payload.newPassword,userExist.id, userExist.email);
+    return resetPassword(payload.newPassword, userExist.email);
   }
 }
 
 
 const userDetail = async (payload) => {
-  let key_name = payload.userId;
-  const is_data = await redisClient.get(key_name);
+  let keyName = payload.userId;
+  const isData = await redisClient.get(keyName);
 
-  if (is_data) {
-    return JSON.parse(is_data);
+  if (isData) {
+    return JSON.parse(isData);
   }
   else {
     const userData = await models.User.findOne({
@@ -181,8 +185,8 @@ const userDetail = async (payload) => {
     if (!userData) {
       throw new Error("User Not Found");
     }
-    await redisClient.set(key_name, JSON.stringify(userData));
-    return userDesignationData;
+    await redisClient.set(keyName, JSON.stringify(userData));
+    return userData;
   }
 }
 
@@ -221,10 +225,11 @@ const forgetPassword = async (payload) => {
 
 const deactivateUser = async (payload) => {
 
-  let { user_id } = payload;
+  let { userId } = payload;
+  let keyName = userId;
   const user = await models.User.findOne({
     where: {
-      id: user_id
+      id: userId
     },
     include: [{
       model: models.Role,
@@ -232,7 +237,6 @@ const deactivateUser = async (payload) => {
     }],
 
   });
-
 
   if (!user) {
     throw new Error("User Not Found")
@@ -242,24 +246,26 @@ const deactivateUser = async (payload) => {
      throw new Error("Access denied")
   }
 
-  let destroyUser = await models.User.destroy({
+   await models.User.destroy({
     where: {
-      id: user_id
+      id: userId
     }
   });
-  return "User deactivate";
- 
- 
 
+  await redisClient.del(keyName);
+  return "User deactivate";
 }
 
 const enableUser = async (payload) => {
-  let { user_id } = payload;
+  let { userId } = payload;
+     
+ 
   let restoreUser = await models.User.restore({
     where: {
-      id: user_id
+      id: userId
     }
   });
+  
   if (restoreUser) {
     return "User activated"
   } else {

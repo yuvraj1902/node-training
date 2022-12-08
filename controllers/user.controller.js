@@ -55,20 +55,17 @@ const logoutUser = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
     try {
-        const { body, user, params } = req;
+        const { body, user } = req;
         const payload = {
             newPassword: body.password,
             userEmail: user.email,
-            token: (Object.keys(params).length > 0 ? params.token : null)
-
+            roleCode:user.Roles[0].role_code
         }
         console.log(payload);
         const data = await userService.resetUserPassword(payload);
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -79,39 +76,29 @@ const resetPasswordByLink = async (req, res, next) => {
         const { body, params } = req;
         const payload = {
             newPassword: body.password,
-            userEmail: null,
-            token: (Object.keys(params).length > 0 ? params.token : null)
+            token:  params.token
         }
         console.log(payload);
         const data = await userService.resetUserPassword(payload);
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
+    
 }
-
-
-
 
 const adminResetPassword = async (req, res, next) => {
     try {
-        const { body, params } = req;
+        const { body} = req;
         const payload = {
             newPassword: body.password,
-            userEmail: body.userEmail,
-            token: (Object.keys(params).length > 0 ? query.token : null)
-
+            userEmail: body.email,
         }
-        console.log(payload);
         const data = await userService.resetUserPassword(payload);
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -131,14 +118,18 @@ const getUserInfo = async (req, res, next) => {
 
 
 const getUserDetail = async (req, res, next) => {
-    const { body } = req;
-    const payload = {
-        user_id: body.user_id
-    };
+    try {
+        const { body } = req;
+        const payload = {
+            userId: body.userId
+        };
 
-    const data = await userService.userDetail(payload);
-    res.data = data;
-    next();
+        const data = await userService.userDetail(payload);
+        res.data = data;
+        next();
+    } catch (error) {
+        commonErrorHandler(req, res, error.message, 400, error);
+    }
 }
 
 const forgetPassword = async (req, res, next) => {
