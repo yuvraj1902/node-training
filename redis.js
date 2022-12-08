@@ -21,7 +21,6 @@ const get = async (key) => {
     // if (!client)
     //     client = getClient();
     const data = await client.get(key);
-    console.log(data);
     return data;
 };
 

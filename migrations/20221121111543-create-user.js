@@ -50,7 +50,7 @@ module.exports = {
       },
       source: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
         isAlphanumeric: true,
       },
       is_firsttime: {

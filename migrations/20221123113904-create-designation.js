@@ -9,13 +9,13 @@ module.exports = {
         primaryKey: true,
         defaultValue: Sequelize.literal("uuid_generate_v4()"),
       },
-      designation_title: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
       designation_code: {
         type: Sequelize.INTEGER,
         allowNull: false
+      },
+      designation_title: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       created_at: {
         type: Sequelize.DATE,

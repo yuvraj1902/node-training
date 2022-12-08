@@ -29,8 +29,7 @@ module.exports = (sequelize, Sequelize) => {
     sequelize,
     tableName: 'role',
     modelName: 'Role',
-    paranoid: true,
-    timestamps: true
+    paranoid: true
   });
   return Role;
 };

@@ -1,4 +1,4 @@
-const logger = require('../helper/logger');
+const logger = require('../utility/logger');
 const { getReasonPhrase } = require('../helper/commonFunctions.helper');
 
 function logRequest(req) {
@@ -53,7 +53,7 @@ module.exports = (req, res, next) => {
     if (req.headers['x-request-id']) {
         props['x-request-id'] = req.headers['x-request-id'];
     }
-
+    
     req.logger = logger.getInstance(props);
 
     if (req.originalUrl === '/health') {

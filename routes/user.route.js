@@ -25,15 +25,8 @@ router.post(
     validator.userValidator.refreshTokenSchema,
     controllers.User.logoutUser,
     genericResponse.sendResponse
-)
-router.post(
-    '/create-user',
-    checkToken,
-    verifyUser,
-    validator.userValidator.createUserSchema,
-    controllers.User.createUser,
-    genericResponse.sendResponse
 );
+
 router.post(
     '/registration',
     validator.userValidator.registrationSchema,
@@ -47,19 +40,14 @@ router.post(
     controllers.User.forgetPassword,
     genericResponse.sendResponse
 );
+
 router.get(
-    '/users',
-    checkToken,
-    verifyUser,
-    controllers.User.getAllUsers,
-    genericResponse.sendResponse
-);
-router.get(
-    '/user-info',
+    '/user-details',
     checkToken,
     controllers.User.getUserInfo,
     genericResponse.sendResponse
 );
+
 router.post(
     '/reset-password',
     checkToken,
@@ -70,41 +58,26 @@ router.post(
 
 router.post(
     '/reset-password/:token',
+    validator.userValidator.resetPasswordSchemaToken,
     validator.userValidator.resetPasswordSchema,
     controllers.User.resetPasswordByLink,
     genericResponse.sendResponse
 );
 
 router.post(
-    '/admin-reset-password',
+    "/add-reportee",
     checkToken,
-    verifyUser,
-    validator.userValidator.adminResetPasswordSchema,
-    controllers.User.adminResetPassword,
+    validator.reporteeValidator.userReporteeSchema,
+    controllers.UserReportee.userAddReportee,
     genericResponse.sendResponse
 );
 router.delete(
-    '/deactivate-user',
+    "/delete-reportee",
     checkToken,
-    verifyUser,
-    validator.userValidator.deactivateUserSchema,
-    controllers.User.deactivateUsers,
+    validator.reporteeValidator.userReporteeSchema,
+    controllers.UserReportee.userDeleteReportee,
     genericResponse.sendResponse
 );
-router.patch(
-    '/enable-user',
-    checkToken,
-    verifyUser,
-    validator.userValidator.enableUserSchema,
-    controllers.User.enableUser,
-    genericResponse.sendResponse
-);
-router.get(
-    '/user-details',
-    checkToken,
-    verifyUser,
-    validator.userValidator.userDetailsSchema,
-    controllers.User.getUserDetail,
-    genericResponse.sendResponse
-);
+
+
 module.exports = router;

@@ -24,11 +24,6 @@ module.exports = (sequelize, Sequelize) => {
         as: 'reportee_of',
         foreignKey: "reportee_id",
       });
-
-      this.hasOne(models.RefreshToken, {
-        foreignKey: 'user_id',
-        targetKey: 'id'
-      });
     }
   }
 
@@ -75,7 +70,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       source: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
         isAlphanumeric: true,
       },
       is_firsttime: {

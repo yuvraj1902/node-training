@@ -5,7 +5,7 @@ const compression = require('compression');
 
 const routes = require('./routes');
 const ReqResLoggerMiddleware = require('./middlewares/req-res-logger');
-const { commonErrorHandler } = require('./helper/commonFunctions.helper');
+const { commonErrorHandler } = require('./helper/errorHandler');
 
 const app = express();
 app.use(express.json());

@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken')
 const models = require('../models')
 const checkToken= async (req, res, next) => {
     try {
-      console.log("here");
       const header = req.headers["authorization"];
       const token = (header ? header.split(' ')[1] : null);
       if (!token) {
@@ -19,7 +18,7 @@ const checkToken= async (req, res, next) => {
         throw new Error('User Not found');
       }
       req.user = user;
-      console.log(user);
+     
       next();
     } catch (error) {
       return res.status(500).json({ error: error.message });

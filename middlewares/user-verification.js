@@ -1,5 +1,5 @@
 const verifyUser= (req, res, next) => {
-        try {
+    try {
             if (req.user.Roles[0].role_code == 1001) {
                 next();
             } else {

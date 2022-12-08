@@ -9,12 +9,12 @@ module.exports = {
         primaryKey: true,
         defaultValue: Sequelize.literal('uuid_generate_v4()')
       },
-      role_key: {
+      role_code: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
       },
-      role_code: {
+      role_key: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,

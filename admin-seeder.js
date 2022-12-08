@@ -1,8 +1,9 @@
-const models = require("./models");
-const { sequelize } = require("./models");
 const prompt = require("prompt");
 const colors = require("@colors/colors/safe");
 const { hash } = require("bcrypt");
+
+const models = require("./models");
+const { sequelize } = require("./models");
 
 async function admin() {
   await prompt.start();

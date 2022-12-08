@@ -24,8 +24,7 @@ module.exports = (sequelize, Sequelize) => {
       sequelize,
       tableName: "designation",
       modelName: "Designation",
-      paranoid: true,
-      timestamps: true,
+      paranoid: true
     }
   );
   return Designation;

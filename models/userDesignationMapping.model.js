@@ -28,7 +28,7 @@ module.exports = (sequelize, Sequelize) => {
         key: 'id'
       }
     },
-    },
+  },
     {
       sequelize,
       tableName: "user_designation_mapping",

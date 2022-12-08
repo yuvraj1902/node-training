@@ -55,7 +55,7 @@ module.exports = {
 
     refreshTokenSchema: async (req, res, next) => {
         const schema = Joi.object({
-            refreshToken: Joi.string().guid().required()
+            refreshToken: Joi.string().min(3).max(200).required()
         });
         validateRequest(req, res, next, schema, 'body');
     },
@@ -71,10 +71,16 @@ module.exports = {
 
     adminResetPasswordSchema: async (req, res, next) => {
         const schema = Joi.object({
-            userEmail: Joi.string().email().lowercase().required(),
+            email: Joi.string().email().lowercase().required(),
             password: passwordComplexity(complexityOptions).required(),
         });
         validateRequest(req, res, next, schema, 'body');
+    },
+    resetPasswordSchemaToken: async (req, res, next) => {
+        const schema = Joi.object({
+            token: Joi.string().alphanum().min(5).required()
+        })
+        validateRequest(req, res, next, schema, 'params');
     },
 
     forgetPassword: async (req, res, next) => {
@@ -101,7 +107,7 @@ module.exports = {
 
     userDetailsSchema: async (req, res, next) => {
         const schema = Joi.object({
-            user_id: Joi.string().guid().required()
+            userId: Joi.string().guid().required()
         });
         validateRequest(req, res, next, schema, 'body');
     },

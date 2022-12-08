@@ -11,8 +11,7 @@ module.exports = (sequelize, Sequelize) => {
       });
     }
   }
-  UserRoleMapping.init(
-    {
+  UserRoleMapping.init({
       user_id: {
         allowNull: false,
         type: Sequelize.UUID,
@@ -32,6 +31,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     {
       sequelize,
+      paranoid: true,
       tableName: "user_role_mapping",
       modelName: "UserRoleMapping",
     }
