@@ -1,0 +1,15 @@
+module.exports = {
+    verifyUser: async (req, res, next) => {
+        try {
+            console.log('in verification hello');
+            if (req.user.Roles[0].dataValues.role_code == 1001) {
+                next();
+            } else {
+                return res.status(403).json({ message: 'Access denied' });
+            }
+        } catch (err) {
+            return res.status(500).json({ message: `Something went wrong!` });
+        }
+
+    }
+}
