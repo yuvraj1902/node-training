@@ -80,6 +80,6 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
      npm start
 ## Output on running npm start
     Executing (default): SELECT 1+1 AS result
-... Microservice db ✔
-... Redis db ✔
---- Server started on 3004 ---
+    ... Microservice db ✔
+    ... Redis db ✔
+    --- Server started on 3004 ---
