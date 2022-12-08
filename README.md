@@ -73,7 +73,7 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
     SECRET_KEY_ACCESS : Secret key for access token
     SECRET_KEY_REFRESH : Secret key for refresh token
 
-#database conectivity
+## Database conectivity
     you need a database and make changes in .env and config.js file
 
 ## Running the project
@@ -83,3 +83,6 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
     ... Microservice db ✔
     ... Redis db ✔
     --- Server started on 3004 ---
+
+## API Documentation
+    For further details about each feature you can refere to Api docs [here](https://documenter.getpostman.com/view/23688073/2s8YzRy2kp)
