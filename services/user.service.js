@@ -49,11 +49,11 @@ const loginUser = async (payload) => {
     throw new Error('Wrong email or password');
   }
 
-  const accessToken = jwt.sign({ userId: user.id }, process.env.secretKey, {
-    expiresIn: process.env.jwtExpiration
+  const accessToken = jwt.sign({ userId: user.dataValues.id }, process.env.SECRET_KEY_ACCESS, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRATION
   });
-  const refreshToken = jwt.sign({ userId: user.id }, process.env.secretKey, {
-    expiresIn: process.env.jwtRefreshExpiration
+  const refreshToken = jwt.sign({ userId: user.dataValues.id }, process.env.SECRET_KEY_REFRESH, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRATION
   });
 
   delete user.dataValues.password;
@@ -67,34 +67,26 @@ const loginUser = async (payload) => {
     refreshToken: refreshToken,
   }
 }
+const refreshToken = async (refreshToken, userId) => {
 
-const refreshToken = async (requestToken) => {
-  let refreshToken = await redisClient.get(requestToken);
-
-  if (!refreshToken) {
-    throw new Error('Login Required');
-  }
-
-  const decoded_jwt = jwt.verify(requestToken, process.env.secretKey);
-  
-  let newAccessToken = jwt.sign({ userId: decoded_jwt.userId }, process.env.secretKey, {
-    expiresIn: process.env.jwtExpiration
+  let newAccessToken = jwt.sign({ userId: userId }, process.env.SECRET_KEY_ACCESS, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRATION
   });
 
   return {
     accessToken: newAccessToken,
-    refreshToken:requestToken,
+    refreshToken,
   }
 }
 
-const getAllUsers = async () => {
+const getAllUsers = async (query) => {
+  let dataLimit = query.limit>0?query.limit:null;
+  console.log("datalimit ", dataLimit);
   const users = await models.User.findAll({
-    attributes: { exclude: ["password"] },
+    attributes: { exclude: ["deleted_at", "password"] },
+    limit: dataLimit
   });
-  if (!users) {
-    throw new Error('Not Found');
-  }
-  return users;
+    return  users;
 }
 
 const logoutUser = async (requestToken) => {
@@ -102,27 +94,45 @@ const logoutUser = async (requestToken) => {
   return;
 }
 
-const resetUserPassword = async (payload, user = {}) => {
-  if (payload.userEmail) {
+const resetUserPassword = async (payload, user = {}, params = {}) => {
+  const resetToken = params.token || null;
+  const password = payload.password || null;
+  let userEmail = user.email || null;
+  let payloadEmail = payload.email || null;
+
+  if (userEmail && !payloadEmail) {
     const userExist = await models.User.findOne({
-      where: { email: payload.userEmail },
-      include: { model: models.Role }
+      where: { email: userEmail },
+      include: {
+        model: models.Role,
+      }
     });
-    
     if (!userExist) {
       throw new Error('User Not Found');
     }
 
-    if (payload.roleCode || userExist.Roles[0].role_title=='User') { //role_code
-      return resetPassword(payload.newPassword, userExist.email);
-    }
-    else{
-      throw new Error('Access Denied');
+      return resetPassword(password, userEmail);
+  }
+  else if (payloadEmail && userEmail) {
+    const userExist = await models.User.findOne({
+      where: { email: payloadEmail },
+      include: {
+        model: models.Role,
+      }
+    });
+
+    const roleArray = userExist.Roles.map(Role => Role.role_code);
+    const roleData = await models.Role.findOne({ where: { role_key: "ADM" } });
+    const adminRoleCode = roleData.role_code;
+    if (roleArray.includes(adminRoleCode)) {
+      throw new Error("Cannot reset admin password");
     }
 
+    return resetPassword(password, payloadEmail);
+    
   }
-  else if (payload.token) { 
-    const cachedUserId = await redisClient.get(payload.token);
+  else if (resetToken) { 
+    const cachedUserId = await redisClient.get(resetToken);
     if (!cachedUserId) {
       throw new Error("Invalid Reset Link");
     }
@@ -130,8 +140,8 @@ const resetUserPassword = async (payload, user = {}) => {
     if (!userExist) {
       throw new Error('User Not Found');
     }
-    await redisClient.del(payload.token);
-    return resetPassword(payload.newPassword, userExist.email);
+    await redisClient.del(resetToken);
+    return resetPassword(password, userExist.email);
   }
 }
 
@@ -201,11 +211,11 @@ const forgetPassword = async (payload) => {
 
 const deactivateUser = async (payload) => {
 
-  let { user_id } = payload;
-  let keyName = user_id;
+  let { userId } = payload;
+  let keyName = userId;
   const user = await models.User.findOne({
     where: {
-      id: user_id
+      id: userId
     },
     include: [{
       model: models.Role,
@@ -224,7 +234,7 @@ const deactivateUser = async (payload) => {
 
    await models.User.destroy({
     where: {
-      id: user_id
+      id: userId
     }
   });
 
@@ -233,12 +243,14 @@ const deactivateUser = async (payload) => {
 }
 
 const enableUser = async (payload) => {
-  let { user_id } = payload;
+  let { userId } = payload;
+     
   let restoreUser = await models.User.restore({
     where: {
-      id: user_id
+      id: userId
     }
   });
+  
   if (restoreUser) {
     return "User activated"
   } else {

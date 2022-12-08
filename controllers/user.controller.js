@@ -15,18 +15,23 @@ const loginUser = async (req, res, next) => {
 
 const refreshToken = async (req, res, next) => {
     try {
-        const { refreshToken: requestToken } = req.body;
-        const data = await userService.refreshToken(requestToken);
+        const { userId: userId } = req.body;
+        const refreshToken = req.headers["authorization"];
+       
+        const data = await userService.refreshToken(refreshToken, userId);
         res.data = data;
         next();
     } catch (error) {
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
 
 const getAllUsers = async (req, res, next) => {
     try {
-        const data = await userService.getAllUsers();
+        const { query } = req
+        const data = await userService.getAllUsers(query);
         res.data = data;
         next();
     } catch (error) {
@@ -37,25 +42,21 @@ const getAllUsers = async (req, res, next) => {
 
 const logoutUser = async (req, res, next) => {
     try {
-        const { refreshToken: requestToken } = req.body;
+        let requestToken = req.headers["authorization"];
+        requestToken = (requestToken ? requestToken.split(' ')[1] : null);
         const data = await userService.logoutUser(requestToken);
         res.data = data;
         next();
     } catch (error) {
-       
+        console.log('-----', error);
+        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
-
 const resetPassword = async (req, res, next) => {
     try {
-        const { body, user } = req;
-        const payload = {
-            newPassword: body.password, //body,user
-            userEmail: user.email,
-            roleCode:user.Roles[0].role_code
-        }
-        const data = await userService.resetUserPassword(payload);
+        const { body: payload, user } = req;
+        const data = await userService.resetUserPassword(payload,user);
         res.data = data;
         next();
     } catch (error) {
@@ -66,12 +67,8 @@ const resetPassword = async (req, res, next) => {
 
 const resetPasswordByLink = async (req, res, next) => {
     try {
-        const { body, params } = req;
-        const payload = {
-            newPassword: body.password,
-            token:  params.token
-        }
-        const data = await userService.resetUserPassword(payload);
+        const { body:payload, params } = req;
+        const data = await userService.resetUserPassword(payload, {},params);
         res.data = data;
         next();
     } catch (error) {
@@ -83,12 +80,8 @@ const resetPasswordByLink = async (req, res, next) => {
 
 const adminResetPassword = async (req, res, next) => {
     try {
-        const { body} = req;
-        const payload = {
-            newPassword: body.password,
-            userEmail: body.email,
-        }
-        const data = await userService.resetUserPassword(payload);
+        const { body:payload,user} = req;
+        const data = await userService.resetUserPassword(payload,user);
         res.data = data;
         next();
     } catch (error) {

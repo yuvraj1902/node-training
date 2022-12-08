@@ -1,104 +1,96 @@
 const { Router } = require("express");
-const router = Router();
 
 const controllers = require("../controllers");
-const { checkToken } = require("../middlewares/auth");
+const { checkAccessToken } = require('../middlewares/auth');
 const { verifyUser } = require("../middlewares/user-verification");
 const validator = require("../validators");
 const genericResponse = require("../helper/generic-response");
 
-
+const router = Router();
 
 router.post(
-    '/create-user',
-    checkToken,
-    verifyUser,
-    validator.userValidator.createUserSchema,
-    controllers.user.createUser,
-    genericResponse.sendResponse
+  '/create-user',
+  checkAccessToken,
+  verifyUser,
+  validator.userValidator.createUserSchema,
+  controllers.User.createUser,
+  genericResponse.sendResponse
+);
+
+router.delete(
+  '/deactivate-user',
+  checkAccessToken,
+  verifyUser,
+  validator.userValidator.deactivateUserSchema,
+  controllers.User.deactivateUser,
+  genericResponse.sendResponse
+);
+router.patch(
+  '/enable-user',
+  checkAccessToken,
+  verifyUser,
+  validator.userValidator.enableUserSchema,
+  controllers.User.enableUser,
+  genericResponse.sendResponse
 );
 
 router.get(
-    '/users',
-    checkToken,
-    verifyUser,
-    controllers.user.getAllUsers,
-    genericResponse.sendResponse
+  '/user-details/:userId',
+  checkAccessToken,
+  verifyUser,
+  validator.userValidator.userDetailsSchema,
+  controllers.User.adminUserDetail,
+  genericResponse.sendResponse
 );
 
+router.post(
+  '/reset-user-password',
+  checkAccessToken,
+  verifyUser,
+  validator.userValidator.adminResetPasswordSchema,
+  controllers.User.adminResetPassword,
+  genericResponse.sendResponse
+);
+
+
+router.get(
+  '/users',
+  checkAccessToken,
+  verifyUser,
+  controllers.User.getAllUsers,
+  genericResponse.sendResponse
+);
+router.post(
+  '/assign-designation',
+  checkAccessToken,
+  verifyUser,
+  validator.designationValidator.designationSchema,
+  controllers.Designation.assignDesignation,
+  genericResponse.sendResponse
+);
+router.post(
+  '/deactivate-designation',
+  checkAccessToken,
+  verifyUser,
+  validator.designationValidator.designationSchema,
+  controllers.Designation.deactivateDesignation,
+  genericResponse.sendResponse
+);
 
 router.post(
   "/add-reportee",
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.reporteeValidator.adminReporteeSchema,
-  controllers.userReportee.adminAddReportee,
+  controllers.UserReportee.adminAddReportee,
   genericResponse.sendResponse
 );
-
 router.delete(
   "/delete-reportee",
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.reporteeValidator.adminReporteeSchema,
-  controllers.userReportee.adminDeleteReportee,
+  controllers.UserReportee.adminDeleteReportee,
   genericResponse.sendResponse
 );
-
-router.get(
-    '/user-details/:userId',
-    checkToken,
-    verifyUser,
-    validator.userValidator.userDetailsSchema,
-    controllers.user.adminUserDetail,
-    genericResponse.sendResponse
-);
-
-
-router.post(
-    '/reset-user-password',
-    checkToken,
-    verifyUser,
-    validator.userValidator.adminResetPasswordSchema,
-    controllers.user.adminResetPassword,
-    genericResponse.sendResponse
-);
-
-
-router.delete(
-    '/deactivate-user',
-    checkToken,
-    verifyUser,
-    validator.userValidator.deactivateUserSchema,
-    controllers.user.deactivateUser,
-    genericResponse.sendResponse
-);
-router.patch(
-    '/enable-user',
-    checkToken,
-    verifyUser,
-    validator.userValidator.enableUserSchema,
-    controllers.user.enableUser,
-    genericResponse.sendResponse
-);
-
-
-router.post(
-  "/assign-designation",
-  checkToken,
-  verifyUser,
-  validator.designationValidator.designationSchema,
-  controllers.designation.assignDesignation,
-  genericResponse.sendResponse
-);
-router.post(
-  "/deactive-designation",
-  checkToken,
-  verifyUser,
-  validator.designationValidator.designationSchema,
-  controllers.designation.deactiveDesignation,
-  genericResponse.sendResponse
-);
-
-
 module.exports = router;

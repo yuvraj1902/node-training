@@ -3,13 +3,6 @@ const { commonErrorHandler } = require('./errorHandler');
 
 const validateRequest = (req, res, next, schema, requestParamterType) => {
 
-  console.log(requestParamterType);
-  const options = {
-    abortEarly: true, // include all errors
-    allowUnknown: false, // ignore unknown props
-    stripUnknown: true // remove unknown props
-  };
-
   let requestData = {};
   if (requestParamterType === 'body') {
     requestData = req.body;
@@ -19,7 +12,7 @@ const validateRequest = (req, res, next, schema, requestParamterType) => {
     requestData = req.params;
   }
 
-  const { error, value } = schema.validate(requestData, options);
+  const { error, value } = schema.validate(requestData);
 
   if (!error) {
     if (requestParamterType === 'body') {

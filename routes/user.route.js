@@ -1,57 +1,56 @@
 const { Router } = require('express');
+
 const controllers = require('../controllers');
-const { checkToken } = require('../middlewares/auth');
-const { verifyUser } = require('../middlewares/user-verification');
+const { checkRefreshToken, checkAccessToken } = require('../middlewares/auth');
 const validator = require('../validators')
 const genericResponse = require('../helper/generic-response')
-const router = Router();
 
+const router = Router();
 
 router.post(
     '/login',
     validator.userValidator.loginSchema,
-    controllers.user.loginUser,
+    controllers.User.loginUser,
     genericResponse.sendResponse
 );
-router.post(
+router.get(
     '/refresh-token',
-    validator.userValidator.refreshTokenSchema,
-    controllers.user.refreshToken,
+    checkRefreshToken,
+    controllers.User.refreshToken,
     genericResponse.sendResponse
 );
 router.post(
     '/logout',
-    validator.userValidator.refreshTokenSchema,
-    controllers.user.logoutUser,
+    controllers.User.logoutUser,
     genericResponse.sendResponse
 );
 
 router.post(
     '/registration',
     validator.userValidator.registrationSchema,
-    controllers.user.registration,
+    controllers.User.registration,
     genericResponse.sendResponse
 );
 
 router.post(
     '/forget-password',
     validator.userValidator.forgetPassword,
-    controllers.user.forgetPassword,
+    controllers.User.forgetPassword,
     genericResponse.sendResponse
 );
 
 router.get(
     '/user-details',
-    checkToken,
-    controllers.user.userDetail,
+    checkAccessToken,
+    controllers.User.userDetail,
     genericResponse.sendResponse
 );
 
 router.post(
     '/reset-password',
-    checkToken,
+    checkAccessToken,
     validator.userValidator.resetPasswordSchema,
-    controllers.user.resetPassword,
+    controllers.User.resetPassword,
     genericResponse.sendResponse
 );
 
@@ -59,42 +58,24 @@ router.post(
     '/reset-password/:token',
     validator.userValidator.resetPasswordSchemaToken,
     validator.userValidator.resetPasswordSchema,
-    controllers.user.resetPasswordByLink,
+    controllers.User.resetPasswordByLink,
     genericResponse.sendResponse
 );
-
-
-router.delete(
-    '/deactivate-user',
-    checkToken,
-    verifyUser,
-    validator.userValidator.deactivateUserSchema,
-    controllers.user.deactivateUser,
-    genericResponse.sendResponse
-);
-router.patch(
-    '/enable-user',
-    checkToken,
-    verifyUser,
-    validator.userValidator.enableUserSchema,
-    controllers.user.enableUser,
-    genericResponse.sendResponse
-);
-
 
 router.post(
-  "/add-reportee",
-  checkToken,
-  validator.reporteeValidator.userReporteeSchema,
-  controllers.userReportee.userAddReportee,
-  genericResponse.sendResponse
+    "/add-reportee",
+    checkAccessToken,
+    validator.reporteeValidator.userReporteeSchema,
+    controllers.UserReportee.userAddReportee,
+    genericResponse.sendResponse
+);
+router.delete(
+    "/delete-reportee",
+    checkAccessToken,
+    validator.reporteeValidator.userReporteeSchema,
+    controllers.UserReportee.userDeleteReportee,
+    genericResponse.sendResponse
 );
 
-router.delete(
-  "/delete-reportee",
-  checkToken,
-  validator.reporteeValidator.userReporteeSchema,
-  controllers.userReportee.userDeleteReportee,
-  genericResponse.sendResponse
-);
+
 module.exports = router;

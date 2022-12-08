@@ -8,13 +8,6 @@ const init = (name = 'logger') => {
     name: name,
     serializers: serializers
   });
-
-  logger.getContext = function () {
-    return {
-      'x-request-id': this.fields['x-request-id']
-    };
-  }
-
 };
 
 const getInstance = (props = {}) => {

@@ -4,6 +4,7 @@ const designationService = require('../services/designation.service');
 
 const assignDesignation = async (req, res, next) => {
     try {
+        console.log("assignDesignation>>>>>>>>");
         const { body: payload } = req;
         const data = await designationService.assignDesignation(payload);
         res.data = data;
@@ -13,10 +14,10 @@ const assignDesignation = async (req, res, next) => {
     }
 }
 
-const deactiveDesignation = async (req, res, next) => {
+const deactivateDesignation = async (req, res, next) => {
     try {
         const { body: payload } = req;
-        const data = await designationService.deactiveDesignation(payload);
+        const data = await designationService.deactivateDesignation(payload);
         res.data = data;
         next();
     } catch (error) {
@@ -26,5 +27,5 @@ const deactiveDesignation = async (req, res, next) => {
 
 module.exports = {
     assignDesignation,
-    deactiveDesignation
+    deactivateDesignation
 }

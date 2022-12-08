@@ -1,8 +1,8 @@
-const user = require('./user.controller');
-const userReportee = require('./userReportee.controller');
-const designation = require("./designation.controller");
+const User = require('./user.controller');
+const UserReportee = require('./userReportee.controller');
+const Designation = require("./designation.controller");
 module.exports = {
-    user,
-    userReportee,
-    designation
+    User,
+    UserReportee,
+    Designation
 }
