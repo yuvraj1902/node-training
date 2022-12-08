@@ -73,9 +73,13 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
     SECRET_KEY_ACCESS : Secret key for access token
     SECRET_KEY_REFRESH : Secret key for refresh token
 
-    #database conectivity
-        you need a database and make changes in .env and config.js file
+#database conectivity
+    you need a database and make changes in .env and config.js file
 
 ## Running the project
      npm start
-
+## Output on running npm start
+    Executing (default): SELECT 1+1 AS result
+... Microservice db ✔
+... Redis db ✔
+--- Server started on 3004 ---
