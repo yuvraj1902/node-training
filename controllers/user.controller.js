@@ -51,7 +51,7 @@ const resetPassword = async (req, res, next) => {
     try {
         const { body, user } = req;
         const payload = {
-            newPassword: body.password,
+            newPassword: body.password, //body,user
             userEmail: user.email,
             roleCode:user.Roles[0].role_code
         }
@@ -112,9 +112,9 @@ const userDetail = async (req, res, next) => {
 
 const adminUserDetail = async (req, res, next) => {
     try {
-        const { body } = req;
+        const { params } = req;
         const payload = {
-            userId: body.userId
+            userId: params.userId
         };
 
         const data = await userService.userDetail(payload);

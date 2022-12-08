@@ -105,6 +105,6 @@ module.exports = {
         const schema = Joi.object({
             userId: Joi.string().guid().required()
         });
-        validateRequest(req, res, next, schema, 'body');
+        validateRequest(req, res, next, schema, 'params');
     },
 };

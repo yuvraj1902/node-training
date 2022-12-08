@@ -102,7 +102,7 @@ const logoutUser = async (requestToken) => {
   return;
 }
 
-const resetUserPassword = async (payload) => {
+const resetUserPassword = async (payload, user = {}) => {
   if (payload.userEmail) {
     const userExist = await models.User.findOne({
       where: { email: payload.userEmail },
@@ -113,7 +113,7 @@ const resetUserPassword = async (payload) => {
       throw new Error('User Not Found');
     }
 
-    if (payload.roleCode || userExist.Roles[0].role_title=='User') {
+    if (payload.roleCode || userExist.Roles[0].role_title=='User') { //role_code
       return resetPassword(payload.newPassword, userExist.email);
     }
     else{
@@ -122,11 +122,11 @@ const resetUserPassword = async (payload) => {
 
   }
   else if (payload.token) { 
-    const isData = await redisClient.get(payload.token);
-    if (!isData) {
+    const cachedUserId = await redisClient.get(payload.token);
+    if (!cachedUserId) {
       throw new Error("Invalid Reset Link");
     }
-    const userExist = await models.User.findOne({ where: { id:isData } });
+    const userExist = await models.User.findOne({ where: { id:cachedUserId } });
     if (!userExist) {
       throw new Error('User Not Found');
     }

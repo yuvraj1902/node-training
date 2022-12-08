@@ -46,7 +46,7 @@ router.delete(
 );
 
 router.get(
-    '/user-details',
+    '/user-details/:userId',
     checkToken,
     verifyUser,
     validator.userValidator.userDetailsSchema,
