@@ -58,7 +58,7 @@ const loginUser = async (payload) => {
 
   delete user.dataValues.password;
   await redisClient.set(user.id, JSON.stringify(user));
-  await redisClient.set(refreshToken, JSON.stringify("true"));
+  await redisClient.set(refreshToken, JSON.stringify("true"),24*60);
 
   return {
     id: user.id,
@@ -80,14 +80,17 @@ const refreshToken = async (refreshToken, userId) => {
 }
 
 const getAllUsers = async (query) => {
-  let dataLimit = query.limit>0?query.limit:null;
-  console.log("datalimit ", dataLimit);
+  let limit = query.page == 0 ? null : 3;
+  let page = query.page < 2 ? 0 : query.page; 
+
   const users = await models.User.findAll({
     attributes: { exclude: ["deleted_at", "password"] },
-    limit: dataLimit
+    limit: limit,
+    offset: page*3
   });
     return  users;
 }
+
 
 const logoutUser = async (requestToken) => {
   await redisClient.del("refresh_token_detail");
@@ -120,6 +123,10 @@ const resetUserPassword = async (payload, user = {}, params = {}) => {
         model: models.Role,
       }
     });
+
+    if (!userExist) {
+      throw new Error('User Not Found');
+    }
 
     const roleArray = userExist.Roles.map(Role => Role.role_code);
     const roleData = await models.Role.findOne({ where: { role_key: "ADM" } });
@@ -198,7 +205,7 @@ const forgetPassword = async (payload) => {
   let baseUrl = process.env.BASE_URL;
   let resetPassawordLink = `${baseUrl}/api/user/reset-password/${randomToken}`;
 
-  await redisClient.set(randomToken, userId);
+  await redisClient.set(randomToken, userId,20);
 
   let recipient = email;
   let subject = "Reset Password Link";
