@@ -25,10 +25,10 @@ Also, be sure to have `git` available in your PATH, `npm` might need it (You can
 If the installation was successful, you should be able to run the following command.
 
     $ node --version
-    v8.11.3
+    v19.0.1
 
     $ npm --version
-    6.1.0
+    8.19.2
 
 If you need to update `npm`, you can make it using `npm`! Cool right? After running the following command, just open again the command line and be happy.
 
