@@ -62,6 +62,7 @@ module.exports = (req, res, next) => {
 
     logRequest(req);
     res.on('finish', logResponse.bind(null, req, res));
+    res.on('close', logResponse.bind(null, req, res));
 
     return next();
 };

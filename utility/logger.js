@@ -11,13 +11,6 @@ const init = (name = 'logger', loggerLevel = 'info') => {
         level: loggerLevel,
         serializers: serializers
     });
-
-    logger.getContext = function () {
-        console.trace("HERE>>>>>>>>>>>>>>>>")
-        return {
-            'x-request-id': this.fields['x-request-id']
-        };                  
-    };
 };
 
 const getInstance = (props = {}) => {

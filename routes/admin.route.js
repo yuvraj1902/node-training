@@ -1,7 +1,7 @@
 const { Router } = require("express");
 
 const controllers = require("../controllers");
-const { checkToken } = require("../middlewares/auth");
+const { checkAccessToken } = require('../middlewares/auth');
 const { verifyUser } = require("../middlewares/user-verification");
 const validator = require("../validators");
 const genericResponse = require("../helper/generic-response");
@@ -10,7 +10,7 @@ const router = Router();
 
 router.post(
   '/create-user',
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.userValidator.createUserSchema,
   controllers.User.createUser,
@@ -19,7 +19,7 @@ router.post(
 
 router.delete(
   '/deactivate-user',
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.userValidator.deactivateUserSchema,
   controllers.User.deactivateUser,
@@ -27,7 +27,7 @@ router.delete(
 );
 router.patch(
   '/enable-user',
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.userValidator.enableUserSchema,
   controllers.User.enableUser,
@@ -36,7 +36,7 @@ router.patch(
 
 router.get(
   '/user-details',
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.userValidator.userDetailsSchema,
   controllers.User.getUserDetail,
@@ -45,7 +45,7 @@ router.get(
 
 router.post(
   '/reset-user-password',
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.userValidator.adminResetPasswordSchema,
   controllers.User.adminResetPassword,
@@ -55,31 +55,31 @@ router.post(
 
 router.get(
   '/users',
-  checkToken,
+  checkAccessToken,
   verifyUser,
   controllers.User.getAllUsers,
   genericResponse.sendResponse
 );
 router.post(
   '/assign-designation',
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.designationValidator.designationSchema,
   controllers.Designation.assignDesignation,
   genericResponse.sendResponse
 );
 router.post(
-  '/deactive-designation',
-  checkToken,
+  '/deactivate-designation',
+  checkAccessToken,
   verifyUser,
   validator.designationValidator.designationSchema,
-  controllers.Designation.deactiveDesignation,
+  controllers.Designation.deactivateDesignation,
   genericResponse.sendResponse
 );
 
 router.post(
   "/add-reportee",
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.reporteeValidator.adminReporteeSchema,
   controllers.UserReportee.adminAddReportee,
@@ -87,7 +87,7 @@ router.post(
 );
 router.delete(
   "/delete-reportee",
-  checkToken,
+  checkAccessToken,
   verifyUser,
   validator.reporteeValidator.adminReporteeSchema,
   controllers.UserReportee.adminDeleteReportee,

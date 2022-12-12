@@ -1,8 +1,7 @@
 const { Router } = require('express');
 
 const controllers = require('../controllers');
-const { checkToken } = require('../middlewares/auth');
-const { verifyUser } = require('../middlewares/user-verification');
+const { checkRefreshToken, checkAccessToken } = require('../middlewares/auth');
 const validator = require('../validators')
 const genericResponse = require('../helper/generic-response')
 
@@ -16,13 +15,12 @@ router.post(
 );
 router.post(
     '/refresh-token',
-    validator.userValidator.refreshTokenSchema,
+    checkRefreshToken,
     controllers.User.refreshToken,
     genericResponse.sendResponse
 );
 router.post(
     '/logout',
-    validator.userValidator.refreshTokenSchema,
     controllers.User.logoutUser,
     genericResponse.sendResponse
 );
@@ -43,14 +41,14 @@ router.post(
 
 router.get(
     '/user-details',
-    checkToken,
+    checkAccessToken,
     controllers.User.getUserInfo,
     genericResponse.sendResponse
 );
 
 router.post(
     '/reset-password',
-    checkToken,
+    checkAccessToken,
     validator.userValidator.resetPasswordSchema,
     controllers.User.resetPassword,
     genericResponse.sendResponse
@@ -66,14 +64,14 @@ router.post(
 
 router.post(
     "/add-reportee",
-    checkToken,
+    checkAccessToken,
     validator.reporteeValidator.userReporteeSchema,
     controllers.UserReportee.userAddReportee,
     genericResponse.sendResponse
 );
 router.delete(
     "/delete-reportee",
-    checkToken,
+    checkAccessToken,
     validator.reporteeValidator.userReporteeSchema,
     controllers.UserReportee.userDeleteReportee,
     genericResponse.sendResponse

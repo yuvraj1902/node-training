@@ -17,8 +17,10 @@ const loginUser = async (req, res, next) => {
 
 const refreshToken = async (req, res, next) => {
     try {
-        const { refreshToken: requestToken } = req.body;
-        const data = await userService.refreshToken(requestToken);
+        const { userId: userId } = req.body;
+        const refreshToken = req.headers["authorization"];
+       
+        const data = await userService.refreshToken(refreshToken, userId);
         res.data = data;
         next();
     } catch (error) {
@@ -42,7 +44,8 @@ const getAllUsers = async (req, res, next) => {
 
 const logoutUser = async (req, res, next) => {
     try {
-        const { refreshToken: requestToken } = req.body;
+        let requestToken = req.headers["authorization"];
+        requestToken = (requestToken ? requestToken.split(' ')[1] : null);
         const data = await userService.logoutUser(requestToken);
         res.data = data;
         next();

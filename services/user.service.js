@@ -42,11 +42,11 @@ const loginUser = async (payload) => {
     throw new Error('Wrong email or password');
   }
 
-  const accessToken = jwt.sign({ userId: user.id }, process.env.secretKey, {
-    expiresIn: process.env.jwtExpiration
+  const accessToken = jwt.sign({ userId: user.id }, process.env.SECRET_KEY_ACCESS, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRATION
   });
-  const refreshToken = jwt.sign({ userId: user.id }, process.env.secretKey, {
-    expiresIn: process.env.jwtRefreshExpiration
+  const refreshToken = jwt.sign({ userId: user.id }, process.env.SECRET_KEY_REFRESH, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRATION
   });
 
   delete user.dataValues.password;
@@ -61,23 +61,15 @@ const loginUser = async (payload) => {
   }
 }
 
-const refreshToken = async (requestToken) => {
-  console.log(requestToken);
-  let refreshToken = await redisClient.get(requestToken);
+const refreshToken = async (refreshToken, userId) => {
 
-  if (!refreshToken) {
-    throw new Error('Login required!');
-  }
-
-  const decoded_jwt = jwt.verify(requestToken, process.env.secretKey);
-
-  let newAccessToken = jwt.sign({ userId: decoded_jwt.userId }, process.env.secretKey, {
-    expiresIn: process.env.jwtExpiration
+  let newAccessToken = jwt.sign({ userId: userId }, process.env.SECRET_KEY_ACCESS, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRATION
   });
 
   return {
     accessToken: newAccessToken,
-    refreshToken: requestToken,
+    refreshToken,
   }
 }
 
@@ -92,7 +84,7 @@ const getAllUsers = async () => {
 const logoutUser = async (requestToken) => {
 
   await redisClient.del(requestToken);
-  const decoded_jwt = jwt.verify(requestToken, process.env.secretKey);
+  const decoded_jwt = jwt.verify(requestToken, process.env.SECRET_KEY_REFRESH);
   if (decoded_jwt.userId)
     await redisClient.del(decoded_jwt.userId);
 
