@@ -1,6 +1,6 @@
 const bunyan = require('bunyan');
 const { v4 } = require('uuid');
-const serializers = require('./serializers');
+const serializers = require('../helper/serializers');
 
 let logger;
 const init = (name = 'logger') => {

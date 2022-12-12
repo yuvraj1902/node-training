@@ -3,7 +3,7 @@ const models = require("./models");
 const prompt = require("prompt");
 const colors = require("@colors/colors/safe");
 const { hash } = require("bcrypt");
-const { req } = require("./utility/serializers");
+const { req } = require("./helper/serializers");
 
 async function admin() {
   await prompt.start();
