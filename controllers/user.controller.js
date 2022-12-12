@@ -5,6 +5,7 @@ const userService = require('../services/user.service');
 const loginUser = async (req, res, next) => {
     try {
         const { body: payload } = req;
+        console.log("controller","dy==67==2384727423464624=53723652345253=34=52=f=jsdggdhvchgcxjasvcgcavhc===");
         const data = await userService.loginUser(payload);
         res.data = data;
         next();

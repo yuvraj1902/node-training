@@ -5,10 +5,10 @@ const {validateRequest} = require('../helper/commonFunctions.helper')
 const complexityOptions = {
     min: 4,
     max: 16,
-    lowerCase: 1,
-    upperCase: 1,
-    numeric: 1,
-    symbol: 1,
+    // lowerCase: 1,
+    // upperCase: 1,
+    // numeric: 1,
+    // symbol: 1,
 };
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
             email: Joi.string().email().lowercase().required(),
             password:passwordComplexity(complexityOptions).required()
         });
-
+        console.log("arvindhdugdyqgfd gdygdu 78434567899");
         validateRequest(req, res, next, schema, 'body');
     },
 

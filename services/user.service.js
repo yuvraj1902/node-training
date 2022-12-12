@@ -21,6 +21,8 @@ const resetPassword = async (newPassword,userEmail) => {
 const loginUser = async (payload) => {
   const { email, password } = payload;
 
+  console.log(payload);
+
   const user = await models.User.findOne({
     where: {
       email: email
@@ -40,6 +42,7 @@ const loginUser = async (payload) => {
     }],
     attributes: { exclude: ["created_at", "updated_at", "deleted_at"] }
   });
+
   if (!user) {
     throw new Error('User Not Found!');
   }
@@ -49,16 +52,20 @@ const loginUser = async (payload) => {
     throw new Error('Wrong email or password');
   }
 
-  const accessToken = jwt.sign({ userId: user.dataValues.id }, process.env.SECRET_KEY_ACCESS, {
+  const accessToken = jwt.sign({ userId: user.dataValues.id }, process.env.SECRET_KEY_ACCESS,
+    {
     expiresIn: process.env.JWT_ACCESS_EXPIRATION
-  });
-  const refreshToken = jwt.sign({ userId: user.dataValues.id }, process.env.SECRET_KEY_REFRESH, {
+  }
+  );
+  const refreshToken = jwt.sign({ userId: user.dataValues.id }, process.env.SECRET_KEY_REFRESH,
+    {
     expiresIn: process.env.JWT_REFRESH_EXPIRATION
-  });
+    }
+  );
 
-  delete user.dataValues.password;
-  await redisClient.set(user.id, JSON.stringify(user));
-  await redisClient.set(refreshToken, JSON.stringify("true"),24*60);
+  // delete user.dataValues.password;
+  // await redisClient.set(user.id, JSON.stringify(user));
+  // await redisClient.set(refreshToken, JSON.stringify("true"),24*60);
 
   return {
     id: user.id,
@@ -267,6 +274,7 @@ const enableUser = async (payload) => {
 }
 
 const createUser = async (payload) => {
+  console.log(payload);
   payload.is_firsttime = true;
   payload.password = await bcrypt.hash(payload.password, 10)
   const trans = await sequelize.transaction();

@@ -7,6 +7,7 @@ const genericResponse = require('../helper/generic-response')
 
 const router = Router();
 
+
 router.post(
     '/login',
     validator.userValidator.loginSchema,

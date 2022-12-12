@@ -14,11 +14,17 @@ module.exports = {
     },
   },
   test: {
-    username: "root",
-    password: null,
-    database: "database_test",
-    host: "127.0.0.1",
-    dialect: "mysql",
+     username: process.env.TEST_DB_USERNAME,
+    password: process.env.TEST_DB_PASSWORD,
+    database: process.env.TEST_DB_DATABASE,
+    host: process.env.TEST_DB_HOST,
+    dialect: "postgres",
+    define: {
+      underscored: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      deletedAt: "deleted_at",
+    },
   },
   production: {
     username: "root",

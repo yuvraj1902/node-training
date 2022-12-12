@@ -8,7 +8,9 @@ const checkAccessToken = async (req, res, next) => {
       if (!token) {
         throw new Error('Access denied');
       }
-      const decoded_jwt = jwt.verify(token, process.env.SECRET_KEY_ACCESS);
+
+      let decoded_jwt = jwt.verify(token, process.env.SECRET_KEY_ACCESS);
+      console.log(decoded_jwt,"jhdhdg");
       const user = await models.User.findOne({
         where: {
                 id: decoded_jwt.userId
