@@ -18,7 +18,6 @@ module.exports = {
             email: Joi.string().email().lowercase().required(),
             password:passwordComplexity(complexityOptions).required()
         });
-        console.log("arvindhdugdyqgfd gdygdu 78434567899");
         validateRequest(req, res, next, schema, 'body');
     },
 
@@ -35,6 +34,9 @@ module.exports = {
             designation_code: Joi.number().min(1).required(),
             reportee_id: Joi.string().guid()
         });
+
+        console.log("arvindhdugdyqgfd gdygdu 78434567899");
+
         validateRequest(req, res, next, schema, 'body');
     },
 

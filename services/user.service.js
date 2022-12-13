@@ -274,18 +274,18 @@ const enableUser = async (payload) => {
 }
 
 const createUser = async (payload) => {
-  console.log(payload);
-  payload.is_firsttime = true;
-  payload.password = await bcrypt.hash(payload.password, 10)
+  const userPayload = JSON.parse(JSON.stringify(payload));
+  userPayload.is_firsttime = true;
+  userPayload.password = await bcrypt.hash(userPayload.password, 10)
   const trans = await sequelize.transaction();
   try {
     const existingUser = await models.User.findOne({
-      where: { email: payload.email },
+      where: { email: userPayload.email },
     });
     if (existingUser) {
       throw new Error("User already exists");
     }
-    const user = await models.User.create(payload,
+    const user = await models.User.create(userPayload,
       { transaction: trans }
     );
 
@@ -293,10 +293,10 @@ const createUser = async (payload) => {
       throw new Error("Something went wrong");
     }
     const userId = user.dataValues.id;
-    if (payload.designation_code) {
+    if (userPayload.designation_code) {
       const designation = await models.Designation.findOne({
         where: {
-          designation_code: payload.designation_code,
+          designation_code: userPayload.designation_code,
         },
       },
         { transaction: trans }
@@ -317,10 +317,10 @@ const createUser = async (payload) => {
         throw new Error("Something went wrong");
       }
     }
-    if (payload.role_key) {
+    if (userPayload.role_key) {
       const role = await models.Role.findOne({
         where: {
-          role_key: payload.role_key,
+          role_key: userPayload.role_key,
         },
       },
         { transaction: trans }
@@ -342,9 +342,9 @@ const createUser = async (payload) => {
         throw new Error("Something went wrong");
       }
     }
-    if (payload.reportee_id) {
+    if (userPayload.reportee_id) {
       await trans.commit();
-      return { data: adminAddReportee({ manager_id: userId, reportee_id: payload.reportee_id }),error:null};
+      return { data: adminAddReportee({ manager_id: userId, reportee_id: userPayload.reportee_id }),error:null};
     } else {
       await trans.commit();
     return { data: user,error:null};

@@ -7,7 +7,7 @@ const logger = require('./utility/logger');
 
 const startServer = async function () {
   try {
-    // logger.init();
+    logger.init();
     await sequelize.authenticate();
     console.log('... Microservice db ✔');
     await redis.connect();

@@ -3,11 +3,13 @@ const request = require("supertest");
 const models = require("../models");
 const { faker } = require("@faker-js/faker");
 const { createUser } = require('../services/user.service');
-const { sequelize } = require("../models");
 const { createRandomUser } = require("../utility/faker");
 const jwt = require("jsonwebtoken");
-const userRoleMappingModel = require("../models/userRoleMapping.model");
+const logger = require("../utility/logger");
+const redis = require("../utility/redis");
 require("dotenv").config();
+logger.init();
+redis.connect();
 
 
 
@@ -15,8 +17,7 @@ describe("user login test cases", () => {
 
     const responseObject = {};
     let user;
-    const userPayload = createRandomUser();
-    userPayload.email = userPayload.email.toLowerCase();
+    const userPayload = createRandomUser("USR");
 
     const loginPayload = {
         email: userPayload.email,
@@ -51,9 +52,6 @@ describe("user login test cases", () => {
         
     }
     beforeAll(async () => {
-        userPayload.source = userPayload.organization;
-        userPayload.google_id = userPayload.email;
-        console.log(userPayload);
         const response =  await createUser(userPayload);
         user = await models.User.findOne({ where: { email: userPayload.email } });
         console.log(user, 'gwefwigfggfhwv');
@@ -103,6 +101,7 @@ describe("user login test cases", () => {
     const response = await request(app).post("/api/user/login").send(loginPayload);
         expect(response.statusCode).toBe(200);
         expect(jwt.verify(response.body.data.accessToken,process.env.SECRET_KEY_ACCESS).userId).toBe(user.id);
+        console.log(response.body,"---------->");
     });
     
     it("tests api/user/login wrong password", async () => {
@@ -150,96 +149,70 @@ describe("user login test cases", () => {
 
   describe("create user test cases", () => {
 
-      let userPayload = createRandomUser();
-      let token;
+      let userPayload = createRandomUser("USR");
+      let userData = createRandomUser("USR");
+      let adminToken, userToken;
+      const userPassword = userPayload.password;
       
-      beforeEach(async () => {
-        userPayload.email = userPayload.email.toLowerCase();
-        userPayload.source = userPayload.organization;
-          userPayload.google_id = userPayload.email;
-          userPayload.role_key="USR"
+      beforeAll(async () => {
+          const user = await createUser(userPayload);          
+          const adminUser = createRandomUser("ADM");
+          const admin1 = await createUser(adminUser);
+          adminToken = jwt.sign({ userId: admin1.data.id }, process.env.SECRET_KEY_ACCESS, { expiresIn: process.env.JWT_ACCESS_EXPIRATION });
+          userToken = jwt.sign({ userId: user.data.id }, process.env.SECRET_KEY_ACCESS, { expiresIn: process.env.JWT_ACCESS_EXPIRATION });
+      });
           
-          const adminUser = createRandomUser();
-          adminUser.email = adminUser.email.toLowerCase();
-            adminUser.source = adminUser.organization;
-          adminUser.google_id = adminUser.email;
-          adminUser.role_key = "ADM";
 
 
-          const response = await createUser(adminUser);
-          console.log(response.data.id);
-          
-          token = jwt.sign({ userId: response.data.id }, process.env.SECRET_KEY_ACCESS, { expiresIn: process.env.JWT_ACCESS_EXPIRATION });
-          
+afterAll(async () => {
+    await models.UserRoleMapping.destroy({
+        where: {
+        },
+        force: true
     });
-
-
-    afterAll(async () => {
-        await models.UserRoleMapping.destroy({
-            where: {
-            },
-            force: true
-        });
-        await models.UserDesignationMapping.destroy({
-            where: {
-            },
-            force: true
-        });
-         await models.UserReporteeMapping.destroy({
-            where: {
-            },
-            force: true
-        });
-        await models.User.destroy({
-            where: {
-            },
-            force: true
-        });
-    })
+    await models.UserDesignationMapping.destroy({
+        where: {
+        },
+        force: true
+    });
+    await models.UserReporteeMapping.destroy({
+        where: {
+        },
+        force: true
+    });
+    await models.User.destroy({
+        where: {
+        },
+        force: true
+    });
+});
 
 
 
     it("tests /api/admin/create-user create-user successfull", async () => {
-    const response = await request(app).post("/api/admin/create-user").send(userPayload).set("Authorization","Bearer "+token);
+    const response = await request(app).post("/api/admin/create-user").send(userData).set("Authorization","Bearer "+adminToken);
         expect(response.statusCode).toBe(200);
         expect(response.body.message).toBe("Success");
-        expect(response.body.data.email).toBe(userPayload.email);
+        expect(response.body.data.email).toBe(userData.email);
+     });
+    
+    it("tests /api/admin/create-user create-user with user login", async () => {
+    const response = await request(app).post("/api/admin/create-user").send(userPayload).set("Authorization","Bearer "+userToken);
+        expect(response.statusCode).toBe(403);
+        expect(response.body.message).toBe("Access denied");
     });
-    
-    // it("tests api/user/login wrong password", async () => {
-    // const response = await request(app).post("/api/user/login").send(loginPayload1);
-    //     expect(response.statusCode).toBe(400);
-    //     expect(response.body.message).toBe("Wrong email or password");
-    // });
-    
-    // it("tests api/user/login wrong email", async () => {
-    // const response = await request(app).post("/api/user/login").send(loginPayload2);
-    //     expect(response.statusCode).toBe(400);
-    //     expect(response.body.message).toBe("User Not Found!");
-    // });
-
-    // it("tests api/user/login invalid email", async () => {
-    // const response = await request(app).post("/api/user/login").send(loginPayload3);
-    //     expect(response.statusCode).toBe(422);
-    //     expect(response.body.message).toBe("\"email\" must be a valid email");
-    // });
-
-    // it("tests api/user/login no email", async () => {
-    // const response = await request(app).post("/api/user/login").send(loginPayload4);
-    //     expect(response.statusCode).toBe(422);
-    //     expect(response.body.message).toBe("\"email\" is required");
-    // });
-
-    // it("tests api/user/login no password", async () => {
-    // const response = await request(app).post("/api/user/login").send(loginPayload5);
-    //     expect(response.statusCode).toBe(422);
-    //     expect(response.body.message).toBe("\"password\" is required");
-    // });
-
-    // it("tests api/user/login no email password", async () => {
-    // const response = await request(app).post("/api/user/login").send(loginPayload6);
-    //     expect(response.statusCode).toBe(422);
-    //     expect(response.body.message).toBe("\"email\" is required");
-    // });
-
-  });
+      
+    it("tests /api/admin/create-user create-user without login", async () => {
+        const response = await request(app).post("/api/admin/create-user").send(userData);
+        expect(response.statusCode).toBe(401);
+        expect(response.body.error).toBe("Access denied");
+    });
+      
+    it("tests /api/admin/create-user create-user already exist", async () => {
+          const response = await request(app).post("/api/admin/create-user").send(userPayload).set("Authorization","Bearer "+adminToken);
+          expect(response.statusCode).toBe(400);
+          expect(response.body.message).toBe('User already exists');
+          console.log(response.body);
+      });
+      
+});
