@@ -13,6 +13,12 @@
     "db:seed:all": "cross-env NODE_ENV=test npx sequelize-cli db:seed:all",
     "db:undo": "cross-env NODE_ENV=test npx sequelize db:migrate:undo:all"
   },
+  "jest":{
+   "collectCoverage": true,
+   "coverageRepoter": ["lcov"],
+   "coverageDirectory": "./output/code-coverage/"
+  },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yuvraj1902/node-training.git"

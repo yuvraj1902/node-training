@@ -25,11 +25,9 @@ const addReportee = async (managerId, reporteeId) => {
             manager_id: managerId,
             reportee_id: reporteeId,
         });
-        return {
-            data: {
+        return { 
                 manager_id: reporteeAdded.manager_id,
                 reportee_id: reporteeAdded.reportee_id
-            }
         }
     } else {
         throw new Error('This relation is not valid');
@@ -73,15 +71,15 @@ const deleteReportee = async (managerId, reporteeId, callback) => {
 const userAddReportee = async (payload, user) => {
     const managerId = user.dataValues.id;
     const { reporteeId } = payload;
-
-    return addReportee(managerId, reporteeId);
+    const addReporteeResponse = await addReportee(managerId, reporteeId);
+    return addReporteeResponse;
 }
 
 const adminAddReportee = async (payload) => {
-    // const { manager_id, reportee_id } = payload;
-    const { managerId, reporteeId } = payload;
+    const { manager_id:managerId, reportee_id:reporteeId } = payload;
 
-    return addReportee(managerId, reporteeId);
+   const addReporteeResponse = await addReportee(managerId, reporteeId);
+    return addReporteeResponse;
 }
 
 const userDeleteReportee = async (payload, user) => {

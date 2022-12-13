@@ -32,11 +32,7 @@ module.exports = {
             source: Joi.string().min(1).required(),
             role_key: Joi.string().min(1).required(),
             designation_code: Joi.number().min(1).required(),
-            reportee_id: Joi.string().guid()
         });
-
-        console.log("arvindhdugdyqgfd gdygdu 78434567899");
-
         validateRequest(req, res, next, schema, 'body');
     },
 

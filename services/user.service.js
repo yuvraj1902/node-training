@@ -7,6 +7,7 @@ const mailer = require('../helper/sendmail');
 const { adminAddReportee } = require('./userReportee.service');
 const redisClient = require('../utility/redis');
 const UniqueStringGenerator = require('unique-string-generator');
+const { err } = require('../utility/serializers');
 
 const resetPassword = async (newPassword,userEmail) => {  
     await models.User.update({ password: await bcrypt.hash(newPassword, 10) }, { where: { email: userEmail } });
@@ -63,9 +64,9 @@ const loginUser = async (payload) => {
     }
   );
 
-  // delete user.dataValues.password;
-  // await redisClient.set(user.id, JSON.stringify(user));
-  // await redisClient.set(refreshToken, JSON.stringify("true"),24*60);
+  delete user.dataValues.password;
+  await redisClient.set(user.id, JSON.stringify(user));
+  await redisClient.set(refreshToken, JSON.stringify("true"),24*60);
 
   return {
     id: user.id,
@@ -289,9 +290,6 @@ const createUser = async (payload) => {
       { transaction: trans }
     );
 
-    if (!user) {
-      throw new Error("Something went wrong");
-    }
     const userId = user.dataValues.id;
     if (userPayload.designation_code) {
       const designation = await models.Designation.findOne({
@@ -302,7 +300,6 @@ const createUser = async (payload) => {
         { transaction: trans }
       );
       if (!designation) {
-
         throw new Error("Invalid Designation");
       }
       const designation_user_mapping_designationID =
@@ -312,10 +309,7 @@ const createUser = async (payload) => {
         },
           { transaction: trans }
         );
-      if (!designation_user_mapping_designationID) {
-
-        throw new Error("Something went wrong");
-      }
+      
     }
     if (userPayload.role_key) {
       const role = await models.Role.findOne({
@@ -327,7 +321,6 @@ const createUser = async (payload) => {
       );
 
       if (!role) {
-
         throw new Error("Invalid Role");
       }
       const user_role_mapping = await models.UserRoleMapping.create({
@@ -336,20 +329,9 @@ const createUser = async (payload) => {
       },
         { transaction: trans }
       );
-
-      if (!user_role_mapping) {
-
-        throw new Error("Something went wrong");
-      }
-    }
-    if (userPayload.reportee_id) {
-      await trans.commit();
-      return { data: adminAddReportee({ manager_id: userId, reportee_id: userPayload.reportee_id }),error:null};
-    } else {
-      await trans.commit();
+    } 
+    await trans.commit();
     return { data: user,error:null};
-
-    }
   } catch (error) {
     await trans.rollback();
     return { data: null, error: error };
