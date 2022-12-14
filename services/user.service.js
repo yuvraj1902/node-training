@@ -9,12 +9,12 @@ const redisClient = require('../utility/redis');
 const UniqueStringGenerator = require('unique-string-generator');
 const { err } = require('../utility/serializers');
 
-const resetPassword = async (newPassword,userEmail) => {  
-    await models.User.update({ password: await bcrypt.hash(newPassword, 10) }, { where: { email: userEmail } });
-    const email_body = `Password reset successfull`;
-    const email_subject = `Password reset`;
-    await mailer.sendMail(email_body, email_subject, userEmail);
-    return "Password reset successfully";
+const resetPassword = async (newPassword, userEmail) => {
+  await models.User.update({ password: await bcrypt.hash(newPassword, 10) }, { where: { email: userEmail } });
+  const email_body = `Password reset successfull`;
+  const email_subject = `Password reset`;
+  await mailer.sendMail(email_body, email_subject, userEmail);
+  return "Password reset successfully";
 }
 
 
@@ -55,18 +55,18 @@ const loginUser = async (payload) => {
 
   const accessToken = jwt.sign({ userId: user.dataValues.id }, process.env.SECRET_KEY_ACCESS,
     {
-    expiresIn: process.env.JWT_ACCESS_EXPIRATION
-  }
+      expiresIn: process.env.JWT_ACCESS_EXPIRATION
+    }
   );
   const refreshToken = jwt.sign({ userId: user.dataValues.id }, process.env.SECRET_KEY_REFRESH,
     {
-    expiresIn: process.env.JWT_REFRESH_EXPIRATION
+      expiresIn: process.env.JWT_REFRESH_EXPIRATION
     }
   );
 
   delete user.dataValues.password;
   await redisClient.set(user.id, JSON.stringify(user));
-  await redisClient.set(refreshToken, JSON.stringify("true"),24*60);
+  await redisClient.set(refreshToken, JSON.stringify("true"), 24 * 60);
 
   return {
     id: user.id,
@@ -88,14 +88,14 @@ const refreshToken = async (refreshToken, userId) => {
 
 const getAllUsers = async (query) => {
   let limit = query.page == 0 ? null : 3;
-  let page = query.page < 2 ? 0 : query.page; 
+  let page = query.page < 2 ? 0 : query.page;
 
   const users = await models.User.findAll({
     attributes: { exclude: ["deleted_at", "password"] },
     limit: limit,
-    offset: page*3
+    offset: page * 3
   });
-    return  users;
+  return users;
 }
 
 
@@ -117,11 +117,7 @@ const resetUserPassword = async (payload, user = {}, params = {}) => {
         model: models.Role,
       }
     });
-    if (!userExist) {
-      throw new Error('User Not Found');
-    }
-
-      return resetPassword(password, userEmail);
+    return resetPassword(password, userEmail);
   }
   else if (payloadEmail && userEmail) {
     const userExist = await models.User.findOne({
@@ -143,14 +139,14 @@ const resetUserPassword = async (payload, user = {}, params = {}) => {
     }
 
     return resetPassword(password, payloadEmail);
-    
+
   }
-  else if (resetToken) { 
+  else if (resetToken) {
     const cachedUserId = await redisClient.get(resetToken);
     if (!cachedUserId) {
       throw new Error("Invalid Reset Link");
     }
-    const userExist = await models.User.findOne({ where: { id:cachedUserId } });
+    const userExist = await models.User.findOne({ where: { id: cachedUserId } });
     if (!userExist) {
       throw new Error('User Not Found');
     }
@@ -186,6 +182,11 @@ const userDetail = async (payload) => {
       }],
       attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
     });
+
+    if (!userData) {
+      throw new Error("User Not Found");
+    }
+
     await redisClient.set(keyName, JSON.stringify(userData));
     return userData;
   }
@@ -202,19 +203,21 @@ const forgetPassword = async (payload) => {
 
   if (!user) {
     throw new Error('User Not Found!');
-  }   
+  }
   let randomToken = UniqueStringGenerator.UniqueString();
   let userId = user.dataValues.id;
   let baseUrl = process.env.BASE_URL;
   let resetPassawordLink = `${baseUrl}/api/user/reset-password/${randomToken}`;
 
-  await redisClient.set(randomToken, userId,20);
+  await redisClient.set(randomToken, userId, 20);
 
   let recipient = email;
   let subject = "Reset Password Link";
   let body = `Password Reset Link:- ${resetPassawordLink}`;
 
   await mailer.sendMail(body, subject, recipient);
+
+  if (process.env.NODE_ENV == "test") return randomToken;
   return "send reset password link successfully";
 
 }
@@ -238,11 +241,11 @@ const deactivateUser = async (payload) => {
     throw new Error("User Not Found")
   }
 
-   if (user.Roles[0].role_code == 1001) {
-     throw new Error("Access denied")
+  if (user.Roles[0].role_code == 1001) {
+    throw new Error("Access denied")
   }
 
-   await models.User.destroy({
+  await models.User.destroy({
     where: {
       id: userId
     }
@@ -254,13 +257,13 @@ const deactivateUser = async (payload) => {
 
 const enableUser = async (payload) => {
   let { userId } = payload;
-     
+
   let restoreUser = await models.User.restore({
     where: {
       id: userId
     }
   });
-  
+
   if (restoreUser) {
     return "User activated"
   } else {
@@ -304,7 +307,7 @@ const createUser = async (payload) => {
         },
           { transaction: trans }
         );
-      
+
     }
     if (userPayload.role_key) {
       const role = await models.Role.findOne({
@@ -324,9 +327,9 @@ const createUser = async (payload) => {
       },
         { transaction: trans }
       );
-    } 
+    }
     await trans.commit();
-    return { data: user,error:null};
+    return { data: user, error: null };
   } catch (error) {
     await trans.rollback();
     return { data: null, error: error };

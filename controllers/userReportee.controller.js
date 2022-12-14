@@ -27,8 +27,7 @@ const adminAddReportee = async (req, res, next) => {
 
 const userDeleteReportee = async (req, res, next) => {
     try {
-        const { body: payload } = req;
-        const { user: user } = req;
+        const { body: payload, user: user } = req;
         const data = await userReporteeService.userDeleteReportee(payload, user);
         res.data = data;
         next();

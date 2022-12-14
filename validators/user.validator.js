@@ -65,7 +65,7 @@ module.exports = {
 
     resetPasswordSchemaToken:  async (req, res, next) => {
         const schema = Joi.object({
-            token: Joi.string().alphanum().min(5).required()
+            token: Joi.string().min(5).required()
         })
         validateRequest(req, res, next, schema, 'params');
     },

@@ -4,7 +4,6 @@ const designationService = require('../services/designation.service');
 
 const assignDesignation = async (req, res, next) => {
     try {
-        console.log("assignDesignation>>>>>>>>");
         const { body: payload } = req;
         const data = await designationService.assignDesignation(payload);
         res.data = data;
