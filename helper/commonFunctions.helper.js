@@ -22,7 +22,6 @@ const validateRequest = (req, res, next, schema, requestParamterType) => {
     } else {
       req.params = value;
     }
-    console.log(value);
     return next();
   }
 

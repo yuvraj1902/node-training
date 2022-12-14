@@ -68,7 +68,7 @@ router.post(
   controllers.Designation.assignDesignation,
   genericResponse.sendResponse
 );
-router.post(
+router.delete(
   '/deactivate-designation',
   checkAccessToken,
   verifyUser,

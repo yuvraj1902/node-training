@@ -22,7 +22,7 @@ const resetPassword = async (newPassword, userEmail) => {
 const loginUser = async (payload) => {
   const { email, password } = payload;
 
-  console.log(payload);
+
 
   const user = await models.User.findOne({
     where: {
@@ -128,16 +128,6 @@ const resetUserPassword = async (payload, user = {}, params = {}) => {
   let payloadEmail = payload.email || null;
 
   if (userEmail && !payloadEmail) {
-    const userExist = await models.User.findOne({
-      where: { email: userEmail },
-      include: {
-        model: models.Role,
-      },
-    });
-    if (!userExist) {
-      throw new Error("User Not Found");
-    }
-
     return resetPassword(password, userEmail);
   } else if (payloadEmail && userEmail) {
     const userExist = await models.User.findOne({
@@ -146,11 +136,6 @@ const resetUserPassword = async (payload, user = {}, params = {}) => {
         model: models.Role,
       },
     });
-
-    if (!userExist) {
-      throw new Error("User Not Found");
-    }
-
     const roleArray = userExist.Roles.map((Role) => Role.role_code);
     const roleData = await models.Role.findOne({ where: { role_key: "ADM" } });
     const adminRoleCode = roleData.role_code;

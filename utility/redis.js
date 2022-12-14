@@ -12,7 +12,6 @@ const connect = () => {
 
 const get = async (key) => {
     const data = await client.get(key);
-    console.log(data);
     return data;
 };
 

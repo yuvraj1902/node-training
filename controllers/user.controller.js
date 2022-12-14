@@ -4,7 +4,7 @@ const userService = require("../services/user.service");
 const loginUser = async (req, res, next) => {
     try {
         const { body: payload } = req;
-        console.log("controller","dy==67==2384727423464624=53723652345253=34=52=f=jsdggdhvchgcxjasvcgcavhc===");
+       
         const data = await userService.loginUser(payload);
         res.data = data;
         next();
@@ -22,8 +22,6 @@ const refreshToken = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -48,8 +46,6 @@ const logoutUser = async (req, res, next) => {
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }

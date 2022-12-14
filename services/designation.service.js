@@ -19,9 +19,18 @@ const assignDesignation = async (payload) => {
     where: {
       id: userId,
     },
+    include: [
+      {
+        model: models.Role,
+        attributes: ["role_code"],
+      },
+    ],
   });
   if (!user) {
     throw new Error("User Not Found!");
+  }
+  if (user.Roles[0].role_code == 1001) {
+    throw new Error("Access denied!");
   }
 
   const userDesignationMapping = await models.UserDesignationMapping.create({
@@ -33,7 +42,6 @@ const assignDesignation = async (payload) => {
 
 const deactivateDesignation = async (payload) => {
   const { userId, designationCode } = payload;
-  console.log(designationCode);
   const designation = await models.Designation.findOne({
     where: {
       designation_code: designationCode,
@@ -48,11 +56,19 @@ const deactivateDesignation = async (payload) => {
     where: {
       id: userId,
     },
+    include: [
+      {
+        model: models.Role,
+        attributes: ["role_code"],
+      },
+    ],
   });
   if (!user) {
     throw new Error("User Not Found!");
   }
-
+  if (user.Roles[0].role_code == 1001) {
+    throw new Error("Access denied!");
+  }
   const existingDesignation = await models.UserDesignationMapping.findOne({
     where: {
       user_id: userId,
