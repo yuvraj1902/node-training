@@ -40,6 +40,7 @@ const checkRefreshToken = async (req, res, next) => {
     const decoded_jwt = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH);
 
     req.body.userId = decoded_jwt.id;
+    req.refreshToken = refreshToken;
     next();
   } catch (error) {
     return res.status(500).json({ error: error.message });

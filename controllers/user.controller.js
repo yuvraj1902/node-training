@@ -17,14 +17,11 @@ const loginUser = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
     try {
         const { userId: userId } = req.body;
-        const refreshToken = req.headers["authorization"];
-       
+        const refreshToken = req.refreshToken;
         const data = await userService.refreshToken(refreshToken, userId);
         res.data = data;
         next();
     } catch (error) {
-        console.log('-----', error);
-        console.log('getModalFieldData error:', error);
         commonErrorHandler(req, res, error.message, 400, error);
     }
 }
@@ -50,8 +47,6 @@ const logoutUser = async (req, res, next) => {
         next();
     } catch (error) {
         console.log('-----', error);
-        console.log('getModalFieldData error:', error);
-        commonErrorHandler(req, res, error.message, 400, error);
     }
 }
 const resetPassword = async (req, res, next) => {

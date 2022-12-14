@@ -76,7 +76,6 @@ const loginUser = async (payload) => {
   }
 }
 const refreshToken = async (refreshToken, userId) => {
-
   let newAccessToken = jwt.sign({ userId: userId }, process.env.SECRET_KEY_ACCESS, {
     expiresIn: process.env.JWT_ACCESS_EXPIRATION
   });
@@ -187,10 +186,6 @@ const userDetail = async (payload) => {
       }],
       attributes: { exclude: ["password", "created_at", "updated_at", "deleted_at"] }
     });
-
-    if (!userData) {
-      throw new Error("User Not Found");
-    }
     await redisClient.set(keyName, JSON.stringify(userData));
     return userData;
   }

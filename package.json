@@ -8,16 +8,20 @@
     "migrate": "npx sequelize db:migrate",
     "seed": "npx sequelize db:seed:all",
     "undo": "npx sequelize db:migrate:undo:all",
-    "test": "cross-env NODE_ENV=test jest --testTimeout=10000",
+    "test": "cross-env NODE_ENV=test jest --testTimeout=20000",
     "db:migrate:test": "cross-env NODE_ENV=test npx sequelize-cli db:migrate ",
     "db:seed:all": "cross-env NODE_ENV=test npx sequelize-cli db:seed:all",
     "db:undo": "cross-env NODE_ENV=test npx sequelize db:migrate:undo:all"
   },
-  "jest":{
-   "collectCoverage": true,
-   "coverageRepoter": ["lcov"],
-   "coverageDirectory": "./output/code-coverage/"
+
+  "jest": {
+    "collectCoverage": true,
+    "coverageRepoter": [
+      "lcov"
+    ],
+    "coverageDirectory": "./output/code-coverage/"
   },
+  
 
   "repository": {
     "type": "git",
