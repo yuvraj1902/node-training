@@ -100,7 +100,7 @@ const getAllUsers = async (query) => {
 
 
 const logoutUser = async (requestToken) => {
-  await redisClient.del("refresh_token_detail");
+  await redisClient.del(requestToken);
   return;
 }
 
